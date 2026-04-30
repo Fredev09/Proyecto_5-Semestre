@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construgonp's S.A.S</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="./static/estilos.css"/>
+  <link rel="icon" href="../static/imagenes/ICONO.png" type="image/png">
+<link rel="shortcut icon" href="../static/imagenes/ICONO.png">
+  <!-- Leaflet Mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- AOS Animaciones -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+</head>
+<body>
+
+  <header class="header">
+    <nav class="navbar">
+      <div class="logo">
+        <img src="./static/imagenes/LOGO.png" alt="Logo Construgonp's S.A.S">
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
+        <li><a href="#zonas">Zonas</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+        <li><a href="#" class="login-btn">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="inicio" class="hero">
+
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="./static/imagenes/VideitoConstru.mp4" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content" data-aos="fade-up">
+    <h1>Construimos el futuro con calidad y compromiso</h1>
+    <p>Soluciones integrales en ingeniería civil, construcción y desarrollo de proyectos.</p>
+    <a href="#contacto" class="btn-primary">Contáctanos</a>
+  </div>
+
+</section>
+
+  <section id="nosotros" class="section nosotros">
+    <h2 data-aos="fade-up">Sobre Nosotros</h2>
+
+    <div class="cards">
+      <div class="card" data-aos="fade-right">
+        <h3>Misión</h3>
+        <p>
+          Brindar soluciones de construcción e ingeniería civil con altos estándares de calidad,
+          seguridad y responsabilidad, contribuyendo al desarrollo de nuestros clientes y comunidades.
+        </p>
+      </div>
+
+      <div class="card" data-aos="fade-up">
+        <h3>Visión</h3>
+        <p>
+          Ser una empresa reconocida a nivel regional y nacional por la excelencia en proyectos de
+          infraestructura, innovación y compromiso con el desarrollo sostenible.
+        </p>
+      </div>
+
+      <div class="card" data-aos="fade-left">
+        <h3>Valores</h3>
+        <p>
+          Responsabilidad, cumplimiento, honestidad, calidad, innovación y compromiso con cada proyecto.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="servicios" class="section servicios">
+    <h2 data-aos="fade-up">Nuestros Servicios</h2>
+
+    <div class="service-grid">
+      <div class="service" data-aos="zoom-in">
+        <h3>Construcción de Obras</h3>
+        <p>Desarrollo de proyectos residenciales, comerciales e institucionales.</p>
+      </div>
+
+      <div class="service" data-aos="zoom-in">
+        <h3>Diseño Estructural</h3>
+        <p>Planeación y diseño de estructuras seguras y eficientes.</p>
+      </div>
+
+      <div class="service" data-aos="zoom-in">
+        <h3>Interventoría</h3>
+        <p>Supervisión técnica, administrativa y financiera de proyectos.</p>
+      </div>
+
+      <div class="service" data-aos="zoom-in">
+        <h3>Consultoría</h3>
+        <p>Asesoría profesional en procesos de ingeniería civil.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="proyectos" class="section proyectos">
+    <h2 data-aos="fade-up">Proyectos Destacados</h2>
+
+    <div class="project-grid">
+      <div class="project-card" data-aos="fade-up">
+        <img src="./imagenes/proyecto2.png" alt="Proyecto 1">
+        <h3>Proyecto Residencial</h3>
+        <p>Construcción de vivienda urbana con diseño moderno.</p>
+      </div>
+
+      <div class="project-card" data-aos="fade-up">
+        <img src="proyecto2.jpg" alt="Proyecto 2">
+        <h3>Obra Vial</h3>
+        <p>Mejoramiento y adecuación de infraestructura vial.</p>
+      </div>
+
+      <div class="project-card" data-aos="fade-up">
+        <img src="proyecto3.jpg" alt="Proyecto 3">
+        <h3>Edificación Comercial</h3>
+        <p>Construcción y adecuación de espacios comerciales.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="zonas" class="section zonas">
+    <h2 data-aos="fade-up">Zonas donde hemos trabajado</h2>
+    <p data-aos="fade-up">
+      Presencia en diferentes regiones de Colombia mediante proyectos de ingeniería civil.
+    </p>
+
+    <div id="map" data-aos="zoom-in"></div>
+  </section>
+
+  <section id="contacto" class="section contacto">
+    <h2 data-aos="fade-up">Contáctanos</h2>
+
+    <form class="contact-form" data-aos="fade-up">
+      <input type="text" placeholder="Nombre completo" required>
+      <input type="email" placeholder="Correo electrónico" required>
+      <input type="text" placeholder="Teléfono" required>
+      <textarea placeholder="Escribe tu mensaje" required></textarea>
+      <button type="submit">Enviar mensaje</button>
+    </form>
+  </section>
+
+  <footer class="footer">
+    <p>Dirección: Cl 30 35 43 Montería |Córdoba</p>
+    <P>TELEFONO 1: 7919575 </P>
+    <P>TELEFONO 2: 3214816995</P>
+
+    <section class="contact-section text-center">
+
+  <div class="container">
+    <h2>Canales de Comunicación</h2>
+    <p>Contáctanos a través de nuestros canales oficiales</p>
+
+    <div class="social-icons">
+
+      <a href="mailto:contacto@construgonps.com" class="social email">
+        <i class="fas fa-envelope"></i>
+      </a>
+
+      <a href="https://wa.me/573001112233" target="_blank" class="social whatsapp">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+
+    </div>
+
+    <div class="contact-info-footer">
+      <p><strong>Correo:</strong> contacto@construgonps.com</p>
+      <p><strong>WhatsApp:</strong> +57 300 111 2233</p>
+    </div>
+
+  </div>
+
+</section>
+    <P>Correo electronico: construgonps@gmail.com</P>
+    <p>Ingeniería civil | Construcción | Consultoría</p>
+    <p>© 2026 CONSTRUGONP'S S.A.S - Todos los derechos reservados</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="./static/animaciones.js"></script>
+
+</body>
+</html>
