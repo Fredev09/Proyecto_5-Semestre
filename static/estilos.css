@@ -257,6 +257,7 @@ body {
   height: 500px;
   border-radius: 18px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+  background: #f5f5f5;
 }
 
 .contacto {
@@ -392,4 +393,3 @@ body {
   margin: 5px 0;
   color: #ddd;
 }
-

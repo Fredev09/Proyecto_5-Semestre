@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", function () {
 // Animaciones
 AOS.init({
   duration: 1000,
@@ -19,9 +20,76 @@ setInterval(changeSlide, 4500);
 // Mapa de Colombia
 const map = L.map("map").setView([4.5709, -74.2973], 6);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap"
-}).addTo(map);
+L.marker([4.7110, -74.0721])
+  .addTo(map)
+  .bindPopup("Bogotá")
+  .openPopup();
+
+fetch("/static/colombia.geojson")
+  .then(res => res.json())
+  .then(data => {
+    const colombiaLayer = L.geoJSON(data, {
+      style: {
+        color: "#8B0000",      // borde rojo oscuro
+        weight: 2,
+        fillColor: "#C62828",  // rojo principal
+        fillOpacity: 0.6
+      }
+    }).addTo(map);
+
+    map.fitBounds(colombiaLayer.getBounds());
+    })
+    .catch(error => {
+      console.error("Error cargando GeoJSON:", error);
+  });
+
+const colombiaBounds = [
+  [ -4.5, -81.7 ],
+  [ 13.5, -66.8 ]
+];
+
+fetch("/static/colombia.geojson")
+  .then(res => res.json())
+  .then(data => {
+
+    const colombiaLayer = L.geoJSON(data, {
+      style: {
+        color: "#8B0000",
+        weight: 2,
+        fillColor: "#C62828",
+        fillOpacity: 0.6
+      },
+
+      onEachFeature: function (feature, layer) {
+
+        const nombre = feature.properties.NOMBRE_DPT || "Departamento";
+
+        layer.bindPopup(`<strong>${nombre}</strong>`);
+
+        layer.on({
+          mouseover: function () {
+            layer.setStyle({
+              fillColor: "#FF5252",
+              fillOpacity: 0.9
+            });
+          },
+          mouseout: function () {
+            layer.setStyle({
+              fillColor: "#C62828",
+              fillOpacity: 0.6
+            });
+          }
+        });
+
+      }
+
+    }).addTo(map);
+
+    map.fitBounds(colombiaLayer.getBounds());
+
+  });
+
+map.setMaxBounds(colombiaBounds);
 
 // Zonas de ejemplo
 const zonasTrabajo = [
@@ -68,4 +136,5 @@ form.addEventListener("submit", function(e) {
   e.preventDefault();
   alert("Mensaje enviado correctamente. Más adelante se conectará con la base de datos.");
   form.reset();
+});
 });

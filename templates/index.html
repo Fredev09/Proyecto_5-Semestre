@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Construgonp's S.A.S</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./static/estilos.css"/>
-  <link rel="icon" href="../static/imagenes/ICONO.png" type="image/png">
-<link rel="shortcut icon" href="../static/imagenes/ICONO.png">
+  <link rel="shortcut icon" href="../static/imagenes/ICONO.png">
   <!-- Leaflet Mapa -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <!-- AOS Animaciones -->
@@ -18,7 +17,7 @@
   <header class="header">
     <nav class="navbar">
       <div class="logo">
-        <img src="./static/imagenes/LOGO.png" alt="Logo Construgonp's S.A.S">
+        <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}"alt="Logo Construgonp's S.A.S">
       </div>
 
       <ul class="nav-links">
@@ -28,7 +27,7 @@
         <li><a href="#proyectos">Proyectos</a></li>
         <li><a href="#zonas">Zonas</a></li>
         <li><a href="#contacto">Contacto</a></li>
-        <li><a href="#" class="login-btn">Admin</a></li>
+        <li><a href="{{ url_for('login') }}" class="login-btn">Admin</a></li>
       </ul>
     </nav>
   </header>
@@ -36,7 +35,7 @@
   <section id="inicio" class="hero">
 
   <video class="hero-video" autoplay muted loop playsinline>
-    <source src="./static/imagenes/VideitoConstru.mp4" type="video/mp4">
+    <source src="{{ url_for('static', filename='imagenes/VideitoConstru.mp4') }}" type="video/mp4">
     Tu navegador no soporta video HTML5.
   </video>
 
@@ -189,7 +188,7 @@
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="./static/animaciones.js"></script>
+  <script src="{{ url_for('static', filename='animaciones.js') }}"></script>
 
 </body>
 </html>

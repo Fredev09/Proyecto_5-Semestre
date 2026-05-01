@@ -10,11 +10,11 @@ from db_utils_mysql import (
 
 
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta_aqui'
+app.secret_key = 'contraseña01'
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return render_template ('index.html')
 
 # Configuración de MySQL (ajusta según tu XAMPP)
 app.config['MYSQL_HOST'] = 'localhost'
@@ -27,8 +27,6 @@ mysql = MySQL(app)
 # Inicializar tabla si no existe
 with app.app_context():
     init_mysql_db(mysql)
-
-
 
 
 def es_contrasena_segura(password):
@@ -180,7 +178,7 @@ def mostrar_recuperacion():
 def dashboard():
     if 'usuario' not in session:
         return redirect(url_for('login'))
-    return render_template('dasboard.html', usuario=session['usuario'], rol=session.get('rol', 'usuario'))
+    return render_template('dashboard.html', usuario=session['usuario'], rol=session.get('rol', 'usuario'))
 
 
 @app.route('/logout')
