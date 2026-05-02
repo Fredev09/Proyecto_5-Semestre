@@ -159,9 +159,60 @@ body {
 
 .section h2 {
   text-align: center;
-  font-size: 38px;
+  font-size: 40px;
   color: var(--rojo);
-  margin-bottom: 45px;
+  margin-bottom: 30px;
+}
+
+.card h3 {
+  color: var(--rojo);
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+.card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gris-oscuro);
+}
+
+.section {
+  padding: 100px 25px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 👈 4 columnas fijas */
+  gap: 25px;
+}
+
+
+.card {
+  background: var(--blanco);
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.card {
+  background: var(--blanco);
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  transition: 0.3s;
+  text-align: justify;
+}
+
+.card p {
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .cards,
@@ -169,10 +220,6 @@ body {
 .project-grid {
   display: grid;
   gap: 25px;
-}
-
-.cards {
-  grid-template-columns: repeat(3, 1fr);
 }
 
 .card,
@@ -196,6 +243,32 @@ body {
 .project-card h3 {
   color: var(--rojo);
   margin-bottom: 12px;
+}
+
+.project-card p {
+  text-align: justify;
+  line-height: 1.6;
+  font-size: 15px;
+  color: var(--gris-oscuro);
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.project-card p {
+  padding: 0 20px;
+}
+
+.project-card h3 {
+  text-align: center;
+}
+
+.project-card p:first-of-type {
+  text-align: center; /* el subtítulo (ubicación) */
+  font-weight: 500;
 }
 
 .servicios {
@@ -421,6 +494,14 @@ body {
   transform: scale(0.95);
 }
 
+.servicios p {
+  max-width: 750px;
+  margin: 0 auto 45px;
+  text-align: center;   /* 👈 cambia a center si lo prefieres más limpio */
+  line-height: 1.8;
+  font-size: 17px;
+}
+
 @keyframes pulse {
   0% {
     transform: translate(-50%, -50%) scale(0.8);
@@ -432,5 +513,17 @@ body {
   }
   100% {
     opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .cards {
+    grid-template-columns: 1fr;
   }
 }

@@ -24,8 +24,8 @@
         <li><a href="#inicio">Inicio</a></li>
         <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#servicios">Servicios</a></li>
-        <li><a href="#proyectos">Proyectos</a></li>
         <li><a href="#zonas">Zonas</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="{{ url_for('login') }}" class="login-btn">Admin</a></li>
       </ul>
@@ -54,25 +54,30 @@
 
     <div class="cards">
       <div class="card" data-aos="fade-right">
-        <h3>Misión</h3>
+        <h3>Quienes Somos </h3>
         <p>
-          Brindar soluciones de construcción e ingeniería civil con altos estándares de calidad,
-          seguridad y responsabilidad, contribuyendo al desarrollo de nuestros clientes y comunidades.
+          Somos una empresa especializada en el desarrollo de proyectos integrales de construcción, interventoría y consultoría para los sectores público y privado. Nos enfocamos en ofrecer soluciones innovadoras y sostenibles que impulsen el desarrollo y mejoren la calidad de vida, trabajando con altos estándares de calidad, cumplimiento y responsabilidad social.
+        </p>
+      </div>
+
+      <div class="card" data-aos="fade-right">
+        <h3>Que hacemos</h3>
+        <p>
+          Brindamos servicios en áreas como obra civil, eléctrica, ambiental, tecnológica y de salud, garantizando proyectos ejecutados de manera oportuna, con herramientas actualizadas y un alto nivel técnico. Nos comprometemos con la calidad, la seguridad y la satisfacción de nuestros clientes.
         </p>
       </div>
 
       <div class="card" data-aos="fade-up">
-        <h3>Visión</h3>
+        <h3> Nuestra Visión</h3>
         <p>
-          Ser una empresa reconocida a nivel regional y nacional por la excelencia en proyectos de
-          infraestructura, innovación y compromiso con el desarrollo sostenible.
+          Aspiramos a ser una empresa reconocida a nivel nacional e internacional por la calidad, innovación y confiabilidad en nuestros proyectos. Queremos ser aliados estratégicos de nuestros clientes, generando impacto positivo y desarrollo sostenible en cada una de nuestras acciones.
         </p>
       </div>
 
       <div class="card" data-aos="fade-left">
-        <h3>Valores</h3>
+        <h3> Nuestros Valores</h3>
         <p>
-          Responsabilidad, cumplimiento, honestidad, calidad, innovación y compromiso con cada proyecto.
+          Nos guiamos por la mejora continua, el respeto, la responsabilidad, el trabajo en equipo y el espíritu emprendedor. Promovemos relaciones basadas en la confianza, la ética y el compromiso con todos nuestros grupos de interés.
         </p>
       </div>
     </div>
@@ -80,6 +85,9 @@
 
   <section id="servicios" class="section servicios">
     <h2 data-aos="fade-up">Nuestros Servicios</h2>
+    <p data-aos="fade-up">
+      Ofrecemos servicios de excelencia respaldados por talento capacitado, procesos eficientes y un firme compromiso con la seguridad y el medio ambiente. Buscamos posicionarnos como líderes del sector mediante soluciones innovadoras y el cumplimiento riguroso de nuestros proyectos.
+    </p>
 
     <div class="service-grid">
       <div class="service" data-aos="zoom-in">
@@ -104,30 +112,6 @@
     </div>
   </section>
 
-  <section id="proyectos" class="section proyectos">
-    <h2 data-aos="fade-up">Proyectos Destacados</h2>
-
-    <div class="project-grid">
-      <div class="project-card" data-aos="fade-up">
-        <img src="./imagenes/proyecto2.png" alt="Proyecto 1">
-        <h3>Proyecto Residencial</h3>
-        <p>Construcción de vivienda urbana con diseño moderno.</p>
-      </div>
-
-      <div class="project-card" data-aos="fade-up">
-        <img src="proyecto2.jpg" alt="Proyecto 2">
-        <h3>Obra Vial</h3>
-        <p>Mejoramiento y adecuación de infraestructura vial.</p>
-      </div>
-
-      <div class="project-card" data-aos="fade-up">
-        <img src="proyecto3.jpg" alt="Proyecto 3">
-        <h3>Edificación Comercial</h3>
-        <p>Construcción y adecuación de espacios comerciales.</p>
-      </div>
-    </div>
-  </section>
-
   <section id="zonas" class="section zonas">
     <h2 data-aos="fade-up">Zonas donde hemos trabajado</h2>
     <p data-aos="fade-up">
@@ -136,6 +120,36 @@
 
     <div id="map" data-aos="zoom-in"></div>
   </section>
+
+    <section id="proyectos" class="section proyectos">
+  <h2 data-aos="fade-up">Proyectos Destacados</h2>
+
+  <div class="project-grid">
+
+    <div id="montelibano" class="project-card" data-aos="fade-up">
+      <img src="../static/imagenes/Montelibano.jpeg" alt="Proyecto Montelíbano">
+      <h3>Montelíbano</h3>
+      <p>Proyecto en el municipio de Montelíbano, Córdoba.</p>
+      <p>Prestación de servicios profesionales para la supervisión técnica, administrativa y financiera del convenio interadministrativo N° 010 de 2010 que tiene por objeto aunar esfuerzos administrativos, técnicos, administrativos operativos y financieros entre el municipio de Montelíbano y GESEP SCA ESP para restablecer y garantizar la operación, mantenimiento, repotenciación, expansión del servicio de alumbrado público que garantice la sostenibilidad y cobertura en cumplimiento de lo establecido en la ley.
+</p>
+    </div>
+
+    <div id="monitos" class="project-card" data-aos="fade-up">
+      <img src="../static/imagenes/Moñitos.jpeg" alt="Proyecto Moñitos">
+      <h3>Moñitos</h3>
+      <p>Proyecto en el municipio de Moñitos, Córdoba.</p>
+      <p>Interventoría técnica, administrativa y financiera a la construcción de pavimento rígido en  la cra 3 entre la calle 24a y calle 25, cra 3 entre calle 22b y calle 22,  calle 21 entre cra 5 y 6, cra 4 entre calle 27a y 28, municipio de Moñitos. </p>
+    </div>
+
+    <div id="majagual" class="project-card" data-aos="fade-up">
+      <img src="../static/imagenes/Majuagal.jpeg" alt="Proyecto Majagual">
+      <h3>Majagual</h3>
+      <p>Proyecto en el municipio de Majagual, Sucre.</p>
+      <p> Estudio y diseños para la formulación del proyecto de evaluación técnica y financiera a la prestación del servicio de alumbrado público en el municipio de Majagual, Sucre. <P>
+    </div>
+
+  </div>
+</section>
 
   <section id="contacto" class="section contacto">
     <h2 data-aos="fade-up">Contáctanos</h2>
