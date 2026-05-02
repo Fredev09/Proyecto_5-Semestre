@@ -192,7 +192,14 @@
                     <label>Usuario</label>
                     <div class="input-icon">
                         <i class="fa fa-user left-icon"></i>
-                        <input type="text" id="username" name="username" placeholder="Ingresa tu usuario" required>
+                       <input 
+                       type="text" 
+                       id="username" 
+                       name="username" 
+                       placeholder="Ingresa tu usuario" 
+                       value="{% if not limpiar_username %}{{ form.username if form else '' }}{% endif %}"
+                       required
+                       >
                     </div>
                 </div>
 
@@ -200,18 +207,35 @@
                     <label>Correo electrónico</label>
                     <div class="input-icon">
                         <i class="fa fa-envelope left-icon"></i>
-                        <input type="email" id="email" name="email" placeholder="Ingresa tu correo" required>
+                        <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="Ingresa tu correo" 
+                        value="{% if not limpiar_email %}{{ form.email if form else '' }}{% endif %}"
+                        required
+                        >
                     </div>
                 </div>
 
                 <div class="input-group">
                     <label>Contraseña</label>
+                    
                     <div class="input-icon">
                         <i class="fa fa-lock left-icon"></i>
-                        <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
-                        <i class="fa fa-eye toggle-password" onclick="togglePassword()"></i>
-                    </div>
-                </div>
+                        <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Ingresa tu contraseña" 
+                        required
+                        >
+
+        <i class="fa fa-eye toggle-password" onclick="togglePassword()"></i>
+    </div>
+</div>
+
+                
 
                 <div class="input-group">
     <label>Rol</label>
@@ -219,9 +243,9 @@
         <i class="fa fa-user-shield left-icon"></i>
 
         <select id="rol" name="rol">
-            <option value="usuario">Usuario</option>
-            <option value="admin">Administrador</option>
-        </select>
+  <option value="usuario" {% if form and form.rol == 'usuario' %}selected{% endif %}>Usuario</option>
+  <option value="admin" {% if form and form.rol == 'admin' %}selected{% endif %}>Administrador</option>
+</select>
 
         <i class="fa fa-chevron-down select-arrow"></i>
     </div>

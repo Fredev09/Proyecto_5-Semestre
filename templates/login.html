@@ -153,6 +153,24 @@
     border: 1px solid #22c55e;
 }
 
+.back-home {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    background: #891010;
+    padding: 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+.back-home:hover {
+    background: #c11b1b;
+    transform: scale(1.1);
+}
+
 .alert.danger {
     background: #fee2e2;
     color: #991b1b;
@@ -162,6 +180,14 @@
 
 </head>
 <body>
+
+    <!-- BOTÓN VOLVER -->
+    <a href="{{ url_for('index') }}" class="back-home">
+        <i class="fa fa-arrow-left"></i>
+    </a>
+
+    <div class="login-container">
+        <!-- tu contenido actual -->
 
     <div class="login-container">
 
