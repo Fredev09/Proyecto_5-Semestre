@@ -185,4 +185,40 @@ document.addEventListener("DOMContentLoaded", function () {
     form.reset();
   });
 
+  // ======================
+  // CARRUSEL SERVICIOS
+  // ======================
+  const track = document.querySelector(".slider-track");
+  const slides = document.querySelectorAll(".service");
+  const nextBtn = document.querySelector(".next");
+  const prevBtn = document.querySelector(".prev");
+
+  let index = 0;
+
+  function updateSlider() {
+    track.style.transform = `translateX(-${index * 100}%)`;
+  }
+
+  if (track && slides.length > 0 && nextBtn && prevBtn) {
+    nextBtn.addEventListener("click", function () {
+      index++;
+
+      if (index >= slides.length) {
+        index = 0;
+      }
+
+      updateSlider();
+    });
+
+    prevBtn.addEventListener("click", function () {
+      index--;
+
+      if (index < 0) {
+        index = slides.length - 1;
+      }
+
+      updateSlider();
+    });
+  }
+
 });
