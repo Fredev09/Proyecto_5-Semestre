@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111;
+            color: white;
+            padding: 16px 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .admin-logo img {
+            width: 180px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .admin-actions a {
+            text-decoration: none;
+            color: white;
+            background: #981313;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 45px auto;
+            padding: 0 35px;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 22px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #981313;
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #981313, #c11b1b);
+            color: white;
+            border-radius: 22px;
+            padding: 26px;
+            box-shadow: 0 10px 30px rgba(152,19,19,0.25);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-card p {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 26px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .panel h2 {
+            color: #981313;
+            margin-bottom: 20px;
+        }
+
+        @media(max-width: 950px) {
+            .stats-grid,
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
+    </div>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('dashboard') }}"><i class="fa fa-arrow-left"></i> Dashboard</a>
+        <a href="{{ url_for('logout') }}"><i class="fa fa-right-from-bracket"></i> Salir</a>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h1>Reportes Generales</h1>
+        <p>Indicadores financieros, comerciales y administrativos del sistema.</p>
+    </section>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <h3>Ingresos</h3>
+            <p>${{ "{:,.0f}".format(ingresos) }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Egresos</h3>
+            <p>${{ "{:,.0f}".format(egresos) }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Utilidad estimada</h3>
+            <p>${{ "{:,.0f}".format(utilidad) }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Inmuebles disponibles</h3>
+            <p>${{ "{:,.0f}".format(inmuebles_disponibles) }}</p>
+        </div>
+    </section>
+
+    <section class="chart-grid">
+        <div class="panel">
+            <h2>Ingresos vs Egresos</h2>
+            <canvas id="finanzasChart"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2>Estado de inmuebles</h2>
+            <canvas id="inmueblesChart"></canvas>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    const ingresosData = {{ ingresos_grafico | tojson }};
+    const egresosData = {{ egresos_grafico | tojson }};
+    const estados = {{ estado_inmuebles | tojson }};
+
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    const ingresosPorMes = Array(12).fill(0);
+    const egresosPorMes = Array(12).fill(0);
+
+    ingresosData.forEach(item => {
+        ingresosPorMes[item.mes - 1] = item.ingresos;
+    });
+
+    egresosData.forEach(item => {
+        egresosPorMes[item.mes - 1] = item.egresos;
+    });
+
+    new Chart(document.getElementById('finanzasChart'), {
+        type: 'bar',
+        data: {
+            labels: meses,
+            datasets: [
+                {
+                    label: 'Ingresos',
+                    data: ingresosPorMes,
+                    backgroundColor: '#981313',
+                    borderRadius: 8
+                },
+                {
+                    label: 'Egresos',
+                    data: egresosPorMes,
+                    backgroundColor: '#222',
+                    borderRadius: 8
+                }
+            ]
+        }
+    });
+
+    new Chart(document.getElementById('inmueblesChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Disponibles', 'Reservados', 'Vendidos'],
+            datasets: [{
+                data: [
+                    estados.disponibles || 0,
+                    estados.reservados || 0,
+                    estados.vendidos || 0
+                ],
+                backgroundColor: ['#1f9d55', '#c58a00', '#981313']
+            }]
+        }
+    });
+</script>
+
+</body>
+</html>

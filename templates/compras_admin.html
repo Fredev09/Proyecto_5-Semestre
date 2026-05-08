@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Compras - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111;
+            color: white;
+            padding: 16px 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .admin-logo img {
+            width: 180px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .admin-actions a {
+            text-decoration: none;
+            color: white;
+            background: #981313;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 45px auto;
+            padding: 0 35px;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 22px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #981313;
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            color: #222;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border-left: 7px solid #981313;
+        }
+
+        .stat-card h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .stat-card p {
+            font-size: 30px;
+            font-weight: 800;
+            color: #981313;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 26px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .panel h2 {
+            color: #981313;
+            margin-bottom: 20px;
+        }
+
+        .compra-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .compra-item strong {
+            color: #981313;
+        }
+
+        @media(max-width: 950px) {
+            .stats-grid,
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
+    </div>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('dashboard') }}"><i class="fa fa-arrow-left"></i> Dashboard</a>
+        <a href="{{ url_for('logout') }}"><i class="fa fa-right-from-bracket"></i> Salir</a>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h1>Gestión de Compras</h1>
+        <p>Control de compras, proveedores, costos operativos y recursos del negocio.</p>
+    </section>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <h3>Total compras</h3>
+            <p>${{ "{:,.0f}".format(total_compras) }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Proveedores</h3>
+            <p>{{ total_proveedores }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Compras del mes</h3>
+            <p>{{ compras_mes }}</p>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="panel">
+            <h2>Distribución de compras</h2>
+            <canvas id="comprasChart"></canvas>
+        </div>
+
+        <div class="panel">
+           {% for compra in ultimas_compras %}
+<div class="compra-item">
+    <strong>{{ compra.concepto }}</strong>
+    <p>Proveedor: {{ compra.proveedor }} · Valor: ${{ "{:,.0f}".format(compra.valor) }} · Fecha: {{ compra.fecha }}</p>
+</div>
+{% else %}
+<div class="compra-item">
+    <strong>No hay compras registradas</strong>
+    <p>Cuando registres una compra, aparecerá aquí.</p>
+</div>
+{% endfor %}
+        </div>
+    </section>
+
+</main>
+
+<script>
+    const comprasData = {{ compras_grafico | tojson }};
+
+    new Chart(document.getElementById('comprasChart'), {
+        type: 'doughnut',
+        data: {
+            labels: comprasData.map(item => item.concepto),
+            datasets: [{
+                data: comprasData.map(item => item.total),
+                backgroundColor: ['#981313', '#c11b1b', '#222', '#777', '#b85c5c']
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+
+</body>
+</html>

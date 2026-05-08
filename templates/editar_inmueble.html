@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Inmueble - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #981313);
+            min-height: 100vh;
+            padding: 45px;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            border-radius: 26px;
+            overflow: hidden;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+        }
+
+        .form-header {
+            background: #111;
+            color: white;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: #ddd;
+        }
+
+        form {
+            padding: 35px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        input, select, textarea {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #981313;
+            box-shadow: 0 0 0 3px rgba(152,19,19,0.12);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .buttons {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        button, .btn-back {
+            border: none;
+            padding: 14px 24px;
+            border-radius: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        button {
+            background: #981313;
+            color: white;
+        }
+
+        button:hover {
+            background: #c11b1b;
+        }
+
+        .btn-back {
+            background: #eee;
+            color: #222;
+        }
+
+        .btn-back:hover {
+            background: #ddd;
+        }
+
+        .preview {
+            grid-column: span 2;
+            background: #f7f7f7;
+            border-radius: 18px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .preview img {
+            width: 130px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 14px;
+            background: #ddd;
+        }
+
+        .preview-info h3 {
+            color: #981313;
+            margin-bottom: 5px;
+        }
+
+        .preview-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media(max-width: 800px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group.full,
+            .buttons,
+            .preview {
+                grid-column: span 1;
+            }
+
+            .preview {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-container">
+    <div class="form-header">
+        <h1>Editar Inmueble</h1>
+        <p>Actualiza la información del inmueble seleccionado.</p>
+    </div>
+
+    <form method="POST">
+
+        <div class="preview">
+            {% if inmueble.imagen %}
+                <img src="{{ url_for('static', filename='imagenes/' ~ inmueble.imagen) }}" alt="{{ inmueble.titulo }}">
+            {% else %}
+                <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Sin imagen">
+            {% endif %}
+
+            <div class="preview-info">
+                <h3>{{ inmueble.titulo }}</h3>
+                <p>{{ inmueble.tipo }} · {{ inmueble.ubicacion }}</p>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Título</label>
+            <input type="text" name="titulo" value="{{ inmueble.titulo }}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Tipo</label>
+            <select name="tipo" required>
+                <option value="Casa" {% if inmueble.tipo == 'Casa' %}selected{% endif %}>Casa</option>
+                <option value="Apartamento" {% if inmueble.tipo == 'Apartamento' %}selected{% endif %}>Apartamento</option>
+                <option value="Lote" {% if inmueble.tipo == 'Lote' %}selected{% endif %}>Lote</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Ubicación</label>
+            <input type="text" name="ubicacion" value="{{ inmueble.ubicacion }}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Precio</label>
+            <input type="number" name="precio" value="{{ inmueble.precio }}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Estado</label>
+            <select name="estado">
+                <option value="Disponible" {% if inmueble.estado == 'Disponible' %}selected{% endif %}>Disponible</option>
+                <option value="Reservado" {% if inmueble.estado == 'Reservado' %}selected{% endif %}>Reservado</option>
+                <option value="Vendido" {% if inmueble.estado == 'Vendido' %}selected{% endif %}>Vendido</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Imagen</label>
+            <input type="text" name="imagen" value="{{ inmueble.imagen }}" placeholder="Ej: casa1.jpg">
+        </div>
+
+        <div class="input-group full">
+            <label>Descripción</label>
+            <textarea name="descripcion">{{ inmueble.descripcion }}</textarea>
+        </div>
+
+        <div class="buttons">
+            <a href="{{ url_for('inmuebles') }}" class="btn-back">
+                <i class="fa fa-arrow-left"></i> Volver
+            </a>
+
+            <button type="submit">
+                <i class="fa fa-save"></i> Guardar cambios
+            </button>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

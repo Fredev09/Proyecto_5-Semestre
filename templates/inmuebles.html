@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inmuebles - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111;
+            color: white;
+            padding: 16px 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .admin-logo img {
+            width: 180px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .admin-actions a {
+            text-decoration: none;
+            color: white;
+            background: #981313;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 45px auto;
+            padding: 0 35px;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #981313;
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+        }
+
+        .inmuebles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 26px;
+        }
+
+        .inmueble-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+
+        .inmueble-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(152,19,19,0.18);
+        }
+
+        .inmueble-card img {
+            width: 100%;
+            height: 230px;
+            object-fit: cover;
+            background: #ddd;
+        }
+
+        .inmueble-info {
+            padding: 24px;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 14px;
+        }
+
+        .Disponible { background: #1f9d55; }
+        .Reservado { background: #c58a00; }
+        .Vendido { background: #981313; }
+
+        .inmueble-info h3 {
+            color: #981313;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .inmueble-info p {
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .precio {
+            font-size: 24px;
+            color: #111;
+            font-weight: 800;
+            margin: 16px 0;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .acciones a {
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 22px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .edit {
+            background: #981313;
+            color: white;
+        }
+
+        .delete {
+            background: #222;
+            color: white;
+        }
+
+        @media(max-width: 1000px) {
+            .inmuebles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
+    </div>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('dashboard') }}"><i class="fa fa-arrow-left"></i> Dashboard</a>
+        <a href="{{ url_for('registrar_inmueble') }}"><i class="fa fa-plus"></i> Registrar inmueble</a>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h1>Gestión Inmobiliaria</h1>
+        <p>Administra casas, apartamentos, lotes, disponibilidad y precios.</p>
+    </section>
+
+    <section class="inmuebles-grid">
+        {% for i in inmuebles %}
+        <div class="inmueble-card">
+            {% if i.imagen %}
+                <img src="{{ url_for('static', filename='imagenes/' ~ i.imagen) }}" alt="{{ i.titulo }}">
+            {% else %}
+                <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="Sin imagen">
+            {% endif %}
+
+            <div class="inmueble-info">
+                <span class="estado {{ i.estado }}">{{ i.estado }}</span>
+
+                <h3>{{ i.titulo }}</h3>
+
+                <p><i class="fa fa-house"></i> {{ i.tipo }}</p>
+                <p><i class="fa fa-location-dot"></i> {{ i.ubicacion }}</p>
+
+                <div class="precio">${{ i.precio }}</div>
+
+                <p>{{ i.descripcion }}</p>
+
+                <div class="acciones">
+                    <a class="edit" href="{{ url_for('editar_inmueble', id=i.id) }}">
+                        <i class="fa fa-pen"></i> Editar
+                    </a>
+
+                    <a class="delete"
+                       href="{{ url_for('eliminar_inmueble', id=i.id) }}"
+                       onclick="return confirm('¿Eliminar este inmueble?')">
+                       <i class="fa fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+</main>
+
+</body>
+</html>

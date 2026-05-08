@@ -114,11 +114,20 @@ def login():
 # REGISTRO
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('rol') != 'admin':
+        flash('No tienes permisos para crear usuarios.', 'danger')
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
         rol = request.form['rol']
+
         if not es_contrasena_segura(password):
             flash('La contraseña no es segura. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.', 'danger')
             return render_template('register.html', form=request.form, 
@@ -222,7 +231,6 @@ def reset_password(token):
         return redirect(url_for('login'))
     return render_template('reset_password.html')
 
-# MODIFICAR CORREO (solo admin o el propio usuario)
 @app.route('/modificar_correo', methods=['GET', 'POST'])
 def modificar_correo():
     if 'usuario' not in session:
@@ -257,14 +265,324 @@ def mostrar_recuperacion():
 def dashboard():
     if 'usuario' not in session:
         return redirect(url_for('login'))
-    return render_template('dashboard.html', usuario=session['usuario'], rol=session.get('rol', 'usuario'))
 
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE estado = 'Activo'")
+    proyectos_activos = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
+    inmuebles_disponibles = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM ventas")
+    ventas_registradas = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM usuarios")
+    usuarios_sistema = cur.fetchone()['total']
+
+    cur.close()
+
+    return render_template(
+        'dashboard.html',
+        usuario=session['usuario'],
+        rol=session.get('rol', 'usuario'),
+        proyectos_activos=proyectos_activos,
+        inmuebles_disponibles=inmuebles_disponibles,
+        ventas_registradas=ventas_registradas,
+        usuarios_sistema=usuarios_sistema
+    )
 
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Sesion cerrada correctamente.', 'success')
     return redirect(url_for('login'))
+
+@app.route('/usuarios')
+def usuarios():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('rol') != 'admin':
+        flash('No tienes permisos para ver usuarios.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT id, username, email, rol, email_confirmado FROM usuarios")
+    usuarios = cur.fetchall()
+    cur.close()
+
+    return render_template('usuarios.html', usuarios=usuarios)
+
+
+@app.route('/eliminar_usuario/<int:id>')
+def eliminar_usuario(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('rol') != 'admin':
+        flash('No tienes permisos para eliminar usuarios.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM usuarios WHERE id = %s", (id,))
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Usuario eliminado correctamente.', 'success')
+    return redirect(url_for('usuarios'))
+
+
+@app.route('/inmuebles')
+def inmuebles():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM inmuebles ORDER BY id DESC")
+    inmuebles = cur.fetchall()
+    cur.close()
+
+    return render_template('inmuebles.html', inmuebles=inmuebles)
+
+
+@app.route('/registrar_inmueble', methods=['GET', 'POST'])
+def registrar_inmueble():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        tipo = request.form['tipo']
+        ubicacion = request.form['ubicacion']
+        precio = request.form['precio']
+        estado = request.form['estado']
+        descripcion = request.form['descripcion']
+        imagen = request.form['imagen']
+
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            INSERT INTO inmuebles (titulo, tipo, ubicacion, precio, estado, descripcion, imagen)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (titulo, tipo, ubicacion, precio, estado, descripcion, imagen))
+        mysql.connection.commit()
+        cur.close()
+
+        flash('Inmueble registrado correctamente.', 'success')
+        return redirect(url_for('inmuebles'))
+
+    return render_template('registrar_inmueble.html')
+
+
+@app.route('/editar_inmueble/<int:id>', methods=['GET', 'POST'])
+def editar_inmueble(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        tipo = request.form['tipo']
+        ubicacion = request.form['ubicacion']
+        precio = request.form['precio']
+        estado = request.form['estado']
+        descripcion = request.form['descripcion']
+        imagen = request.form['imagen']
+
+        cur.execute("""
+            UPDATE inmuebles
+            SET titulo=%s, tipo=%s, ubicacion=%s, precio=%s, estado=%s, descripcion=%s, imagen=%s
+            WHERE id=%s
+        """, (titulo, tipo, ubicacion, precio, estado, descripcion, imagen, id))
+        mysql.connection.commit()
+        cur.close()
+
+        flash('Inmueble actualizado correctamente.', 'success')
+        return redirect(url_for('inmuebles'))
+
+    cur.execute("SELECT * FROM inmuebles WHERE id = %s", (id,))
+    inmueble = cur.fetchone()
+    cur.close()
+
+    return render_template('editar_inmueble.html', inmueble=inmueble)
+
+
+
+@app.route('/eliminar_inmueble/<int:id>')
+def eliminar_inmueble(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM inmuebles WHERE id = %s", (id,))
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Inmueble eliminado correctamente.', 'success')
+    return redirect(url_for('inmuebles'))
+
+@app.route('/constructora')
+def constructora_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return render_template('constructora_admin.html')
+
+
+@app.route('/inmobiliaria_admin')
+def inmobiliaria_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('inmuebles'))
+
+
+@app.route('/ventas_admin')
+def ventas_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
+    total_vendido = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM ventas WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")
+    ventas_mes = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM ventas")
+    inmuebles_vendidos = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT v.id, v.cliente, v.valor_venta, v.fecha, i.titulo
+        FROM ventas v
+        INNER JOIN inmuebles i ON v.inmueble_id = i.id
+        ORDER BY v.fecha DESC
+        LIMIT 5
+    """)
+    ultimas_ventas = cur.fetchall()
+
+    cur.execute("""
+        SELECT MONTH(fecha) AS mes, COUNT(*) AS total
+        FROM ventas
+        WHERE YEAR(fecha) = YEAR(CURDATE())
+        GROUP BY MONTH(fecha)
+        ORDER BY MONTH(fecha)
+    """)
+    ventas_grafico = cur.fetchall()
+
+    cur.close()
+
+    return render_template(
+        'ventas_admin.html',
+        total_vendido=total_vendido,
+        ventas_mes=ventas_mes,
+        inmuebles_vendidos=inmuebles_vendidos,
+        ultimas_ventas=ultimas_ventas,
+        ventas_grafico=ventas_grafico
+    )
+
+@app.route('/compras_admin')
+def compras_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT COALESCE(SUM(valor), 0) AS total FROM compras")
+    total_compras = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(DISTINCT proveedor) AS total FROM compras")
+    total_proveedores = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM compras WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")
+    compras_mes = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT concepto, proveedor, valor, fecha
+        FROM compras
+        ORDER BY fecha DESC
+        LIMIT 5
+    """)
+    ultimas_compras = cur.fetchall()
+
+    cur.execute("""
+        SELECT concepto, SUM(valor) AS total
+        FROM compras
+        GROUP BY concepto
+        ORDER BY total DESC
+        LIMIT 5
+    """)
+    compras_grafico = cur.fetchall()
+
+    cur.close()
+
+    return render_template(
+        'compras_admin.html',
+        total_compras=total_compras,
+        total_proveedores=total_proveedores,
+        compras_mes=compras_mes,
+        ultimas_compras=ultimas_compras,
+        compras_grafico=compras_grafico
+    )
+
+@app.route('/reportes_admin')
+def reportes_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
+    ingresos = cur.fetchone()['total']
+
+    cur.execute("SELECT COALESCE(SUM(valor), 0) AS total FROM compras")
+    egresos = cur.fetchone()['total']
+
+    utilidad = ingresos - egresos
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
+    inmuebles_disponibles = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT 
+            SUM(CASE WHEN estado = 'Disponible' THEN 1 ELSE 0 END) AS disponibles,
+            SUM(CASE WHEN estado = 'Reservado' THEN 1 ELSE 0 END) AS reservados,
+            SUM(CASE WHEN estado = 'Vendido' THEN 1 ELSE 0 END) AS vendidos
+        FROM inmuebles
+    """)
+    estado_inmuebles = cur.fetchone()
+
+    cur.execute("""
+        SELECT MONTH(fecha) AS mes, COALESCE(SUM(valor_venta), 0) AS ingresos
+        FROM ventas
+        WHERE YEAR(fecha) = YEAR(CURDATE())
+        GROUP BY MONTH(fecha)
+        ORDER BY MONTH(fecha)
+    """)
+    ingresos_grafico = cur.fetchall()
+
+    cur.execute("""
+        SELECT MONTH(fecha) AS mes, COALESCE(SUM(valor), 0) AS egresos
+        FROM compras
+        WHERE YEAR(fecha) = YEAR(CURDATE())
+        GROUP BY MONTH(fecha)
+        ORDER BY MONTH(fecha)
+    """)
+    egresos_grafico = cur.fetchall()
+
+    cur.close()
+
+    return render_template(
+        'reportes_admin.html',
+        ingresos=ingresos,
+        egresos=egresos,
+        utilidad=utilidad,
+        inmuebles_disponibles=inmuebles_disponibles,
+        estado_inmuebles=estado_inmuebles,
+        ingresos_grafico=ingresos_grafico,
+        egresos_grafico=egresos_grafico
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True)
