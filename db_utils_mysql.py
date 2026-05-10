@@ -49,3 +49,21 @@ def get_usuario_by_email_mysql(mysql, email):
     user = cur.fetchone()
     cur.close()
     return user
+
+def add_proyecto_mysql(mysql, nombre, descripcion, estado):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        '''INSERT INTO proyectos_constructora 
+        (nombre, descripcion, estado) 
+        VALUES (%s, %s, %s)''',
+        (nombre, descripcion, estado)
+    )
+    mysql.connection.commit()
+    cur.close()
+
+def get_proyectos_mysql(mysql):
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT id, nombre, descripcion, estado FROM proyectos_constructora')
+    proyectos = cur.fetchall()
+    cur.close()
+    return proyectos

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Proyectos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #981313;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #981313;
+            margin-bottom: 15px;
+        }
+
+        form {
+            display: grid;
+            gap: 15px;
+        }
+
+        input, textarea, select {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            background: #981313;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #c11b1b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            background: #981313;
+            color: white;
+        }
+
+        .estado {
+            padding: 6px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .activo { background: green; }
+        .proceso { background: orange; }
+        .finalizado { background: gray; }
+
+        .btn-edit {
+            background: #333;
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-edit:hover {
+            background: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Gestión de Proyectos</h1>
+
+    <!-- 🔹 REGISTRAR PROYECTO -->
+    <div class="card">
+        <h2><i class="fa fa-plus"></i> Registrar nuevo proyecto</h2>
+
+        <form action="{{ url_for('crear_proyecto') }}" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre del proyecto" required>
+
+            <textarea name="descripcion" placeholder="Descripción del proyecto" required></textarea>
+
+            <select name="estado" required>
+                <option value="">Seleccione estado</option>
+                <option value="activo">Activo</option>
+                <option value="en proceso">En proceso</option>
+                <option value="finalizado">Finalizado</option>
+            </select>
+
+            <button type="submit">
+                <i class="fa fa-save"></i> Crear proyecto
+            </button>
+        </form>
+    </div>
+
+    <!-- 🔹 LISTAR PROYECTOS -->
+    <div class="card">
+        <h2><i class="fa fa-list"></i> Lista de proyectos</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for proyecto in proyectos %}
+                <tr>
+                    <td>{{ proyecto.id }}</td>
+                    <td>{{ proyecto.nombre }}</td>
+                    <td>{{ proyecto.descripcion }}</td>
+                    <td>
+                        <span class="estado 
+                            {% if proyecto.estado == 'activo' %}activo{% endif %}
+                            {% if proyecto.estado == 'en proceso' %}proceso{% endif %}
+                            {% if proyecto.estado == 'finalizado' %}finalizado{% endif %}
+                        ">
+                            {{ proyecto.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('editar_proyecto', id=proyecto.id) }}" class="btn-edit">
+                            <i class="fa fa-pen"></i> Editar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

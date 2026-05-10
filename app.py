@@ -1,5 +1,4 @@
 import email
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash, current_app
 from flask_mysqldb import MySQL
 import random
@@ -9,7 +8,7 @@ import re
 import uuid
 from db_utils_mysql import (
     add_usuario_mysql, update_email_mysql, set_email_confirmado_mysql,
-    get_usuario_by_username_mysql, get_usuario_by_email_mysql, init_mysql_db
+    get_usuario_by_username_mysql, get_usuario_by_email_mysql, init_mysql_db ,add_proyecto_mysql, get_proyectos_mysql
 )
 
 
@@ -583,6 +582,26 @@ def reportes_admin():
         egresos_grafico=egresos_grafico
     )
 
+@app.route('/proyectos')
+def proyectos_admin():
+    proyectos = get_proyectos_mysql(mysql)
+    return render_template('Proyectos_confi.html', proyectos=proyectos)
+
+
+@app.route('/crear_proyecto', methods=['POST'])
+def crear_proyecto():
+    nombre = request.form['nombre']
+    descripcion = request.form['descripcion']
+    estado = request.form['estado']
+
+    add_proyecto_mysql(mysql, nombre, descripcion, estado)
+
+    return redirect('/proyectos')
+
+
+@app.route('/editar_proyecto/<int:id>')
+def editar_proyecto(id):
+    return f"Editando proyecto {id}"
 
 if __name__ == '__main__':
     app.run(debug=True)
