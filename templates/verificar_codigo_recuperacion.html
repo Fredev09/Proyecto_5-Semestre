@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Verificar código - Constructora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #891010);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reset-container {
+            display: flex;
+            width: 800px;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .left-side {
+            width: 40%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-side img {
+            width: 150px;
+        }
+
+        .right-side {
+            width: 60%;
+            padding: 45px 50px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1a1a1a;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: #222;
+        }
+
+        .input-icon {
+            position: relative;
+            margin-top: 6px;
+        }
+
+        .input-icon i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            left: 12px;
+        }
+
+        .input-icon input {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            display: block;
+            padding: 12px 40px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 4px;
+            font-weight: bold;
+        }
+
+        .input-icon input:focus {
+            border-color: #891010;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            max-width: 320px;
+            margin: 15px auto 0;
+            display: block;
+            padding: 13px;
+            background: #891010;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #6f0c0c;
+        }
+
+        .alert {
+            margin-bottom: 15px;
+            background: #891010;
+            color: white;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .links a {
+            color: #b91c1c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="reset-container">
+
+    <div class="left-side">
+        <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO">
+    </div>
+
+    <div class="right-side">
+
+        <h2><i class="fa fa-shield-halved"></i> Verificar código</h2>
+        <p class="subtitle">Ingresa el código enviado a tu correo</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <div class="input-group">
+                <label>Código de recuperación</label>
+                <div class="input-icon">
+                    <i class="fa fa-key"></i>
+                    <input type="text" name="codigo" maxlength="6" placeholder="000000" required>
+                </div>
+            </div>
+
+            <button type="submit">
+                <i class="fa fa-check"></i> Verificar código
+            </button>
+
+        </form>
+
+        <div class="links">
+            <a href="{{ url_for('recover') }}">
+                <i class="fa fa-arrow-left"></i> Enviar otro código
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

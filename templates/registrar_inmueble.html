@@ -129,7 +129,7 @@
         <p>Agrega casas, apartamentos o lotes al módulo inmobiliario.</p>
     </div>
 
-    <form method="POST">
+    <form action="/guardar_inmueble" method="POST" enctype="multipart/form-data">
         <div class="input-group">
             <label>Título</label>
             <input type="text" name="titulo" placeholder="Ej: Apartamento moderno" required>
@@ -165,7 +165,7 @@
 
         <div class="input-group">
             <label>Imagen</label>
-            <input type="text" name="imagen" placeholder="Ej: casa1.jpg">
+           <input type="file" name="imagen" accept="image/*" required>
         </div>
 
         <div class="input-group full">

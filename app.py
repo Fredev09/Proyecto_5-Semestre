@@ -4,11 +4,19 @@ from flask_mysqldb import MySQL
 import random
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+from werkzeug.utils import secure_filename
 import re
 import uuid
 from db_utils_mysql import (
-    add_usuario_mysql, update_email_mysql, set_email_confirmado_mysql,
-    get_usuario_by_username_mysql, get_usuario_by_email_mysql, init_mysql_db ,add_proyecto_mysql, get_proyectos_mysql
+    add_usuario_mysql,
+    update_email_mysql,
+    set_email_confirmado_mysql,
+    get_usuario_by_username_mysql,
+    get_usuario_by_email_mysql,
+    init_mysql_db,
+    get_proyectos_mysql,
+    add_proyecto_mysql
 )
 
 
@@ -88,6 +96,37 @@ Equipo Constructora CiviWeb Manager
 """
 
     mail.send(msg)
+
+
+def enviar_codigo_recuperacion(destinatario, codigo):
+    msg = Message(
+        subject='Recuperación de contraseña - CiviWeb Manager',
+        recipients=[destinatario]
+    )
+
+    msg.body = f"""
+    Hola,
+    
+    Recibimos una solicitud para restablecer tu contraseña en CiviWeb Manager.
+    
+    Tu código de recuperación es:
+    ------------------------------
+    
+    {codigo}
+    ------------------------------
+    Ingresa este código en la plataforma para crear una nueva contraseña.
+    
+    Si no solicitaste este cambio, ignora este correo.
+    
+    Atentamente,
+    
+    Equipo CiviWeb Manager
+    
+    """
+
+    mail.send(msg)
+
+    
 
 # LOGIN
 @app.route('/login', methods=['GET', 'POST'])
@@ -187,27 +226,43 @@ def recover():
     if request.method == 'POST':
         email = request.form['email']
         user = get_usuario_by_email_mysql(mysql, email)
-        if user:
-            token = str(uuid.uuid4())
-            session['recover_token'] = token
-            session['recover_user'] = user['username']
-            enlace = url_for('reset_password', token=token, _external=True)
-           
 
-            flash('Se ha enviado un enlace de recuperación. Haz clic en el siguiente enlace para restablecer tu contraseña:', 'success')
-            flash(enlace, 'info')
-            return redirect(url_for('mostrar_recuperacion'))
+        if user:
+            codigo = str(random.randint(100000, 999999))
+
+            session['codigo_recuperacion'] = codigo
+            session['correo_recuperacion'] = email
+            session['usuario_recuperacion'] = user['username']
+
+            enviar_codigo_recuperacion(email, codigo)
+
+            flash('Hemos enviado un código de recuperación a tu correo.', 'success')
+            return redirect(url_for('verificar_codigo_recuperacion'))
         else:
             flash('Correo no encontrado.', 'danger')
+
     return render_template('recover.html')
 
-# RESTABLECER CONTRASEÑA
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if 'recover_token' not in session or session['recover_token'] != token:
-        flash('Enlace inválido o expirado.', 'danger')
-        return redirect(url_for('login'))
-    
+@app.route('/verificar_codigo_recuperacion', methods=['GET', 'POST'])
+def verificar_codigo_recuperacion():
+    if request.method == 'POST':
+        codigo_ingresado = request.form['codigo']
+
+        if codigo_ingresado == session.get('codigo_recuperacion'):
+            flash('Código verificado correctamente. Ahora puedes cambiar tu contraseña.', 'success')
+            return redirect(url_for('reset_password_codigo'))
+        else:
+            flash('Código incorrecto.', 'danger')
+
+    return render_template('verificar_codigo_recuperacion.html')
+
+# RESTABLECER CONTRASEÑA NO ES SIMULADO
+@app.route('/reset_password_codigo', methods=['GET', 'POST'])
+def reset_password_codigo():
+    if 'usuario_recuperacion' not in session:
+        flash('Primero debes verificar tu correo.', 'danger')
+        return redirect(url_for('recover'))
+
     if request.method == 'POST':
         password = request.form['password']
         confirm_password = request.form['confirm_password']
@@ -217,17 +272,26 @@ def reset_password(token):
             return render_template('reset_password.html')
 
         if not es_contrasena_segura(password):
-            flash('La contraseña no es segura.', 'danger')
+            flash('La contraseña no es segura. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.', 'danger')
             return render_template('reset_password.html')
+
         password_hash = generate_password_hash(password)
+
         cur = mysql.connection.cursor()
-        cur.execute('UPDATE usuarios SET password_hash = %s WHERE username = %s', (password_hash, session['recover_user']))
+        cur.execute(
+            'UPDATE usuarios SET password_hash = %s WHERE username = %s',
+            (password_hash, session['usuario_recuperacion'])
+        )
         mysql.connection.commit()
         cur.close()
-        session.pop('recover_token', None)
-        session.pop('recover_user', None)
-        flash('Contraseña restablecida correctamente.', 'success')
+
+        session.pop('codigo_recuperacion', None)
+        session.pop('correo_recuperacion', None)
+        session.pop('usuario_recuperacion', None)
+
+        flash('Contraseña restablecida correctamente. Ya puedes iniciar sesión.', 'success')
         return redirect(url_for('login'))
+
     return render_template('reset_password.html')
 
 @app.route('/modificar_correo', methods=['GET', 'POST'])
@@ -344,7 +408,6 @@ def inmuebles():
 
     return render_template('inmuebles.html', inmuebles=inmuebles)
 
-
 @app.route('/registrar_inmueble', methods=['GET', 'POST'])
 def registrar_inmueble():
     if 'usuario' not in session:
@@ -357,13 +420,21 @@ def registrar_inmueble():
         precio = request.form['precio']
         estado = request.form['estado']
         descripcion = request.form['descripcion']
-        imagen = request.form['imagen']
+
+        archivo_imagen = request.files.get('imagen')
+
+        nombre_imagen = ''
+
+        if archivo_imagen and archivo_imagen.filename != '':
+            nombre_imagen = secure_filename(archivo_imagen.filename)
+            ruta_imagen = os.path.join('static', 'imagenes', nombre_imagen)
+            archivo_imagen.save(ruta_imagen)
 
         cur = mysql.connection.cursor()
         cur.execute("""
             INSERT INTO inmuebles (titulo, tipo, ubicacion, precio, estado, descripcion, imagen)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (titulo, tipo, ubicacion, precio, estado, descripcion, imagen))
+        """, (titulo, tipo, ubicacion, precio, estado, descripcion, nombre_imagen))
         mysql.connection.commit()
         cur.close()
 
@@ -371,7 +442,6 @@ def registrar_inmueble():
         return redirect(url_for('inmuebles'))
 
     return render_template('registrar_inmueble.html')
-
 
 @app.route('/editar_inmueble/<int:id>', methods=['GET', 'POST'])
 def editar_inmueble(id):
@@ -602,6 +672,31 @@ def crear_proyecto():
 @app.route('/editar_proyecto/<int:id>')
 def editar_proyecto(id):
     return f"Editando proyecto {id}"
+
+@app.route('/inmobiliaria')
+def inmobiliaria_publica():
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT * FROM inmuebles
+        WHERE estado IN ('Disponible', 'Reservado')
+        ORDER BY id DESC
+    """)
+
+    inmuebles_publicos = cur.fetchall()
+    cur.close()
+
+    return render_template(
+        'inmobiliaria_publica.html',
+        inmuebles_publicos=inmuebles_publicos
+    )
+
+@app.route('/reservas_admin')
+def reservas_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    return render_template('reservas_admin.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

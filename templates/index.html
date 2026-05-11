@@ -23,10 +23,8 @@
       <ul class="nav-links">
         <li><a href="#inicio">Inicio</a></li>
         <li><a href="#nosotros">Nosotros</a></li>
-        <li><a href="#servicios">Servicios</a></li>
-        <li><a href="#inmobiliaria">Inmobiliaria</a></li>
+        <li><a href="{{ url_for('inmobiliaria_publica') }}">Inmobiliaria</a></li>
         <li><a href="#zonas">Zonas</a></li>
-        <li><a href="#proyectos">Proyectos</a></li>
         <li><a href="#contacto">Contacto</a></li>
         <li><a href="{{ url_for('login') }}" class="login-btn">Admin</a></li>
       </ul>
@@ -45,7 +43,8 @@
   <div class="hero-content" data-aos="fade-up">
     <h1>Construimos el futuro con calidad y compromiso</h1>
     <p>Soluciones integrales en ingeniería civil, construcción y desarrollo de proyectos.</p>
-    <a href="#contacto" class="btn-primary">Contáctanos</a>
+    <a href="#servicios" class="btn-primary">Servicios</a>
+    <a href="{{ url_for('inmobiliaria_publica') }}" class="btn-primary">Inmobiliaria</a>
   </div>
 
 </section>
