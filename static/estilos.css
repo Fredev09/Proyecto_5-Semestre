@@ -87,8 +87,11 @@ body {
 
 .hero {
   position: relative;
-  height: 100vh;
-  overflow: hidden;
+    min-height: 100vh;
+    overflow: hidden;
+    padding-top: 120px;
+    display: flex;
+    align-items: center;
 }
 
 .carousel,
@@ -117,25 +120,35 @@ body {
 }
 
 .hero-content {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: 10%;
-  transform: translateY(-50%);
-  max-width: 650px;
-  color: var(--blanco);
+    position: relative;
+    z-index: 2;
+    margin-left: 9%;
+    margin-top: 20px;
+    max-width: 620px;
+    color: white;
 }
 
 .hero-content h1 {
-  font-size: 52px;
-  margin-bottom: 20px;
+   font-size: 50px;
+    line-height: 1.08;
+    font-weight: 900;
+    margin-bottom: 22px;
+    letter-spacing: -1px;
+    max-width: 620px;
+}
+
+.hero-content h1 span {
+     color: #c11212;
+    display: block;
 }
 
 .hero-content p {
-  font-size: 20px;
-  margin-bottom: 30px;
+     font-size: 20px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.92);
+    max-width: 560px;
+    margin-bottom: 30px;
 }
-
 .btn-primary {
   text-decoration: none;
   background: var(--rojo);
@@ -279,14 +292,12 @@ body {
   overflow: hidden;
 }
 
-/* Imagen */
 .service img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Capa oscura + texto */
 .overlay {
   position: absolute;
   inset: 0;
@@ -302,7 +313,6 @@ body {
   color: white;
 }
 
-/* Texto */
 .overlay h3 {
   color: var(--dorado);
   margin-bottom: 10px;
@@ -1061,6 +1071,7 @@ body {
     margin-bottom: 15px;
     color: #666;
 }
+
 
 .inmueble-info h4 {
     color: #981313;

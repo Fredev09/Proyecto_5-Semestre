@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Registrar Inmueble</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -129,7 +130,8 @@
         <p>Agrega casas, apartamentos o lotes al módulo inmobiliario.</p>
     </div>
 
-    <form action="/guardar_inmueble" method="POST" enctype="multipart/form-data">
+    <form 
+    method="POST" enctype="multipart/form-data">
         <div class="input-group">
             <label>Título</label>
             <input type="text" name="titulo" placeholder="Ej: Apartamento moderno" required>
@@ -140,9 +142,17 @@
             <select name="tipo" required>
                 <option value="Casa">Casa</option>
                 <option value="Apartamento">Apartamento</option>
-                <option value="Lote">Lote</option>
+
             </select>
         </div>
+
+        <div class="input-group">
+    <label>Tipo de negocio</label>
+    <select name="tipo_negocio" required>
+        <option value="Venta">Venta</option>
+        <option value="Arriendo">Arriendo</option>
+    </select>
+</div>
 
         <div class="input-group">
             <label>Ubicación</label>
@@ -167,6 +177,11 @@
             <label>Imagen</label>
            <input type="file" name="imagen" accept="image/*" required>
         </div>
+        <div class="input-group full">
+    <label>Galería del inmueble</label>
+    <input type="file" name="galeria" accept="image/*,video/mp4" multiple>
+    <small>Puedes subir varias fotos y un video MP4 corto del inmueble.</small>
+</div>
 
         <div class="input-group full">
             <label>Descripción</label>
@@ -174,7 +189,7 @@
         </div>
 
         <div class="buttons">
-            <a href="{{ url_for('inmuebles') }}" class="btn-back">
+            <a href="{{ url_for('inmobiliaria_admin') }}" class="btn-back">
                 <i class="fa fa-arrow-left"></i> Volver
             </a>
 

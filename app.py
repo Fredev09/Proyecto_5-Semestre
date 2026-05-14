@@ -23,6 +23,8 @@ from db_utils_mysql import (
 app = Flask(__name__)
 app.secret_key = 'contraseña01'
 
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+
 @app.after_request
 def no_cache(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
@@ -53,7 +55,19 @@ app.config['MAIL_DEFAULT_SENDER'] = 'camila2001super@gmail.com'
 
 mail = Mail(app)
 
-# Inicializar tabla si no existe
+mail = Mail(app)
+
+UPLOAD_FOLDER = os.path.join('static', 'imagenes')
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'mp4'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def imagen_permitida(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 with app.app_context():
     init_mysql_db(mysql)
 
@@ -401,12 +415,64 @@ def inmuebles():
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
+    busqueda = request.args.get('busqueda', '')
+    tipo = request.args.get('tipo', '')
+    estado = request.args.get('estado', '')
+
+    query = "SELECT * FROM inmuebles WHERE 1=1"
+    valores = []
+
+    if busqueda:
+        query += " AND (titulo LIKE %s OR ubicacion LIKE %s OR descripcion LIKE %s)"
+        valores.extend([f"%{busqueda}%", f"%{busqueda}%", f"%{busqueda}%"])
+
+    if tipo:
+        query += " AND tipo = %s"
+        valores.append(tipo)
+
+    if estado:
+        query += " AND estado = %s"
+        valores.append(estado)
+
+    query += " ORDER BY id DESC"
+
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM inmuebles ORDER BY id DESC")
+    cur.execute(query, valores)
     inmuebles = cur.fetchall()
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles")
+    total_inmuebles = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
+    disponibles = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Reservado'")
+    reservados = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Vendido'")
+    vendidos = cur.fetchone()['total']
+
     cur.close()
 
-    return render_template('inmuebles.html', inmuebles=inmuebles)
+    return render_template(
+        'inmuebles.html',
+        inmuebles=inmuebles,
+        total_inmuebles=total_inmuebles,
+        disponibles=disponibles,
+        reservados=reservados,
+        vendidos=vendidos,
+        busqueda=busqueda,
+        tipo=tipo,
+        estado=estado
+    )
+
+@app.route('/inmobiliaria_admin')
+def inmobiliaria_admin():
+
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    return render_template('inmobiliaria_admin.html')
 
 @app.route('/registrar_inmueble', methods=['GET', 'POST'])
 def registrar_inmueble():
@@ -414,34 +480,103 @@ def registrar_inmueble():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        titulo = request.form['titulo']
+        titulo = request.form['titulo'].strip()
         tipo = request.form['tipo']
-        ubicacion = request.form['ubicacion']
+        tipo_negocio = request.form['tipo_negocio']
+        ubicacion = request.form['ubicacion'].strip()
         precio = request.form['precio']
         estado = request.form['estado']
-        descripcion = request.form['descripcion']
-
+        descripcion = request.form['descripcion'].strip()
         archivo_imagen = request.files.get('imagen')
+
+        if not titulo or not tipo or not ubicacion or not precio or not estado:
+            flash('Todos los campos obligatorios deben estar completos.', 'danger')
+            return render_template('registrar_inmueble.html', form=request.form)
+
+        try:
+            precio = float(precio)
+            if precio <= 0:
+                flash('El precio debe ser mayor a cero.', 'danger')
+                return render_template('registrar_inmueble.html', form=request.form)
+        except ValueError:
+            flash('El precio debe ser un número válido.', 'danger')
+            return render_template('registrar_inmueble.html', form=request.form)
 
         nombre_imagen = ''
 
         if archivo_imagen and archivo_imagen.filename != '':
-            nombre_imagen = secure_filename(archivo_imagen.filename)
-            ruta_imagen = os.path.join('static', 'imagenes', nombre_imagen)
+            if not imagen_permitida(archivo_imagen.filename):
+                flash('Formato de imagen no permitido. Usa PNG, JPG, JPEG, WEBP o MP4.', 'danger')
+                return render_template('registrar_inmueble.html', form=request.form)
+
+            nombre_original = secure_filename(archivo_imagen.filename)
+            extension = nombre_original.rsplit('.', 1)[1].lower()
+            nombre_imagen = f"inmueble_{uuid.uuid4().hex}.{extension}"
+
+            ruta_imagen = os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen)
             archivo_imagen.save(ruta_imagen)
 
         cur = mysql.connection.cursor()
+        
         cur.execute("""
-            INSERT INTO inmuebles (titulo, tipo, ubicacion, precio, estado, descripcion, imagen)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (titulo, tipo, ubicacion, precio, estado, descripcion, nombre_imagen))
+                    INSERT INTO inmuebles (titulo, tipo, tipo_negocio, ubicacion, precio, estado, descripcion, imagen)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (titulo, tipo, tipo_negocio, ubicacion, precio, estado, descripcion, nombre_imagen))
+
+        inmueble_id = cur.lastrowid
+
+        archivos_galeria = request.files.getlist('galeria')
+
+        for archivo in archivos_galeria:
+            if archivo and archivo.filename != '':
+                if imagen_permitida(archivo.filename):
+                    nombre_original = secure_filename(archivo.filename)
+                    extension = nombre_original.rsplit('.', 1)[1].lower()
+                    nombre_archivo = f"inmueble_{uuid.uuid4().hex}.{extension}"
+
+                    ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
+                    archivo.save(ruta_archivo)
+
+                    tipo_archivo = 'video' if extension == 'mp4' else 'imagen'
+
+                    cur.execute("""
+                        INSERT INTO inmueble_multimedia (inmueble_id, archivo, tipo)
+                        VALUES (%s, %s, %s)
+                    """, (inmueble_id, nombre_archivo, tipo_archivo))
+
         mysql.connection.commit()
         cur.close()
 
-        flash('Inmueble registrado correctamente.', 'success')
+        flash('Inmueble publicado exitosamente con su galería multimedia.', 'success')
         return redirect(url_for('inmuebles'))
 
     return render_template('registrar_inmueble.html')
+
+
+@app.route('/eliminar_multimedia/<int:id>/<int:inmueble_id>')
+def eliminar_multimedia(id, inmueble_id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT archivo FROM inmueble_multimedia WHERE id = %s", (id,))
+    multimedia = cur.fetchone()
+
+    if multimedia:
+        ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], multimedia['archivo'])
+
+        if os.path.exists(ruta_archivo):
+            os.remove(ruta_archivo)
+
+        cur.execute("DELETE FROM inmueble_multimedia WHERE id = %s", (id,))
+        mysql.connection.commit()
+
+        flash('Archivo eliminado de la galería correctamente.', 'success')
+
+    cur.close()
+
+    return redirect(url_for('editar_inmueble', id=inmueble_id))
 
 @app.route('/editar_inmueble/<int:id>', methods=['GET', 'POST'])
 def editar_inmueble(id):
@@ -450,33 +585,79 @@ def editar_inmueble(id):
 
     cur = mysql.connection.cursor()
 
-    if request.method == 'POST':
-        titulo = request.form['titulo']
-        tipo = request.form['tipo']
-        ubicacion = request.form['ubicacion']
-        precio = request.form['precio']
-        estado = request.form['estado']
-        descripcion = request.form['descripcion']
-        imagen = request.form['imagen']
-
-        cur.execute("""
-            UPDATE inmuebles
-            SET titulo=%s, tipo=%s, ubicacion=%s, precio=%s, estado=%s, descripcion=%s, imagen=%s
-            WHERE id=%s
-        """, (titulo, tipo, ubicacion, precio, estado, descripcion, imagen, id))
-        mysql.connection.commit()
-        cur.close()
-
-        flash('Inmueble actualizado correctamente.', 'success')
-        return redirect(url_for('inmuebles'))
-
     cur.execute("SELECT * FROM inmuebles WHERE id = %s", (id,))
     inmueble = cur.fetchone()
+
+    if not inmueble:
+        cur.close()
+        flash('El inmueble no existe.', 'danger')
+        return redirect(url_for('inmuebles'))
+
+    if request.method == 'POST':
+        titulo = request.form['titulo'].strip()
+        tipo = request.form['tipo']
+        tipo_negocio = request.form['tipo_negocio']
+        ubicacion = request.form['ubicacion'].strip()
+        precio = request.form['precio']
+        estado = request.form['estado']
+        descripcion = request.form['descripcion'].strip()
+
+        archivo_imagen = request.files.get('imagen')
+        nombre_imagen = inmueble['imagen']
+
+        if archivo_imagen and archivo_imagen.filename != '':
+            if not imagen_permitida(archivo_imagen.filename):
+                flash('Formato de imagen no permitido.', 'danger')
+                return redirect(url_for('editar_inmueble', id=id))
+
+            nombre_original = secure_filename(archivo_imagen.filename)
+            extension = nombre_original.rsplit('.', 1)[1].lower()
+            nombre_imagen = f"inmueble_{uuid.uuid4().hex}.{extension}"
+
+            ruta_imagen = os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen)
+            archivo_imagen.save(ruta_imagen)
+
+        cur.execute("""
+                    UPDATE inmuebles
+                    SET titulo=%s, tipo=%s, tipo_negocio=%s, ubicacion=%s, precio=%s, estado=%s, descripcion=%s, imagen=%s
+                    WHERE id=%s
+                    """, (titulo, tipo, tipo_negocio, ubicacion, precio, estado, descripcion, nombre_imagen, id))
+
+        archivos_galeria = request.files.getlist('galeria')
+
+        for archivo in archivos_galeria:
+            if archivo and archivo.filename != '':
+                if imagen_permitida(archivo.filename):
+                    nombre_original = secure_filename(archivo.filename)
+                    extension = nombre_original.rsplit('.', 1)[1].lower()
+                    nombre_archivo = f"inmueble_{uuid.uuid4().hex}.{extension}"
+
+                    ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
+                    archivo.save(ruta_archivo)
+
+                    tipo_archivo = 'video' if extension == 'mp4' else 'imagen'
+
+                    cur.execute("""
+                        INSERT INTO inmueble_multimedia (inmueble_id, archivo, tipo)
+                        VALUES (%s, %s, %s)
+                    """, (id, nombre_archivo, tipo_archivo))
+
+        mysql.connection.commit()
+
+        flash('Inmueble actualizado correctamente.', 'success')
+        cur.close()
+        return redirect(url_for('inmuebles'))
+
+    cur.execute("SELECT * FROM inmueble_multimedia WHERE inmueble_id = %s", (id,))
+    galeria = cur.fetchall()
+
     cur.close()
 
-    return render_template('editar_inmueble.html', inmueble=inmueble)
-
-
+    return render_template(
+        'editar_inmueble.html',
+        inmueble=inmueble,
+        galeria=galeria
+    )
 
 @app.route('/eliminar_inmueble/<int:id>')
 def eliminar_inmueble(id):
@@ -484,7 +665,19 @@ def eliminar_inmueble(id):
         return redirect(url_for('login'))
 
     cur = mysql.connection.cursor()
+
+    cur.execute("SELECT archivo FROM inmueble_multimedia WHERE inmueble_id = %s", (id,))
+    archivos = cur.fetchall()
+
+    for item in archivos:
+        ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], item['archivo'])
+        if os.path.exists(ruta_archivo):
+            os.remove(ruta_archivo)
+
+    cur.execute("DELETE FROM inmueble_multimedia WHERE inmueble_id = %s", (id,))
+
     cur.execute("DELETE FROM inmuebles WHERE id = %s", (id,))
+
     mysql.connection.commit()
     cur.close()
 
@@ -496,14 +689,6 @@ def constructora_admin():
     if 'usuario' not in session:
         return redirect(url_for('login'))
     return render_template('constructora_admin.html')
-
-
-@app.route('/inmobiliaria_admin')
-def inmobiliaria_admin():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-    return redirect(url_for('inmuebles'))
-
 
 @app.route('/ventas_admin')
 def ventas_admin():
@@ -682,8 +867,17 @@ def inmobiliaria_publica():
         WHERE estado IN ('Disponible', 'Reservado')
         ORDER BY id DESC
     """)
-
     inmuebles_publicos = cur.fetchall()
+
+    for inmueble in inmuebles_publicos:
+        cur.execute("""
+            SELECT * FROM inmueble_multimedia
+            WHERE inmueble_id = %s
+            ORDER BY id ASC
+        """, (inmueble['id'],))
+
+        inmueble['galeria'] = cur.fetchall()
+
     cur.close()
 
     return render_template(

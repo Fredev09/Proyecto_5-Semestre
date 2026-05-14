@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Inmobiliaria - CiviWeb Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="../static/imagenes/ICONO.png">
 
     <style>
 * {
@@ -61,17 +62,6 @@ body {
     color: #C5A46D;
 }
 
-.whatsapp-btn {
-    background: #8B1E1E;
-    color: white !important;
-    padding: 8px 16px;
-    border-radius: 20px;
-}
-
-.whatsapp-btn:hover {
-    background: #C5A46D;
-    color: #1C1C1C !important;
-}
 
 .hero {
     position: relative;
@@ -106,6 +96,7 @@ body {
     color: white;
 }
 
+
 .hero h1 {
     font-size: 52px;
     line-height: 1.15;
@@ -123,7 +114,7 @@ body {
     color: #f1f1f1;
 }
 
-/* CATÁLOGO */
+
 .catalogo {
     padding: 90px 8%;
     background: #fff;
@@ -132,7 +123,7 @@ body {
 .catalogo-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     margin-bottom: 45px;
     gap: 25px;
 }
@@ -148,13 +139,12 @@ body {
     color: #555;
     font-size: 17px;
 }
-
 .filters {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+    justify-content: flex-end;
 }
-
 .filter {
     border: none;
     background: #f1f1f1;
@@ -172,7 +162,6 @@ body {
     color: white;
 }
 
-/* CARDS */
 .inmuebles-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -323,7 +312,6 @@ body {
     transform: rotate(-20deg);
 }
 
-/* EMPTY */
 .empty {
     background: white;
     border-radius: 24px;
@@ -347,18 +335,152 @@ body {
     position: fixed;
     left: 28px;
     bottom: 28px;
-    width: 60px;
-    height: 60px;
+    width: 58px;
+    height: 58px;
     background: #25D366;
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 31px;
     text-decoration: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.25);
     z-index: 2000;
+    transition: 0.3s;
+}
+
+.whatsapp:hover {
+    background: #1ebe5d;
+    transform: translateY(-4px) scale(1.05);
+}
+
+.modal-detalle {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    padding: 30px;
+}
+
+.modal-detalle.active {
+    display: flex;
+}
+
+.modal-contenido {
+    background: white;
+    width: 100%;
+    max-width: 1050px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 28px;
+    padding: 35px;
+    position: relative;
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    border: none;
+    background: #8B1E1E;
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.modal-contenido h2 {
+    color: #8B1E1E;
+    font-size: 34px;
+    margin-bottom: 12px;
+}
+
+.detalle-ubicacion,
+.detalle-descripcion {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.detalle-precio {
+    color: #8B1E1E;
+    font-size: 28px;
+    margin-bottom: 22px;
+}
+
+.galeria-detalle {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.galeria-detalle img,
+.galeria-detalle video {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 18px;
+    background: #eee;
+}
+
+.footer {
+  background: var(--negro);
+  color: var(--blanco);
+  text-align: center;
+  padding: 35px 20px;
+}
+
+
+.contact-info-footer {
+  margin-top: 30px;
+}
+
+.contact-info-footer p {
+  margin: 5px 0;
+  color: #ddd;
+}
+
+.contact-section {
+  background: #1c1c1c;
+  color: #f5f5f5;
+  padding: 70px 20px;
+}
+
+.contact-section h2 {
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.contact-section p {
+  color: #ccc;
+}
+
+
+.social-icons {
+  margin-top: 30px;
+}
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 65px;
+  margin: 12px;
+  border-radius: 50%;
+  font-size: 24px;
+  color: #fff;
+  background: #2a2a2a;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.social-whatsapp:hover {
+    background: #25d366;
 }
 
 @media(max-width: 1050px) {
@@ -430,7 +552,7 @@ body {
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Inicio</a>
             <a href="#arriendo">Arriendo</a>
-            <a href="#venta" class="active">Venta</a>
+            <a href="#venta" >Venta</a>
             <a href="#contacto" class="whatsapp-btn">
                 <i class="fa-brands fa-whatsapp"></i> Escríbenos
             </a>
@@ -463,25 +585,149 @@ body {
 
 </section>
 
-<section class="catalogo" id="venta">
+<section class="catalogo" id="arriendo">
+
     <div class="catalogo-header">
+
         <div>
-            <h2>Propiedades disponibles</h2>
+            <h2>Propiedades en arriendo</h2>
             <p>Catálogo actualizado desde el panel administrativo.</p>
         </div>
 
-        <div class="filters">
-            <button class="filter active">Todos</button>
-            <button class="filter">Casas</button>
-            <button class="filter">Apartamentos</button>
+    </div>
+
+    <div class="filters">
+        <button class="filter active" onclick="filtrarPropiedades('Todos', this)">Todos</button>
+        <button class="filter" onclick="filtrarPropiedades('Casa', this)">Casas</button>
+        <button class="filter" onclick="filtrarPropiedades('Apartamento', this)">Apartamentos</button>
+    </div>
+
+    <div class="inmuebles-grid">
+
+        {% for i in inmuebles_publicos %}
+            {% if i.tipo_negocio == 'Arriendo' %}
+
+            <article class="inmueble-card" data-tipo="{{ i.tipo }}">
+
+                <div class="image-box">
+
+                    {% if i.imagen %}
+                        <img src="{{ url_for('static', filename='imagenes/' ~ i.imagen) }}">
+                    {% endif %}
+
+                    <span class="tag-location">{{ i.ubicacion }}</span>
+                    <span class="tag-status {{ i.estado }}">{{ i.estado }}</span>
+
+                </div>
+
+                <div class="card-info">
+
+                    <h3>{{ i.titulo }}</h3>
+
+                    <p class="ubicacion">
+                        <i class="fa fa-location-dot"></i>
+                        {{ i.ubicacion }}
+                    </p>
+
+                    <p class="descripcion">
+                        {{ i.descripcion }}
+                    </p>
+
+                    <div class="price-row">
+                        <span class="tipo">{{ i.tipo }}</span>
+
+                        <span class="precio">
+                            COP ${{ "{:,.0f}".format(i.precio) }}
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+    <span class="codigo">
+        <i class="fa fa-fingerprint"></i>
+        CW-{{ "%04d"|format(i.id) }}
+    </span>
+
+    <a href="#" class="ver-mas"
+       onclick="abrirDetalle('detalle-{{ i.id }}')">
+
+        <i class="fa fa-arrow-right"></i>
+    </a>
+</div>
+
+            </article>
+
+            <div class="modal-detalle" id="detalle-{{ i.id }}">
+    <div class="modal-contenido">
+
+        <button class="cerrar-modal" onclick="cerrarDetalle('detalle-{{ i.id }}')">
+            <i class="fa fa-times"></i>
+        </button>
+
+        <h2>{{ i.titulo }}</h2>
+
+        <p class="detalle-ubicacion">
+            <i class="fa fa-location-dot"></i> {{ i.ubicacion }}
+        </p>
+
+        <h3 class="detalle-precio">
+            COP ${{ "{:,.0f}".format(i.precio) }}
+        </h3>
+
+        <p class="detalle-descripcion">
+            {{ i.descripcion }}
+        </p>
+
+        <div class="galeria-detalle">
+            {% if i.imagen %}
+                <img src="{{ url_for('static', filename='imagenes/' ~ i.imagen) }}">
+            {% endif %}
+
+            {% for item in i.galeria %}
+                {% if item.tipo == 'video' %}
+                    <video controls>
+                        <source src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}" type="video/mp4">
+                    </video>
+                {% else %}
+                    <img src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}">
+                {% endif %}
+            {% endfor %}
         </div>
+
+    </div>
+</div>
+
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
+</section>
+
+<section class="catalogo venta-section" id="venta">
+
+    <div class="catalogo-header">
+
+        <div>
+            <h2>Propiedades en venta</h2>
+            <p>Catálogo actualizado desde el panel administrativo.</p>
+        </div>
+
+
     </div>
 
     {% if inmuebles_publicos %}
+
     <div class="inmuebles-grid">
+
         {% for i in inmuebles_publicos %}
-        <article class="inmueble-card">
+        {% if i.tipo_negocio == 'Venta' %}
+
+        <article class="inmueble-card" data-tipo="{{ i.tipo }}">
+
             <div class="image-box">
+
                 {% if i.imagen %}
                     <img src="{{ url_for('static', filename='imagenes/' ~ i.imagen) }}" alt="{{ i.titulo }}">
                 {% else %}
@@ -490,13 +736,16 @@ body {
 
                 <span class="tag-location">{{ i.ubicacion }}</span>
                 <span class="tag-status {{ i.estado }}">{{ i.estado }}</span>
+
             </div>
 
             <div class="card-info">
+
                 <h3>{{ i.titulo }}</h3>
 
                 <p class="ubicacion">
-                    <i class="fa fa-location-dot"></i> {{ i.ubicacion }}
+                    <i class="fa fa-location-dot"></i>
+                    {{ i.ubicacion }}
                 </p>
 
                 <p class="descripcion">
@@ -504,35 +753,156 @@ body {
                 </p>
 
                 <div class="price-row">
-                    <span class="tipo">{{ i.tipo }}</span>
-                    <span class="precio">COP ${{ "{:,.0f}".format(i.precio) }}</span>
+
+                    <span class="tipo">
+                        {{ i.tipo }}
+                    </span>
+
+                    <span class="precio">
+                        COP ${{ "{:,.0f}".format(i.precio) }}
+                    </span>
+
                 </div>
+
             </div>
 
             <div class="card-footer">
-                <span class="codigo">
-                    <i class="fa fa-fingerprint"></i> CW-{{ "%04d"|format(i.id) }}
-                </span>
 
-                <a href="#contacto" class="ver-mas" title="Ver más">
+                <span class="codigo">
+                    <i class="fa fa-fingerprint"></i>
+                    CW-{{ "%04d"|format(i.id) }}
+                </span>
+                <a href="#" class="ver-mas" title="Ver más" onclick="abrirDetalle('detalle-{{ i.id }}')">
                     <i class="fa fa-arrow-right"></i>
                 </a>
+
             </div>
         </article>
+        <div class="modal-detalle" id="detalle-{{ i.id }}">
+    <div class="modal-contenido">
+
+        <button class="cerrar-modal" onclick="cerrarDetalle('detalle-{{ i.id }}')">
+            <i class="fa fa-times"></i>
+        </button>
+
+        <h2>{{ i.titulo }}</h2>
+
+        <p class="detalle-ubicacion">
+            <i class="fa fa-location-dot"></i> {{ i.ubicacion }}
+        </p>
+
+        <h3 class="detalle-precio">
+            COP ${{ "{:,.0f}".format(i.precio) }}
+        </h3>
+
+        <p class="detalle-descripcion">
+            {{ i.descripcion }}
+        </p>
+
+        <div class="galeria-detalle">
+            {% if i.imagen %}
+                <img src="{{ url_for('static', filename='imagenes/' ~ i.imagen) }}">
+            {% endif %}
+
+            {% for item in i.galeria %}
+                {% if item.tipo == 'video' %}
+                    <video controls>
+                        <source src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}" type="video/mp4">
+                    </video>
+                {% else %}
+                    <img src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}">
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+        
+
+        {% endif %}
         {% endfor %}
+
     </div>
+
     {% else %}
+
     <div class="empty">
+
         <i class="fa fa-house-circle-exclamation"></i>
+
         <h2>No hay propiedades disponibles</h2>
-        <p>Desde panel administrativo, aparecerán aquí inmuebles disponibles.</p>
+
+        <p>
+            Desde panel administrativo, aparecerán aquí inmuebles disponibles.
+        </p>
+
     </div>
+
     {% endif %}
+
 </section>
 
 <a class="whatsapp" id="contacto" href="https://wa.me/573001112233" target="_blank">
     <i class="fa-brands fa-whatsapp"></i>
 </a>
+
+ <footer class="footer">
+    
+    <section class="contact-section text-center">
+
+  <div class="container">
+    <h2>Canales de Comunicación</h2>
+    <p>Contáctanos a través de nuestros canales oficiales</p>
+
+    <div class="social-icons">
+
+      <a href="mailto:construgonps@gmail.com" class="social email">
+        <i class="fas fa-envelope"></i>
+      </a>
+
+      <a href="https://wa.me/573001112233" target="_blank" class="social social-whatsapp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+<P>Correo electronico: construgonps@gmail.com</P>
+    <p>Ingeniería civil | Construcción | Consultoría</p>
+    <p>© 2026 CONSTRUGONP'S S.A.S - Todos los derechos reservados</p>
+    </div>
+
+  </div>
+
+</section>
+    
+  </footer>
+
+<script>
+    function abrirDetalle(id) {
+        document.getElementById(id).classList.add('active');
+    }
+
+    function cerrarDetalle(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+</script>
+
+<script>
+    function filtrarPropiedades(tipo, boton) {
+        const tarjetas = document.querySelectorAll('.inmueble-card');
+        const botones = document.querySelectorAll('.filter');
+
+        botones.forEach(btn => btn.classList.remove('active'));
+        boton.classList.add('active');
+
+        tarjetas.forEach(card => {
+            const tipoCard = card.dataset.tipo;
+
+            if (tipo === 'Todos' || tipoCard === tipo) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

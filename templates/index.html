@@ -7,9 +7,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="shortcut icon" href="../static/imagenes/ICONO.png">
-  <!-- Leaflet Mapa -->
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- AOS Animaciones -->
+
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
 </head>
 <body>
@@ -41,7 +41,10 @@
   <div class="hero-overlay"></div>
 
   <div class="hero-content" data-aos="fade-up">
-    <h1>Construimos el futuro con calidad y compromiso</h1>
+   <h1>
+    Construimos el futuro con
+    <span>CALIDAD Y COMPROMISO</span>
+</h1>
     <p>Soluciones integrales en ingeniería civil, construcción y desarrollo de proyectos.</p>
     <a href="#servicios" class="btn-primary">Servicios</a>
     <a href="{{ url_for('inmobiliaria_publica') }}" class="btn-primary">Inmobiliaria</a>
@@ -327,10 +330,11 @@
 
   </div>
 
-</section>
+
     <P>Correo electronico: construgonps@gmail.com</P>
     <p>Ingeniería civil | Construcción | Consultoría</p>
     <p>© 2026 CONSTRUGONP'S S.A.S - Todos los derechos reservados</p>
+    </section>
   </footer>
 
   <!-- Scripts -->
