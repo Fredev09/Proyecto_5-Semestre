@@ -8,6 +8,8 @@ import os
 from werkzeug.utils import secure_filename
 import re
 import uuid
+from datetime import datetime
+
 from db_utils_mysql import (
     add_usuario_mysql,
     update_email_mysql,
@@ -16,9 +18,13 @@ from db_utils_mysql import (
     get_usuario_by_email_mysql,
     init_mysql_db,
     get_proyectos_mysql,
-    add_proyecto_mysql
+    add_proyecto_mysql,
+    init_contactos_mysql,
+    add_contacto_mysql,
+    get_contactos_mysql,
+    actualizar_prioridades_mysql,
+    marcar_contactado_mysql
 )
-
 
 app = Flask(__name__)
 app.secret_key = 'contraseña01'
@@ -70,6 +76,7 @@ def imagen_permitida(filename):
 
 with app.app_context():
     init_mysql_db(mysql)
+    init_contactos_mysql(mysql)
 
 
 def es_contrasena_segura(password):
@@ -653,6 +660,8 @@ def editar_inmueble(id):
 
     cur.close()
 
+    return render_template('editar_inmueble.html', inmueble=inmueble)
+
     return render_template(
         'editar_inmueble.html',
         inmueble=inmueble,
@@ -689,6 +698,12 @@ def constructora_admin():
     if 'usuario' not in session:
         return redirect(url_for('login'))
     return render_template('constructora_admin.html')
+
+@app.route('/inmobiliaria_admin')
+def inmobiliaria_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('inmuebles'))
 
 @app.route('/ventas_admin')
 def ventas_admin():
@@ -856,7 +871,7 @@ def crear_proyecto():
 
 @app.route('/editar_proyecto/<int:id>')
 def editar_proyecto(id):
-    return f"Editando proyecto {id}"
+    return render_template('editarPro.html')
 
 @app.route('/inmobiliaria')
 def inmobiliaria_publica():
@@ -891,6 +906,84 @@ def reservas_admin():
         return redirect(url_for('login'))
 
     return render_template('reservas_admin.html')
+
+@app.route('/guardar_contacto', methods=['POST'])
+def guardar_contacto():
+    try:
+        nombre = request.form.get('nombre')
+        telefono = request.form.get('telefono')
+        correo = request.form.get('correo')
+        servicio = request.form.get('servicio')
+        mensaje = request.form.get('mensaje')
+
+        # DEBUG EN CONSOLA
+        print("FORMULARIO RECIBIDO:")
+        print(nombre, telefono, correo, servicio, mensaje)
+
+        if not all([nombre, telefono, correo, servicio, mensaje]):
+            flash('Todos los campos son obligatorios.', 'danger')
+            return redirect(url_for('index'))
+
+        add_contacto_mysql(
+            mysql,
+            nombre,
+            telefono,
+            correo,
+            servicio,
+            mensaje
+        )
+
+        flash('Tu solicitud fue enviada correctamente.', 'success')
+
+    except Exception as e:
+        print("ERROR AL GUARDAR CONTACTO:", e)
+        flash(f'Error al guardar: {str(e)}', 'danger')
+
+    return redirect(url_for('index'))
+
+
+@app.route('/admin_contactos')
+def admin_contactos():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    actualizar_prioridades_mysql(mysql)
+    contactos = get_contactos_mysql(mysql)
+
+    contactos_procesados = []
+
+    for c in contactos:
+        fecha_envio = c['fecha_envio']
+        fecha_contacto = c['fecha_contacto']
+        estado = c['estado']
+
+        if estado == "Contactado" and fecha_contacto:
+            tiempo = fecha_contacto - fecha_envio
+        else:
+            tiempo = datetime.now() - fecha_envio
+
+        contactos_procesados.append({
+            "id": c['id'],
+            "nombre": c['nombre'],
+            "telefono": c['telefono'],
+            "correo": c['correo'],
+            "servicio": c['servicio'],
+            "mensaje": c['mensaje'],
+            "fecha_envio": fecha_envio,
+            "estado": estado,
+            "tiempo": f"{tiempo.days} días"
+        })
+
+    return render_template(
+        'admin_contactos.html',
+        contactos=contactos_procesados
+    )
+
+@app.route('/marcar_contactado/<int:id>')
+def marcar_contactado(id):
+    marcar_contactado_mysql(mysql, id)
+    flash("Cliente marcado como contactado", "success")
+    return redirect(url_for('admin_contactos'))
 
 if __name__ == '__main__':
     app.run(debug=True)

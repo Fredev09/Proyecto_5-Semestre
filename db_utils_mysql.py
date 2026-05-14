@@ -67,3 +67,95 @@ def get_proyectos_mysql(mysql):
     proyectos = cur.fetchall()
     cur.close()
     return proyectos
+
+def init_contactos_mysql(mysql):
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS clientes_interesados (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(120) NOT NULL,
+            telefono VARCHAR(30) NOT NULL,
+            correo VARCHAR(120) NOT NULL,
+            servicio VARCHAR(100) NOT NULL,
+            mensaje TEXT NOT NULL,
+            fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            estado ENUM('Pendiente','Contactado','Prioridad Alta') DEFAULT 'Pendiente',
+            fecha_contacto TIMESTAMP NULL
+        )
+    ''')
+    mysql.connection.commit()
+    cur.close()
+
+def add_contacto_mysql(mysql, nombre, telefono, correo, servicio, mensaje):
+    try:
+        cur = mysql.connection.cursor()
+
+        sql = """
+            INSERT INTO clientes_interesados
+            (nombre, telefono, correo, servicio, mensaje)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+
+        valores = (
+            nombre.strip(),
+            telefono.strip(),
+            correo.strip(),
+            servicio.strip(),
+            mensaje.strip()
+        )
+
+        # DEBUG EN CONSOLA
+        print("===================================")
+        print("GUARDANDO CLIENTE EN MYSQL")
+        print("SQL:", sql)
+        print("VALORES:", valores)
+        print("===================================")
+
+        cur.execute(sql, valores)
+
+        mysql.connection.commit()
+
+        print("CLIENTE GUARDADO CORRECTAMENTE")
+
+        cur.close()
+
+    except Exception as e:
+        print("ERROR EN add_contacto_mysql():", e)
+        raise
+
+
+def get_contactos_mysql(mysql):
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        SELECT id, nombre, telefono, correo, servicio, mensaje,
+               fecha_envio, estado, fecha_contacto
+        FROM clientes_interesados
+        ORDER BY fecha_envio ASC
+    ''')
+    contactos = cur.fetchall()
+    cur.close()
+    return contactos
+
+
+def actualizar_prioridades_mysql(mysql):
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        UPDATE clientes_interesados
+        SET estado = 'Prioridad Alta'
+        WHERE estado = 'Pendiente'
+        AND TIMESTAMPDIFF(HOUR, fecha_envio, NOW()) >= 24
+    ''')
+    mysql.connection.commit()
+    cur.close()
+
+
+def marcar_contactado_mysql(mysql, contacto_id):
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        UPDATE clientes_interesados
+        SET estado = 'Contactado',
+            fecha_contacto = NOW()
+        WHERE id = %s
+    ''', (contacto_id,))
+    mysql.connection.commit()
+    cur.close()

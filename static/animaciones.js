@@ -177,13 +177,34 @@ document.addEventListener("DOMContentLoaded", function () {
   // ======================
   // FORMULARIO
   // ======================
-  const form = document.querySelector(".contact-form");
+        const form = document.querySelector(".contact-form");
 
-  form.addEventListener("submit", function(e) {
-    e.preventDefault();
-    alert("Mensaje enviado correctamente.");
-    form.reset();
-  });
+        if (form) {
+          form.addEventListener("submit", function(e) {
+
+            // VALIDACIÓN BÁSICA
+            const nombre = form.querySelector('[name="nombre"]').value.trim();
+            const telefono = form.querySelector('[name="telefono"]').value.trim();
+            const correo = form.querySelector('[name="correo"]').value.trim();
+            const servicio = form.querySelector('[name="servicio"]').value.trim();
+            const mensaje = form.querySelector('[name="mensaje"]').value.trim();
+
+            if (!nombre || !telefono || !correo || !servicio || !mensaje) {
+              e.preventDefault();
+              alert("Por favor completa todos los campos.");
+              return;
+            }
+
+            // IMPORTANTE:
+            // NO BLOQUEAR EL SUBMIT
+            // Flask necesita recibir el POST
+
+            alert("Mensaje enviado correctamente.");
+            
+            // NO uses form.reset() aquí
+            // porque puede limpiar antes del envío
+          });
+        } 
 
   // ======================
   // CARRUSEL SERVICIOS
