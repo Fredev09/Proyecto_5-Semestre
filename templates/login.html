@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Constructora</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -40,11 +41,11 @@
         }
 
         /* (FORMULARIO) */
-        .right-side {
-    width: 60%;
-    padding: 40px 50px;
-    box-sizing: border-box;
-}
+            .right-side {
+            width: 60%;
+            padding: 40px 50px;
+            box-sizing: border-box;
+        }
 
         .right-side h2 {
             margin: 0;
@@ -111,71 +112,262 @@
         }
 
         .input-icon {
-    position: relative;
-}
+            position: relative;
+        }
 
-.input-icon i {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-}
+        .input-icon i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
 
-.input-icon i.fa-user,
-.input-icon i.fa-lock {
-    left: 12px;
-}
+        .input-icon i.fa-user,
+        .input-icon i.fa-lock {
+            left: 12px;
+        }
 
-.input-icon input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px 45px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
+        .input-icon input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 45px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
 
-.toggle-password {
-    right: 12px;
-    cursor: pointer;
-}
+        .toggle-password {
+            right: 12px;
+            cursor: pointer;
+        }
 
-.alert {
-    margin: 15px 0;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-}
+        .alert {
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
 
-.alert.success {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #22c55e;
-}
+        .alert.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #22c55e;
+        }
 
-.back-home {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    color: white;
-    background: #891010;
-    padding: 10px;
-    border-radius: 50%;
-    text-decoration: none;
-    transition: 0.3s;
-    z-index: 1000;
-}
+        .back-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: #891010;
+            padding: 10px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: 0.3s;
+            z-index: 1000;
+        }
 
-.back-home:hover {
-    background: #c11b1b;
-    transform: scale(1.1);
-}
+        .back-home:hover {
+            background: #c11b1b;
+            transform: scale(1.1);
+        }
 
-.alert.danger {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #ef4444;
-}
+        .alert.danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        /* =========================================
+        INICIO RESPONSIVE LOGIN
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Mejor control */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Contenedor flexible */
+        .login-container {
+            max-width: 850px;
+            width: 100%;
+        }
+
+        /* Laptop */
+        @media (max-width: 992px) {
+
+            .login-container {
+                width: 95%;
+            }
+
+            .left-side img {
+                width: 120px;
+            }
+
+            .right-side {
+                padding: 35px;
+            }
+
+            .right-side h2 {
+                font-size: 26px;
+            }
+        }
+
+        /* Tablet */
+        @media (max-width: 768px) {
+
+            body {
+                padding: 15px;
+                align-items: center;
+            }
+
+            .login-container {
+                flex-direction: column;
+                width: 100%;
+                border-radius: 18px;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+            }
+
+            .left-side {
+                padding: 28px 20px;
+            }
+
+            .left-side img {
+                width: 130px;
+            }
+
+            .right-side {
+                padding: 28px 22px;
+            }
+
+            .right-side h2 {
+                font-size: 24px;
+                line-height: 1.4;
+            }
+
+            .right-side p {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .input-group label {
+                font-size: 14px;
+            }
+
+            .input-icon input {
+                padding: 12px 42px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .links a {
+                display: inline-block;
+                margin-top: 8px;
+                font-size: 14px;
+            }
+
+            .back-home {
+                top: 15px;
+                left: 15px;
+                padding: 9px;
+            }
+        }
+
+        /* Celulares */
+        @media (max-width: 480px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .login-container {
+                border-radius: 16px;
+            }
+
+            .left-side {
+                padding: 22px 15px;
+            }
+
+            .left-side img {
+                width: 110px;
+            }
+
+            .right-side {
+                padding: 22px 18px;
+            }
+
+            .right-side h2 {
+                font-size: 21px;
+            }
+
+            .right-side p {
+                font-size: 13px;
+            }
+
+            .input-icon i.fa-user,
+            .input-icon i.fa-lock {
+                left: 10px;
+            }
+
+            .toggle-password {
+                right: 10px;
+            }
+
+            .input-icon input {
+                padding: 12px 38px;
+                font-size: 14px;
+            }
+
+            .alert {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            button {
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            .back-home {
+                padding: 8px;
+                top: 10px;
+                left: 10px;
+            }
+        }
+
+        /* Pantallas muy pequeñas */
+        @media (max-width: 360px) {
+
+            .right-side h2 {
+                font-size: 19px;
+            }
+
+            .right-side p {
+                font-size: 12px;
+            }
+
+            .input-icon input {
+                font-size: 13px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE LOGIN
+        ========================================= */
     </style>
 
 </head>
@@ -188,8 +380,6 @@
 
     <div class="login-container">
         <!-- tu contenido actual -->
-
-    <div class="login-container">
 
         <!-- IZQUIERDA -->
         <div class="left-side">

@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Inmueble</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
@@ -119,6 +120,176 @@
                 grid-column: span 1;
             }
         }
+        /* =========================================
+        INICIO RESPONSIVE REGISTRAR INMUEBLE
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Mejor control general */
+        body {
+            padding: 20px;
+        }
+
+        /* Mejor visual para archivos */
+        input[type="file"] {
+            padding: 12px;
+            background: #fafafa;
+            cursor: pointer;
+        }
+
+        small {
+            margin-top: 6px;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Laptop */
+        @media (max-width: 1100px) {
+
+            .form-container {
+                max-width: 95%;
+            }
+
+            .form-header h1 {
+                font-size: 30px;
+            }
+
+            form {
+                padding: 30px;
+            }
+        }
+
+        /* Tablet */
+        @media(max-width: 800px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .form-container {
+                border-radius: 20px;
+            }
+
+            .form-header {
+                padding: 24px;
+            }
+
+            .form-header h1 {
+                font-size: 28px;
+            }
+
+            .form-header p {
+                font-size: 14px;
+            }
+
+            form {
+                grid-template-columns: 1fr;
+                padding: 24px;
+                gap: 18px;
+            }
+
+            .input-group.full,
+            .buttons {
+                grid-column: span 1;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            button,
+            .btn-back {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Celulares */
+        @media(max-width: 600px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .form-container {
+                border-radius: 18px;
+            }
+
+            .form-header {
+                padding: 20px 15px;
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
+
+            .form-header p {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            form {
+                padding: 18px;
+                gap: 16px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            input,
+            select,
+            textarea {
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            textarea {
+                min-height: 100px;
+            }
+
+            input[type="file"] {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            small {
+                font-size: 12px;
+            }
+
+            button,
+            .btn-back {
+                padding: 13px;
+                font-size: 14px;
+            }
+        }
+
+        /* Pantallas pequeñas */
+        @media(max-width: 400px) {
+
+            .form-header h1 {
+                font-size: 21px;
+            }
+
+            .form-header p {
+                font-size: 12px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 13px;
+            }
+
+            small {
+                font-size: 11px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE REGISTRAR INMUEBLE
+        ========================================= */
     </style>
 </head>
 

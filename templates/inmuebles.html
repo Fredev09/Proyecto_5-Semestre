@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inmuebles - CiviWeb Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
@@ -270,126 +271,126 @@
         }
 
         .alert {
-    background: #e8f8ee;
-    color: #1f7a3a;
-    border-left: 6px solid #1f9d55;
-    padding: 18px 22px;
-    border-radius: 14px;
-    margin-bottom: 25px;
-    font-weight: bold;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: aparecer 0.4s ease;
-}
+            background: #e8f8ee;
+            color: #1f7a3a;
+            border-left: 6px solid #1f9d55;
+            padding: 18px 22px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: aparecer 0.4s ease;
+        }
 
-.alert i {
-    font-size: 20px;
-}
-.modal-eliminar {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-}
+        .alert i {
+            font-size: 20px;
+        }
+        .modal-eliminar {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
 
-.modal-eliminar.active {
-    display: flex;
-}
+        .modal-eliminar.active {
+            display: flex;
+        }
 
-.modal-card {
-    background: white;
-    width: 420px;
-    max-width: 90%;
-    border-radius: 24px;
-    padding: 35px;
-    text-align: center;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
-    animation: modalEntrada 0.25s ease;
-}
+        .modal-card {
+            background: white;
+            width: 420px;
+            max-width: 90%;
+            border-radius: 24px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+            animation: modalEntrada 0.25s ease;
+        }
 
-.modal-icon {
-    width: 72px;
-    height: 72px;
-    background: #981313;
-    color: white;
-    border-radius: 50%;
-    margin: 0 auto 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-}
+        .modal-icon {
+            width: 72px;
+            height: 72px;
+            background: #981313;
+            color: white;
+            border-radius: 50%;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
 
-.modal-card h2 {
-    color: #981313;
-    margin-bottom: 12px;
-}
+        .modal-card h2 {
+            color: #981313;
+            margin-bottom: 12px;
+        }
 
-.modal-card p {
-    color: #555;
-    line-height: 1.6;
-    margin-bottom: 25px;
-}
+        .modal-card p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
 
-.modal-actions {
-    display: flex;
-    gap: 14px;
-    justify-content: center;
-}
+        .modal-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+        }
 
-.btn-cancelar,
-.btn-eliminar {
-    border: none;
-    padding: 13px 22px;
-    border-radius: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 15px;
-}
+        .btn-cancelar,
+        .btn-eliminar {
+            border: none;
+            padding: 13px 22px;
+            border-radius: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 15px;
+        }
 
-.btn-cancelar {
-    background: #eee;
-    color: #222;
-}
+        .btn-cancelar {
+            background: #eee;
+            color: #222;
+        }
 
-.btn-eliminar {
-    background: #981313;
-    color: white;
-}
+        .btn-eliminar {
+            background: #981313;
+            color: white;
+        }
 
-.btn-eliminar:hover {
-    background: #c11b1b;
-}
+        .btn-eliminar:hover {
+            background: #c11b1b;
+        }
 
-@keyframes modalEntrada {
-    from {
-        opacity: 0;
-        transform: translateY(-15px) scale(0.96);
-    }
+        @keyframes modalEntrada {
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(0.96);
+            }
 
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-@keyframes aparecer {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         @media(max-width: 1050px) {
             .stats,
@@ -414,6 +415,258 @@
                 gap: 18px;
             }
         }
+
+        /* =========================================
+        INICIO RESPONSIVE GESTION INMUEBLES
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Checkbox oculto */
+        #admin-menu-toggle {
+            display: none;
+        }
+
+        /* Botón hamburguesa */
+        .admin-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            margin-left: auto;
+            z-index: 2001;
+        }
+
+        .admin-hamburger span {
+            width: 30px;
+            height: 3px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        /* Laptop */
+        @media(max-width: 1200px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .inmuebles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Tablet */
+        @media(max-width: 950px) {
+
+            .admin-header {
+                padding: 18px 20px;
+                position: relative;
+                flex-wrap: wrap;
+                flex-direction: row;
+            }
+
+            .admin-logo img {
+                width: 155px;
+            }
+
+            /* Mostrar hamburguesa */
+            .admin-hamburger {
+                display: flex;
+            }
+
+            /* Menú oculto */
+            .admin-actions {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 20px;
+                flex-direction: column;
+                background: #111;
+                padding: 18px;
+                border-radius: 0 0 0 18px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+                width: 240px;
+            }
+
+            /* Activar menú */
+            #admin-menu-toggle:checked + .admin-hamburger + .admin-actions {
+                display: flex;
+            }
+
+            .admin-actions a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                padding: 0 18px;
+                margin: 30px auto;
+            }
+
+            .page-title {
+                padding: 26px;
+            }
+
+            .page-title h1 {
+                font-size: 32px;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .inmuebles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Celular */
+        @media(max-width: 768px) {
+
+            .admin-header {
+                padding: 15px;
+            }
+
+            .admin-logo img {
+                width: 135px;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .page-title,
+            .filters,
+            .empty {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .page-title h1 {
+                font-size: 26px;
+            }
+
+            .page-title p {
+                font-size: 14px;
+                line-height: 1.7;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .stat-card h3 {
+                font-size: 14px;
+            }
+
+            .stat-card p {
+                font-size: 28px;
+            }
+
+            .filters input,
+            .filters select,
+            .filters button {
+                width: 100%;
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            .section-title h2 {
+                font-size: 24px;
+            }
+
+            .section-title p {
+                font-size: 14px;
+            }
+
+            .inmueble-card {
+                border-radius: 18px;
+            }
+
+            .image-box {
+                height: 220px;
+            }
+
+            .inmueble-info {
+                padding: 20px;
+            }
+
+            .inmueble-info h3 {
+                font-size: 20px;
+            }
+
+            .precio {
+                font-size: 22px;
+            }
+
+            .acciones {
+                flex-direction: column;
+            }
+
+            .acciones a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .modal-card {
+                padding: 24px 18px;
+                border-radius: 18px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn-cancelar,
+            .btn-eliminar {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Pantallas pequeñas */
+        @media(max-width: 480px) {
+
+            .admin-actions {
+                width: 100%;
+                right: 0;
+                border-radius: 0;
+            }
+
+            .page-title h1 {
+                font-size: 22px;
+            }
+
+            .section-title h2 {
+                font-size: 21px;
+            }
+
+            .image-box {
+                height: 200px;
+            }
+
+            .inmueble-info h3 {
+                font-size: 18px;
+            }
+
+            .precio {
+                font-size: 20px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE GESTION INMUEBLES
+        ========================================= */
     </style>
 </head>
 
@@ -423,6 +676,16 @@
     <div class="admin-logo">
         <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="CiviWeb Manager">
     </div>
+
+    <!-- INICIO MENU HAMBURGUESA ADMIN -->
+    <input type="checkbox" id="admin-menu-toggle">
+
+    <label for="admin-menu-toggle" class="admin-hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </label>
+    <!-- FIN MENU HAMBURGUESA ADMIN -->
 
     <div class="admin-actions">
         <a href="{{ url_for('inmobiliaria_admin') }}">

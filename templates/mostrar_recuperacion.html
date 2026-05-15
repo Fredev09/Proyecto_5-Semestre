@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar contraseña - Constructora</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -91,6 +92,197 @@
             color: #666;
             margin-top: 10px;
         }
+
+        /* =========================================
+        INICIO RESPONSIVE RECUPERAR CONTRASEÑA
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Mejor control */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 20px;
+        }
+
+        /* Contenedor adaptable */
+        .recover-container {
+            max-width: 850px;
+            width: 100%;
+        }
+
+        /* Mejoras visuales */
+        .alert.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .alert.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Evita romper links largos */
+        .link-box a {
+            word-break: break-word;
+            max-width: 100%;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Laptop */
+        @media (max-width: 992px) {
+
+            .recover-container {
+                width: 95%;
+            }
+
+            .left-side img {
+                width: 130px;
+            }
+
+            .right-side {
+                padding: 38px 35px;
+            }
+
+            h2 {
+                font-size: 28px;
+            }
+
+            .info {
+                font-size: 15px;
+            }
+        }
+
+        /* Tablet */
+        @media (max-width: 768px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .recover-container {
+                flex-direction: column;
+                width: 100%;
+                border-radius: 18px;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+            }
+
+            .left-side {
+                padding: 28px 20px;
+            }
+
+            .left-side img {
+                width: 125px;
+            }
+
+            .right-side {
+                padding: 30px 24px;
+            }
+
+            h2 {
+                font-size: 24px;
+                line-height: 1.4;
+            }
+
+            .alert {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .link-box a {
+                width: 100%;
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .info {
+                font-size: 14px;
+                line-height: 1.7;
+            }
+
+            .links a {
+                display: inline-block;
+                font-size: 14px;
+            }
+        }
+
+        /* Celulares */
+        @media (max-width: 480px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .recover-container {
+                border-radius: 16px;
+            }
+
+            .left-side {
+                padding: 22px 15px;
+            }
+
+            .left-side img {
+                width: 105px;
+            }
+
+            .right-side {
+                padding: 24px 18px;
+            }
+
+            h2 {
+                font-size: 21px;
+            }
+
+            .alert {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .link-box {
+                margin: 18px 0;
+            }
+
+            .link-box a {
+                font-size: 14px;
+                padding: 13px;
+                border-radius: 10px;
+            }
+
+            .info {
+                font-size: 13px;
+            }
+
+            .links a {
+                font-size: 13px;
+            }
+        }
+
+        /* Pantallas pequeñas */
+        @media (max-width: 360px) {
+
+            h2 {
+                font-size: 19px;
+            }
+
+            .info {
+                font-size: 12px;
+            }
+
+            .link-box a {
+                font-size: 13px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE RECUPERAR CONTRASEÑA
+        ========================================= */
     </style>
 </head>
 

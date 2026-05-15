@@ -1197,3 +1197,289 @@ CSS ADMIN CONTACTOS
     color: #1f9d55;
     font-weight: bold;
 }
+
+/* =========================================
+INICIO RESPONSIVE GLOBAL + MENU HAMBURGUESA
+NO BORRAR TU CSS ANTERIOR
+PEGAR AL FINAL
+========================================= */
+
+/* Ocultar checkbox */
+#menu-toggle {
+  display: none;
+}
+
+/* Botón hamburguesa */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  gap: 6px;
+  z-index: 2001;
+}
+
+.hamburger span {
+  width: 28px;
+  height: 3px;
+  background: var(--blanco);
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+/* Tablets grandes */
+@media (max-width: 1024px) {
+
+  .hero-content {
+    margin-left: 5%;
+    max-width: 90%;
+  }
+
+  .hero-content h1 {
+    font-size: 42px;
+  }
+
+  .hero-content p {
+    font-size: 18px;
+  }
+
+  .section h2,
+  .nosotros-section h2,
+  .zonas h2,
+  .servicios-slider-section h2,
+  .proyectos h2,
+  .inmobiliaria-section h2 {
+    font-size: 34px;
+  }
+
+  .cards,
+  .project-grid,
+  .valores-grid,
+  .inmobiliaria-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Tablets y móviles */
+@media (max-width: 900px) {
+
+  .navbar {
+    padding: 15px 20px;
+    position: relative;
+  }
+
+  /* Mostrar hamburguesa a la derecha */
+  .hamburger {
+    display: flex;
+    margin-left: auto;
+  }
+
+  /* Menú desplegable */
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 280px;
+    background: rgba(28, 28, 28, 0.98);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 25px;
+    gap: 18px;
+    display: none;
+    border-radius: 0 0 0 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  }
+
+  /* Activar menú */
+  #menu-toggle:checked + .hamburger + .nav-links {
+    display: flex;
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
+  .nav-links a {
+    display: block;
+    width: 100%;
+    font-size: 17px;
+    padding: 8px 0;
+  }
+
+  .hero {
+    padding-top: 100px;
+    min-height: auto;
+    padding-bottom: 80px;
+  }
+
+  .hero-content {
+    text-align: center;
+    margin: auto;
+    padding: 0 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 34px;
+    line-height: 1.2;
+  }
+
+  .hero-content p {
+    font-size: 17px;
+  }
+
+  .cards,
+  .project-grid,
+  .valores-grid,
+  .inmobiliaria-grid,
+  .nosotros-content,
+  .contact-box,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .servicio-overlay {
+    padding: 30px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .servicio-overlay h3 {
+    font-size: 30px;
+  }
+
+  .servicio-overlay p {
+    font-size: 16px;
+  }
+
+  .contact-form,
+  .contact-info {
+    padding: 20px;
+  }
+
+  #map {
+    height: 350px;
+  }
+}
+
+/* Celulares */
+@media (max-width: 600px) {
+
+  .logo img {
+    width: 95px;
+  }
+
+  .hero-content h1 {
+    font-size: 28px;
+  }
+
+  .hero-content p {
+    font-size: 15px;
+  }
+
+  .btn-primary {
+    padding: 12px 22px;
+    font-size: 14px;
+  }
+
+  .section,
+  .nosotros-section,
+  .servicios-slider-section,
+  .proyectos,
+  .inmobiliaria-section {
+    padding: 65px 18px;
+  }
+
+  .section h2,
+  .nosotros-section h2,
+  .zonas h2,
+  .servicios-slider-section h2,
+  .proyectos h2,
+  .inmobiliaria-section h2 {
+    font-size: 28px;
+  }
+
+  .card,
+  .project-card,
+  .valor-card,
+  .inmueble-card {
+    padding: 20px;
+  }
+
+  .servicios-slider {
+    height: 380px;
+  }
+
+  .servicio-overlay h3 {
+    font-size: 24px;
+  }
+
+  .servicio-overlay p {
+    font-size: 14px;
+  }
+
+  .prev,
+  .next,
+  .servicio-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .social {
+    width: 52px;
+    height: 52px;
+    font-size: 20px;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 400px) {
+
+  .hero-content h1 {
+    font-size: 24px;
+  }
+
+  .hero-content p {
+    font-size: 14px;
+  }
+
+  .nav-links {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .section h2 {
+    font-size: 24px;
+  }
+}
+
+/* =========================================
+FIN RESPONSIVE GLOBAL + MENU HAMBURGUESA
+========================================= */
+
+/* =========================================
+INICIO AJUSTES INDEX BOTONES HERO
+========================================= */
+
+@media (max-width: 768px) {
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-content .btn-primary {
+    width: 220px;
+    text-align: center;
+    margin: 8px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  #map {
+    height: 300px;
+  }
+}
+/* =========================================
+FIN AJUSTES INDEX BOTONES HERO
+========================================= */

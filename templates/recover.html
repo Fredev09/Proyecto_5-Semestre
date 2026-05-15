@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar contraseña - Constructora</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -142,6 +143,209 @@
             margin-top: 18px;
             line-height: 1.5;
         }
+
+        /* =========================================
+        INICIO RESPONSIVE RECOVER
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Mejor control */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 20px;
+        }
+
+        /* Contenedor adaptable */
+        .recover-container {
+            max-width: 850px;
+            width: 100%;
+        }
+
+        /* Alertas mejoradas */
+        .alert.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .alert.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Laptop */
+        @media (max-width: 992px) {
+
+            .recover-container {
+                width: 95%;
+            }
+
+            .left-side img {
+                width: 130px;
+            }
+
+            .right-side {
+                padding: 38px 35px;
+            }
+
+            h2 {
+                font-size: 28px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+            }
+        }
+
+        /* Tablet */
+        @media (max-width: 768px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .recover-container {
+                flex-direction: column;
+                width: 100%;
+                border-radius: 18px;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+            }
+
+            .left-side {
+                padding: 28px 20px;
+            }
+
+            .left-side img {
+                width: 125px;
+            }
+
+            .right-side {
+                padding: 30px 24px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+
+            .input-group label {
+                font-size: 14px;
+            }
+
+            .input-icon input {
+                padding: 12px 42px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .info-text {
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+            .links a {
+                display: inline-block;
+                font-size: 14px;
+            }
+        }
+
+        /* Celulares */
+        @media (max-width: 480px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .recover-container {
+                border-radius: 16px;
+            }
+
+            .left-side {
+                padding: 22px 15px;
+            }
+
+            .left-side img {
+                width: 105px;
+            }
+
+            .right-side {
+                padding: 24px 18px;
+            }
+
+            h2 {
+                font-size: 21px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .input-group {
+                margin-bottom: 16px;
+            }
+
+            .input-icon input {
+                padding: 12px 38px;
+                font-size: 14px;
+            }
+
+            .left-icon {
+                left: 10px;
+            }
+
+            .alert {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            button {
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            .info-text {
+                font-size: 12px;
+            }
+
+            .links a {
+                font-size: 13px;
+            }
+        }
+
+        /* Pantallas pequeñas */
+        @media (max-width: 360px) {
+
+            h2 {
+                font-size: 19px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            .input-icon input {
+                font-size: 13px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE RECOVER
+        ========================================= */
     </style>
 </head>
 

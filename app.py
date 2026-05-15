@@ -699,12 +699,6 @@ def constructora_admin():
         return redirect(url_for('login'))
     return render_template('constructora_admin.html')
 
-@app.route('/inmobiliaria_admin')
-def inmobiliaria_admin():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-    return redirect(url_for('inmuebles'))
-
 @app.route('/ventas_admin')
 def ventas_admin():
     if 'usuario' not in session:

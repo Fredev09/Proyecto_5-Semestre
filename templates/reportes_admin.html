@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes - CiviWeb Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
@@ -124,6 +125,209 @@
                 gap: 15px;
             }
         }
+
+        /* =========================================
+        INICIO RESPONSIVE REPORTES ADMIN
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Checkbox oculto */
+        #admin-menu-toggle {
+            display: none;
+        }
+
+        /* Botón hamburguesa */
+        .admin-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            margin-left: auto;
+            z-index: 2001;
+        }
+
+        .admin-hamburger span {
+            width: 30px;
+            height: 3px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        /* Canvas adaptable */
+        .panel canvas {
+            width: 100% !important;
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        /* Laptop */
+        @media(max-width: 1200px) {
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .page-title h1 {
+                font-size: 34px;
+            }
+        }
+
+        /* Tablet */
+        @media(max-width: 950px) {
+
+            .admin-header {
+                padding: 18px 20px;
+                position: relative;
+                flex-wrap: wrap;
+                flex-direction: row;
+            }
+
+            .admin-logo img {
+                width: 155px;
+            }
+
+            /* Mostrar hamburguesa */
+            .admin-hamburger {
+                display: flex;
+            }
+
+            /* Menú oculto */
+            .admin-actions {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 20px;
+                flex-direction: column;
+                background: #111;
+                padding: 18px;
+                border-radius: 0 0 0 18px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+                width: 230px;
+            }
+
+            /* Activar */
+            #admin-menu-toggle:checked + .admin-hamburger + .admin-actions {
+                display: flex;
+            }
+
+            .admin-actions a {
+                width: 100%;
+                text-align: center;
+                margin: 0 0 10px 0;
+            }
+
+            .admin-actions a:last-child {
+                margin-bottom: 0;
+            }
+
+            .container {
+                padding: 0 18px;
+                margin: 30px auto;
+            }
+
+            .page-title,
+            .panel {
+                padding: 26px;
+            }
+
+            .page-title h1 {
+                font-size: 30px;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Celular */
+        @media(max-width: 768px) {
+
+            .admin-header {
+                padding: 15px;
+            }
+
+            .admin-logo img {
+                width: 135px;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .page-title,
+            .panel {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .page-title h1 {
+                font-size: 26px;
+            }
+
+            .page-title p {
+                font-size: 14px;
+                line-height: 1.7;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .stat-card h3 {
+                font-size: 14px;
+            }
+
+            .stat-card p {
+                font-size: 24px;
+                word-break: break-word;
+            }
+
+            .panel h2 {
+                font-size: 22px;
+            }
+
+            #finanzasChart,
+            #inmueblesChart {
+                max-height: 320px;
+            }
+        }
+
+        /* Pantallas pequeñas */
+        @media(max-width: 480px) {
+
+            .admin-actions {
+                width: 100%;
+                right: 0;
+                border-radius: 0;
+            }
+
+            .page-title h1 {
+                font-size: 22px;
+            }
+
+            .panel h2 {
+                font-size: 20px;
+            }
+
+            .stat-card p {
+                font-size: 21px;
+            }
+
+            #finanzasChart,
+            #inmueblesChart {
+                max-height: 260px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE REPORTES ADMIN
+        ========================================= */
     </style>
 </head>
 
@@ -133,6 +337,16 @@
     <div class="admin-logo">
         <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
     </div>
+
+    <!-- INICIO MENU HAMBURGUESA ADMIN -->
+    <input type="checkbox" id="admin-menu-toggle">
+
+    <label for="admin-menu-toggle" class="admin-hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </label>
+    <!-- FIN MENU HAMBURGUESA ADMIN -->
 
     <div class="admin-actions">
         <a href="{{ url_for('dashboard') }}"><i class="fa fa-arrow-left"></i> Dashboard</a>
