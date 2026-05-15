@@ -2,745 +2,1032 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inmobiliaria - CiviWeb Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="../static/imagenes/ICONO.png">
 
     <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f5f5f5;
-    color: #222;
-}
-
-.header {
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    background: rgba(28, 28, 28, 0.95);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-.navbar {
-    max-width: 1200px;
-    margin: auto;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo img {
-    width: 130px;
-    height: auto;
-    object-fit: contain;
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: white;
-    font-weight: 600;
-    font-size: 16px;
-    transition: 0.3s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-    color: #C5A46D;
-}
-
-
-.hero {
-    position: relative;
-    height: 100vh;
-    overflow: hidden;
-    padding-top: 110px;
-    display: flex;
-    align-items: center;
-}
-
-.hero-video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-}
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.58);
-    z-index: 1;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-    margin-left: 10%;
-    max-width: 650px;
-    color: white;
-}
-
-
-.hero h1 {
-    font-size: 52px;
-    line-height: 1.15;
-    font-weight: 900;
-    margin-bottom: 20px;
-}
-
-.hero h1 span {
-    color: #c11212;
-}
-
-.hero p {
-    font-size: 20px;
-    line-height: 1.6;
-    color: #f1f1f1;
-}
-
-
-.catalogo {
-    padding: 90px 8%;
-    background: #fff;
-}
-
-.catalogo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 45px;
-    gap: 25px;
-}
-
-.catalogo-header h2 {
-    font-size: 42px;
-    color: #8B1E1E;
-    font-weight: 800;
-    margin-bottom: 8px;
-}
-
-.catalogo-header p {
-    color: #555;
-    font-size: 17px;
-}
-.filters {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-.filter {
-    border: none;
-    background: #f1f1f1;
-    color: #111;
-    padding: 11px 22px;
-    border-radius: 24px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.filter:hover,
-.filter.active {
-    background: #8B1E1E;
-    color: white;
-}
-
-.inmuebles-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
-}
-
-.inmueble-card {
-    background: white;
-    border-radius: 22px;
-    overflow: hidden;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.10);
-    transition: 0.35s;
-}
-
-.inmueble-card:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 18px 40px rgba(139,30,30,0.18);
-}
-
-.image-box {
-    height: 245px;
-    position: relative;
-    overflow: hidden;
-}
-
-.image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: 0.4s;
-}
-
-.inmueble-card:hover .image-box img {
-    transform: scale(1.05);
-}
-
-.tag-location,
-.tag-status {
-    position: absolute;
-    top: 16px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 900;
-    text-transform: uppercase;
-}
-
-.tag-location {
-    left: 16px;
-    background: #8B1E1E;
-    color: white;
-}
-
-.tag-status {
-    right: 16px;
-    background: #1C1C1C;
-    color: white;
-}
-
-.Disponible {
-    background: #1f9d55 !important;
-}
-
-.Reservado {
-    background: #c58a00 !important;
-}
-
-.Vendido {
-    background: #8B1E1E !important;
-}
-
-.card-info {
-    padding: 24px;
-}
-
-.card-info h3 {
-    font-size: 23px;
-    line-height: 1.25;
-    color: #111;
-    margin-bottom: 14px;
-    font-weight: 900;
-}
-
-.ubicacion {
-    color: #555;
-    font-size: 15px;
-    margin-bottom: 12px;
-}
-
-.descripcion {
-    color: #666;
-    line-height: 1.55;
-    font-size: 15px;
-    margin-bottom: 22px;
-    min-height: 48px;
-}
-
-.price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #eee;
-    padding-top: 18px;
-}
-
-.tipo {
-    color: #444;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 14px;
-}
-
-.precio {
-    font-size: 19px;
-    font-weight: 900;
-    color: #8B1E1E;
-}
-
-.card-footer {
-    padding: 0 24px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.codigo {
-    font-weight: 800;
-    color: #222;
-    font-size: 14px;
-}
-
-.ver-mas {
-    width: 42px;
-    height: 42px;
-    background: #8B1E1E;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.ver-mas:hover {
-    background: #C5A46D;
-    color: #111;
-    transform: rotate(-20deg);
-}
-
-.empty {
-    background: white;
-    border-radius: 24px;
-    padding: 55px;
-    text-align: center;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.08);
-}
-
-.empty i {
-    font-size: 48px;
-    color: #8B1E1E;
-    margin-bottom: 18px;
-}
-
-.empty h2 {
-    color: #8B1E1E;
-    margin-bottom: 10px;
-}
-
-.whatsapp {
-    position: fixed;
-    left: 28px;
-    bottom: 28px;
-    width: 58px;
-    height: 58px;
-    background: #25D366;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 31px;
-    text-decoration: none;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.25);
-    z-index: 2000;
-    transition: 0.3s;
-}
-
-.whatsapp:hover {
-    background: #1ebe5d;
-    transform: translateY(-4px) scale(1.05);
-}
-
-.modal-detalle {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.78);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 5000;
-    padding: 30px;
-}
-
-.modal-detalle.active {
-    display: flex;
-}
-
-.modal-contenido {
-    background: white;
-    width: 100%;
-    max-width: 1050px;
-    max-height: 90vh;
-    overflow-y: auto;
-    border-radius: 28px;
-    padding: 35px;
-    position: relative;
-}
-
-.cerrar-modal {
-    position: absolute;
-    top: 22px;
-    right: 22px;
-    border: none;
-    background: #8B1E1E;
-    color: white;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.modal-contenido h2 {
-    color: #8B1E1E;
-    font-size: 34px;
-    margin-bottom: 12px;
-}
-
-.detalle-ubicacion,
-.detalle-descripcion {
-    color: #555;
-    line-height: 1.7;
-    margin-bottom: 16px;
-}
-
-.detalle-precio {
-    color: #8B1E1E;
-    font-size: 28px;
-    margin-bottom: 22px;
-}
-
-.galeria-detalle {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-}
-
-.galeria-detalle img,
-.galeria-detalle video {
-    width: 100%;
-    height: 320px;
-    object-fit: cover;
-    border-radius: 18px;
-    background: #eee;
-}
-
-.footer {
-  background: var(--negro);
-  color: var(--blanco);
-  text-align: center;
-  padding: 35px 20px;
-}
-
-
-.contact-info-footer {
-  margin-top: 30px;
-}
-
-.contact-info-footer p {
-  margin: 5px 0;
-  color: #ddd;
-}
-
-.contact-section {
-  background: #1c1c1c;
-  color: #f5f5f5;
-  padding: 70px 20px;
-}
-
-.contact-section h2 {
-  color: #ffffff;
-  margin-bottom: 10px;
-}
-
-.contact-section p {
-  color: #ccc;
-}
-
-
-.social-icons {
-  margin-top: 30px;
-}
-.social {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 65px;
-  height: 65px;
-  margin: 12px;
-  border-radius: 50%;
-  font-size: 24px;
-  color: #fff;
-  background: #2a2a2a;
-  transition: 0.3s;
-  text-decoration: none;
-}
-
-.social-whatsapp:hover {
-    background: #25d366;
-}
-
-.nosotros-section {
-    padding: 90px 8%;
-    background: #fff;
-    text-align: center;
-}
-
-.nosotros-section h2 {
-    color: #8B1E1E;
-    font-size: 42px;
-    font-weight: 900;
-    margin-bottom: 35px;
-}
-
-.nosotros-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 45px;
-    align-items: center;
-    margin-bottom: 45px;
-}
-
-.nosotros-img img {
-    width: 100%;
-    height: 410px;
-    object-fit: cover;
-    border-radius: 18px;
-    box-shadow: 0 14px 35px rgba(0,0,0,0.18);
-}
-
-.nosotros-text {
-    text-align: center;
-    color: #333;
-    font-size: 18px;
-    line-height: 1.8;
-}
-
-.nosotros-text p {
-    margin-bottom: 18px;
-}
-
-.nosotros-text strong {
-    color: #8B1E1E;
-}
-
-.valores-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
-    border-top: 1px solid #ddd;
-    padding-top: 45px;
-}
-
-.valor-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    padding: 35px 25px;
-    transition: 0.3s;
-}
-
-.valor-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-}
-
-.valor-card i {
-    font-size: 40px;
-    color: #8B1E1E;
-    margin-bottom: 18px;
-}
-
-.valor-card h3 {
-    font-size: 22px;
-    margin-bottom: 12px;
-    color: #111;
-}
-
-.valor-card p {
-    color: #555;
-    line-height: 1.6;
-}
-
-.clientes-slider-section {
-    padding: 90px 8%;
-    background: #f8f8f8;
-}
-
-.clientes-slider {
-    position: relative;
-    overflow: hidden;
-}
-
-.cliente-slide {
-    display: none;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 70px;
-    min-height: 520px;
-}
-
-.cliente-slide.active {
-    display: grid;
-}
-
-.cliente-text span {
-    color: #999;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-.cliente-text h2 {
-    font-size: 46px;
-    line-height: 1.15;
-    color: #111;
-    margin: 25px 0 20px;
-    font-weight: 900;
-}
-
-.stars {
-    color: #f5a623;
-    font-size: 20px;
-    margin-bottom: 30px;
-}
-
-.cliente-text p {
-    font-size: 21px;
-    line-height: 1.7;
-    color: #333;
-    font-style: italic;
-    max-width: 650px;
-    margin-bottom: 28px;
-}
-
-.cliente-text h4 {
-    font-size: 18px;
-    color: #111;
-    font-weight: 900;
-}
-
-.cliente-img img {
-    width: 100%;
-    height: 520px;
-    object-fit: cover;
-    border-radius: 22px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.16);
-}
-
-.cliente-dots {
-    position: absolute;
-    left: 22%;
-    bottom: 15px;
-    display: flex;
-    gap: 12px;
-}
-
-.cliente-dot {
-    width: 11px;
-    height: 11px;
-    background: #ccc;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.cliente-dot.active {
-    background: #8B1E1E;
-    transform: scale(1.2);
-}
-
-@media(max-width: 900px) {
-    .cliente-slide {
-        grid-template-columns: 1fr;
-        gap: 35px;
-    }
-
-    .cliente-text h2 {
-        font-size: 34px;
-    }
-
-    .cliente-img img {
-        height: 340px;
-    }
-
-    .cliente-dots {
-        position: static;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        .header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(28, 28, 28, 0.95);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #C5A46D;
+        }
+
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            padding-top: 110px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.58);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            margin-left: 10%;
+            max-width: 650px;
+            color: white;
+        }
+
+
+        .hero h1 {
+            font-size: 52px;
+            line-height: 1.15;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            color: #c11212;
+        }
+
+        .hero p {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #f1f1f1;
+        }
+
+
+        .catalogo {
+            padding: 90px 8%;
+            background: #fff;
+        }
+
+        .catalogo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 45px;
+            gap: 25px;
+        }
+
+        .catalogo-header h2 {
+            font-size: 42px;
+            color: #8B1E1E;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .catalogo-header p {
+            color: #555;
+            font-size: 17px;
+        }
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .filter {
+            border: none;
+            background: #f1f1f1;
+            color: #111;
+            padding: 11px 22px;
+            border-radius: 24px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter:hover,
+        .filter.active {
+            background: #8B1E1E;
+            color: white;
+        }
+
+        .inmuebles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .inmueble-card {
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.10);
+            transition: 0.35s;
+        }
+
+        .inmueble-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 18px 40px rgba(139,30,30,0.18);
+        }
+
+        .image-box {
+            height: 245px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+
+        .inmueble-card:hover .image-box img {
+            transform: scale(1.05);
+        }
+
+        .tag-location,
+        .tag-status {
+            position: absolute;
+            top: 16px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .tag-location {
+            left: 16px;
+            background: #8B1E1E;
+            color: white;
+        }
+
+        .tag-status {
+            right: 16px;
+            background: #1C1C1C;
+            color: white;
+        }
+
+        .Disponible {
+            background: #1f9d55 !important;
+        }
+
+        .Reservado {
+            background: #c58a00 !important;
+        }
+
+        .Vendido {
+            background: #8B1E1E !important;
+        }
+
+        .card-info {
+            padding: 24px;
+        }
+
+        .card-info h3 {
+            font-size: 23px;
+            line-height: 1.25;
+            color: #111;
+            margin-bottom: 14px;
+            font-weight: 900;
+        }
+
+        .ubicacion {
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .descripcion {
+            color: #666;
+            line-height: 1.55;
+            font-size: 15px;
+            margin-bottom: 22px;
+            min-height: 48px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 18px;
+        }
+
+        .tipo {
+            color: #444;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .precio {
+            font-size: 19px;
+            font-weight: 900;
+            color: #8B1E1E;
+        }
+
+        .card-footer {
+            padding: 0 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .codigo {
+            font-weight: 800;
+            color: #222;
+            font-size: 14px;
+        }
+
+        .ver-mas {
+            width: 42px;
+            height: 42px;
+            background: #8B1E1E;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .ver-mas:hover {
+            background: #C5A46D;
+            color: #111;
+            transform: rotate(-20deg);
+        }
+
+        .empty {
+            background: white;
+            border-radius: 24px;
+            padding: 55px;
+            text-align: center;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+        }
+
+        .empty i {
+            font-size: 48px;
+            color: #8B1E1E;
+            margin-bottom: 18px;
+        }
+
+        .empty h2 {
+            color: #8B1E1E;
+            margin-bottom: 10px;
+        }
+
+        .whatsapp {
+            position: fixed;
+            left: 28px;
+            bottom: 28px;
+            width: 58px;
+            height: 58px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 31px;
+            text-decoration: none;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            z-index: 2000;
+            transition: 0.3s;
+        }
+
+        .whatsapp:hover {
+            background: #1ebe5d;
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        .modal-detalle {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 30px;
+        }
+
+        .modal-detalle.active {
+            display: flex;
+        }
+
+        .modal-contenido {
+            background: white;
+            width: 100%;
+            max-width: 1050px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 28px;
+            padding: 35px;
+            position: relative;
+        }
+
+        .cerrar-modal {
+            position: absolute;
+            top: 22px;
+            right: 22px;
+            border: none;
+            background: #8B1E1E;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .modal-contenido h2 {
+            color: #8B1E1E;
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .detalle-ubicacion,
+        .detalle-descripcion {
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .detalle-precio {
+            color: #8B1E1E;
+            font-size: 28px;
+            margin-bottom: 22px;
+        }
+
+        .galeria-detalle {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .galeria-detalle img,
+        .galeria-detalle video {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 18px;
+            background: #eee;
+        }
+
+        .footer {
+        background: var(--negro);
+        color: var(--blanco);
+        text-align: center;
+        padding: 35px 20px;
+        }
+
+
+        .contact-info-footer {
+        margin-top: 30px;
+        }
+
+        .contact-info-footer p {
+        margin: 5px 0;
+        color: #ddd;
+        }
+
+        .contact-section {
+        background: #1c1c1c;
+        color: #f5f5f5;
+        padding: 70px 20px;
+        }
+
+        .contact-section h2 {
+        color: #ffffff;
+        margin-bottom: 10px;
+        }
+
+        .contact-section p {
+        color: #ccc;
+        }
+
+
+        .social-icons {
+        margin-top: 30px;
+        }
+        .social {
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
-        margin-top: 25px;
-    }
-}
+        width: 65px;
+        height: 65px;
+        margin: 12px;
+        border-radius: 50%;
+        font-size: 24px;
+        color: #fff;
+        background: #2a2a2a;
+        transition: 0.3s;
+        text-decoration: none;
+        }
 
-@media(max-width: 900px) {
-    .nosotros-content,
-    .valores-grid {
-        grid-template-columns: 1fr;
-    }
+        .social-whatsapp:hover {
+            background: #25d366;
+        }
 
-    .nosotros-img img {
-        height: 300px;
-    }
-}
+        .nosotros-section {
+            padding: 90px 8%;
+            background: #fff;
+            text-align: center;
+        }
 
-@media(max-width: 1050px) {
-    .navbar {
-        flex-direction: column;
-        gap: 15px;
-    }
+        .nosotros-section h2 {
+            color: #8B1E1E;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 35px;
+        }
 
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+        .nosotros-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 45px;
+            align-items: center;
+            margin-bottom: 45px;
+        }
 
-    .hero-content {
-        margin-left: 7%;
-        max-width: 700px;
-    }
+        .nosotros-img img {
+            width: 100%;
+            height: 410px;
+            object-fit: cover;
+            border-radius: 18px;
+            box-shadow: 0 14px 35px rgba(0,0,0,0.18);
+        }
 
-    .hero h1 {
-        font-size: 42px;
-    }
+        .nosotros-text {
+            text-align: center;
+            color: #333;
+            font-size: 18px;
+            line-height: 1.8;
+        }
 
-    .catalogo {
-        padding: 70px 7%;
-    }
+        .nosotros-text p {
+            margin-bottom: 18px;
+        }
 
-    .catalogo-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+        .nosotros-text strong {
+            color: #8B1E1E;
+        }
 
-    .inmuebles-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+        .valores-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            border-top: 1px solid #ddd;
+            padding-top: 45px;
+        }
 
-@media(max-width: 750px) {
-    .hero {
-        height: 85vh;
-    }
+        .valor-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            padding: 35px 25px;
+            transition: 0.3s;
+        }
 
-    .hero h1 {
-        font-size: 36px;
-    }
+        .valor-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
 
-    .hero p {
-        font-size: 18px;
-    }
+        .valor-card i {
+            font-size: 40px;
+            color: #8B1E1E;
+            margin-bottom: 18px;
+        }
 
-    .inmuebles-grid {
-        grid-template-columns: 1fr;
-    }
+        .valor-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #111;
+        }
 
-    .catalogo-header h2 {
-        font-size: 34px;
-    }
-}
-</style>
+        .valor-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .clientes-slider-section {
+            padding: 90px 8%;
+            background: #f8f8f8;
+        }
+
+        .clientes-slider {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cliente-slide {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 70px;
+            min-height: 520px;
+        }
+
+        .cliente-slide.active {
+            display: grid;
+        }
+
+        .cliente-text span {
+            color: #999;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .cliente-text h2 {
+            font-size: 46px;
+            line-height: 1.15;
+            color: #111;
+            margin: 25px 0 20px;
+            font-weight: 900;
+        }
+
+        .stars {
+            color: #f5a623;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .cliente-text p {
+            font-size: 21px;
+            line-height: 1.7;
+            color: #333;
+            font-style: italic;
+            max-width: 650px;
+            margin-bottom: 28px;
+        }
+
+        .cliente-text h4 {
+            font-size: 18px;
+            color: #111;
+            font-weight: 900;
+        }
+
+        .cliente-img img {
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+            border-radius: 22px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.16);
+        }
+
+        .cliente-dots {
+            position: absolute;
+            left: 22%;
+            bottom: 15px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .cliente-dot {
+            width: 11px;
+            height: 11px;
+            background: #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .cliente-dot.active {
+            background: #8B1E1E;
+            transform: scale(1.2);
+        }
+
+        @media(max-width: 900px) {
+            .cliente-slide {
+                grid-template-columns: 1fr;
+                gap: 35px;
+            }
+
+            .cliente-text h2 {
+                font-size: 34px;
+            }
+
+            .cliente-img img {
+                height: 340px;
+            }
+
+            .cliente-dots {
+                position: static;
+                justify-content: center;
+                margin-top: 25px;
+            }
+        }
+
+        @media(max-width: 900px) {
+            .nosotros-content,
+            .valores-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nosotros-img img {
+                height: 300px;
+            }
+        }
+
+        @media(max-width: 1050px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero-content {
+                margin-left: 7%;
+                max-width: 700px;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .catalogo {
+                padding: 70px 7%;
+            }
+
+            .catalogo-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .inmuebles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 750px) {
+            .hero {
+                height: 85vh;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .inmuebles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .catalogo-header h2 {
+                font-size: 34px;
+            }
+        }
+
+        /* =========================================
+        INICIO RESPONSIVE INMOBILIARIA PUBLICA
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Checkbox oculto */
+        #menu-toggle {
+            display: none;
+        }
+
+        /* Botón hamburguesa */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            margin-left: auto;
+            z-index: 3001;
+        }
+
+        .hamburger span {
+            width: 30px;
+            height: 3px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        /* Laptop */
+        @media(max-width: 1200px) {
+
+            .hero-content {
+                margin-left: 7%;
+                max-width: 80%;
+            }
+
+            .hero h1 {
+                font-size: 44px;
+            }
+
+            .catalogo-header h2 {
+                font-size: 36px;
+            }
+
+            .inmuebles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tablet */
+        @media(max-width: 950px) {
+
+            .navbar {
+                padding: 15px 20px;
+                position: relative;
+            }
+
+            /* Mostrar hamburguesa */
+            .hamburger {
+                display: flex;
+            }
+
+            /* Menú oculto */
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 270px;
+                background: rgba(28,28,28,0.98);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 25px;
+                border-radius: 0 0 0 18px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+            }
+
+            /* Activar menú */
+            #menu-toggle:checked + .hamburger + .nav-links {
+                display: flex;
+            }
+
+            .nav-links a {
+                width: 100%;
+                padding: 8px 0;
+            }
+
+            .hero {
+                height: auto;
+                min-height: 85vh;
+                padding-top: 120px;
+                padding-bottom: 60px;
+            }
+
+            .hero-content {
+                margin: auto;
+                padding: 0 20px;
+                text-align: center;
+                max-width: 90%;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .catalogo {
+                padding: 70px 5%;
+            }
+
+            .catalogo-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filters {
+                justify-content: flex-start;
+            }
+
+            .modal-contenido {
+                padding: 25px;
+            }
+
+            .modal-contenido h2 {
+                font-size: 28px;
+            }
+
+            .galeria-detalle {
+                grid-template-columns: 1fr;
+            }
+
+            .galeria-detalle img,
+            .galeria-detalle video {
+                height: 260px;
+            }
+        }
+
+        /* Celulares */
+        @media(max-width: 768px) {
+
+            .logo img {
+                width: 110px;
+            }
+
+            .hero {
+                min-height: 78vh;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+                line-height: 1.25;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .catalogo {
+                padding: 60px 4%;
+            }
+
+            .catalogo-header h2 {
+                font-size: 30px;
+            }
+
+            .catalogo-header p {
+                font-size: 15px;
+            }
+
+            .filters {
+                gap: 8px;
+            }
+
+            .filter {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .inmuebles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-info h3 {
+                font-size: 20px;
+            }
+
+            .descripcion {
+                min-height: auto;
+                font-size: 14px;
+            }
+
+            .precio {
+                font-size: 17px;
+            }
+
+            .modal-detalle {
+                padding: 12px;
+            }
+
+            .modal-contenido {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .modal-contenido h2 {
+                font-size: 24px;
+            }
+
+            .detalle-precio {
+                font-size: 22px;
+            }
+
+            .galeria-detalle img,
+            .galeria-detalle video {
+                height: 220px;
+            }
+
+            .whatsapp {
+                width: 52px;
+                height: 52px;
+                font-size: 26px;
+                left: 18px;
+                bottom: 18px;
+            }
+
+            .social {
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+            }
+        }
+
+        /* Pantallas pequeñas */
+        @media(max-width: 480px) {
+
+            .nav-links {
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .hero h1 {
+                font-size: 25px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .catalogo-header h2 {
+                font-size: 25px;
+            }
+
+            .image-box {
+                height: 220px;
+            }
+
+            .card-info,
+            .card-footer {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .modal-contenido h2 {
+                font-size: 22px;
+            }
+
+            .cerrar-modal {
+                width: 38px;
+                height: 38px;
+            }
+
+            .footer {
+                padding: 25px 15px;
+            }
+
+            .contact-section {
+                padding: 50px 15px;
+            }
+        }
+
+        /* =========================================
+        FIN RESPONSIVE INMOBILIARIA PUBLICA
+        ========================================= */
+    </style>
 </head>
 
 <body>
@@ -750,6 +1037,16 @@ body {
         <div class="logo">
             <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="Logo">
         </div>
+
+        <!-- INICIO MENU HAMBURGUESA -->
+        <input type="checkbox" id="menu-toggle">
+
+        <label for="menu-toggle" class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+        <!-- FIN MENU HAMBURGUESA -->
 
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Inicio</a>
