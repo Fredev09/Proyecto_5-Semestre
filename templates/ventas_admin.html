@@ -358,6 +358,32 @@
                 <textarea name="observacion" placeholder="Ej: Venta registrada con pago inicial y documentación pendiente."></textarea>
             </div>
 
+            <div class="input-group full">
+    <label>Método de pago</label>
+
+    <div style="display: flex; gap: 18px; flex-wrap: wrap;">
+        <label>
+            <input type="checkbox" name="metodo_pago" value="Efectivo">
+            Efectivo
+        </label>
+
+        <label>
+            <input type="checkbox" name="metodo_pago" value="Transferencia">
+            Transferencia
+        </label>
+
+        <label>
+            <input type="checkbox" name="metodo_pago" value="Crédito">
+            Crédito
+        </label>
+    </div>
+</div>
+
+<div class="input-group">
+    <label>Anticipo</label>
+    <input type="number" name="anticipo" placeholder="Ej: 50000000" value="0" required>
+</div>
+
             <button type="submit" class="btn-submit">
                 <i class="fa fa-save"></i> Registrar venta
             </button>

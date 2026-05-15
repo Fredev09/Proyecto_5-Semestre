@@ -696,11 +696,13 @@ def constructora_admin():
         return redirect(url_for('login'))
     return render_template('constructora_admin.html')
 
+
 @app.route('/ventas_admin', methods=['GET', 'POST'])
 def ventas_admin():
 
     if 'usuario' not in session:
         return redirect(url_for('login'))
+
     conexion = mysql.connection
     cur = conexion.cursor()
 
@@ -708,12 +710,21 @@ def ventas_admin():
 
         inmueble_id = request.form['inmueble_id']
         cliente_id = request.form['cliente_id']
-        valor_venta = request.form['valor_venta']
-        metodo_pago = request.form['metodo_pago']
-        anticipo = request.form['anticipo']
-        saldo = request.form['saldo']
-        estado_pago = request.form['estado_pago']
+
+        valor_venta = float(request.form['valor_venta'])
+        anticipo = float(request.form['anticipo'])
+
+        metodo_pago = ", ".join(request.form.getlist('metodo_pago'))
+
         observacion = request.form['observacion']
+        saldo = valor_venta - anticipo
+
+        if saldo <= 0:
+            estado_pago = 'Pagado'
+        elif anticipo > 0:
+            estado_pago = 'Pendiente'
+        else:
+            estado_pago = 'Sin anticipo'
 
         cur.execute("""
             INSERT INTO ventas (
@@ -756,13 +767,14 @@ def ventas_admin():
         WHERE estado = 'Disponible'
         ORDER BY id DESC
     """)
-    inmuebles_disponibles = cur.fetchall()
 
+    inmuebles_disponibles = cur.fetchall()
     cur.execute("""
         SELECT *
         FROM clientes
         ORDER BY nombre ASC
     """)
+
     clientes = cur.fetchall()
 
     cur.execute("""
@@ -799,19 +811,23 @@ def ventas_admin():
         SELECT COALESCE(SUM(valor_venta), 0) AS total
         FROM ventas
     """)
+
     total_vendido = cur.fetchone()['total']
 
     cur.execute("""
         SELECT COUNT(*) AS total
         FROM ventas
     """)
+
     total_ventas = cur.fetchone()['total']
+
     cur.execute("""
         SELECT COUNT(*) AS total
         FROM ventas
         WHERE MONTH(fecha) = MONTH(CURDATE())
         AND YEAR(fecha) = YEAR(CURDATE())
     """)
+
     ventas_mes = cur.fetchone()['total']
 
     cur.close()
@@ -827,7 +843,6 @@ def ventas_admin():
         total_ventas=total_ventas,
         ventas_mes=ventas_mes
     )
-
 @app.route('/clientes_admin', methods=['GET', 'POST'])
 def clientes_admin():
     if 'usuario' not in session:
