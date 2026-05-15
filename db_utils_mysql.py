@@ -159,3 +159,17 @@ def marcar_contactado_mysql(mysql, contacto_id):
     ''', (contacto_id,))
     mysql.connection.commit()
     cur.close()
+
+def get_proyectos_mysql(mysql):
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT id, nombre, tipo_trabajo, descripcion, estado
+        FROM proyectos_constructora
+        ORDER BY id DESC
+    """)
+
+    proyectos = cur.fetchall()
+    cur.close()
+
+    return proyectos

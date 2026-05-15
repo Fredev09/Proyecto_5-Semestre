@@ -391,19 +391,19 @@
             <p>Registra, consulta y controla los proyectos constructivos activos y finalizados.</p>
         </a>
 
-        <a href="#" class="module-card">
+        <a href="{{ url_for('servicios_constructivos') }}" class="module-card">
             <i class="fa fa-screwdriver-wrench"></i>
             <h3>Servicios constructivos</h3>
             <p>Gestiona los servicios ofrecidos por la empresa en obras civiles y consultoría.</p>
         </a>
 
         <a href="{{ url_for('admin_contactos') }}" class="module-card">
-            <i class="fa fa-map-location-dot"></i>
+            <i class="fa fa-list-check"></i>
             <h3>Clientes interesados</h3>
             <p>Consulta los clientes interesados en adquirir nuestros servicios.</p>
         </a>
 
-        <a href="#" class="module-card">
+        <a href="{{ url_for('clientes_constructora') }}" class="module-card">
             <i class="fa fa-users"></i>
             <h3>Clientes</h3>
             <p>Administra clientes, entidades contratantes y contactos relacionados.</p>

@@ -9,6 +9,8 @@ from werkzeug.utils import secure_filename
 import re
 import uuid
 from datetime import datetime
+from dotenv import load_dotenv
+import pymysql
 
 from db_utils_mysql import (
     add_usuario_mysql,
@@ -26,8 +28,9 @@ from db_utils_mysql import (
     marcar_contactado_mysql
 )
 
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'contraseña01'
+app.secret_key = os.getenv("SECRET_KEY")
 
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 
@@ -43,21 +46,21 @@ def index():
     return render_template ('index.html')
 
 # Configuración de MySQL (ajusta según tu XAMPP)
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'proyecto_final'
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 #Configuracion e-mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'camila2001super@gmail.com'
-app.config['MAIL_PASSWORD'] = 'sctagkciisazqpua'
-app.config['MAIL_DEFAULT_SENDER'] = 'camila2001super@gmail.com'
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'False'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
@@ -659,9 +662,6 @@ def editar_inmueble(id):
     galeria = cur.fetchall()
 
     cur.close()
-
-    return render_template('editar_inmueble.html', inmueble=inmueble)
-
     return render_template(
         'editar_inmueble.html',
         inmueble=inmueble,
@@ -699,50 +699,220 @@ def constructora_admin():
         return redirect(url_for('login'))
     return render_template('constructora_admin.html')
 
+
 @app.route('/ventas_admin')
+
+@app.route('/ventas_admin', methods=['GET', 'POST'])
+
 def ventas_admin():
+
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
-    cur = mysql.connection.cursor()
+    conexion = mysql.connection
+    cur = conexion.cursor()
 
-    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
+    if request.method == 'POST':
+
+        inmueble_id = request.form['inmueble_id']
+        cliente_id = request.form['cliente_id']
+
+        valor_venta = float(request.form['valor_venta'])
+        anticipo = float(request.form['anticipo'])
+
+        metodo_pago = ", ".join(request.form.getlist('metodo_pago'))
+
+        observacion = request.form['observacion']
+        saldo = valor_venta - anticipo
+
+        if saldo <= 0:
+            estado_pago = 'Pagado'
+        elif anticipo > 0:
+            estado_pago = 'Pendiente'
+        else:
+            estado_pago = 'Sin anticipo'
+
+        cur.execute("""
+            INSERT INTO ventas (
+                inmueble_id,
+                cliente_id,
+                valor_venta,
+                metodo_pago,
+                anticipo,
+                saldo,
+                estado_pago,
+                observacion
+            )
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            inmueble_id,
+            cliente_id,
+            valor_venta,
+            metodo_pago,
+            anticipo,
+            saldo,
+            estado_pago,
+            observacion
+        ))
+
+        cur.execute("""
+            UPDATE inmuebles
+            SET estado = 'Vendido'
+            WHERE id = %s
+        """, (inmueble_id,))
+
+        conexion.commit()
+
+        flash('Venta registrada correctamente.', 'success')
+
+        return redirect(url_for('ventas_admin'))
+
+    cur.execute("""
+        SELECT *
+        FROM inmuebles
+        WHERE estado = 'Disponible'
+        ORDER BY id DESC
+    """)
+
+    inmuebles_disponibles = cur.fetchall()
+    cur.execute("""
+        SELECT *
+        FROM clientes
+        ORDER BY nombre ASC
+    """)
+
+    clientes = cur.fetchall()
+
+    cur.execute("""
+        SELECT 
+            v.id,
+            v.valor_venta,
+            v.fecha,
+            v.observacion,
+            v.metodo_pago,
+            v.anticipo,
+            v.saldo,
+            v.estado_pago,
+
+            i.titulo AS inmueble,
+            i.ubicacion,
+
+            c.nombre AS cliente,
+            c.documento
+
+        FROM ventas v
+
+        INNER JOIN inmuebles i 
+            ON v.inmueble_id = i.id
+
+        INNER JOIN clientes c 
+            ON v.cliente_id = c.id
+
+        ORDER BY v.fecha DESC
+    """)
+
+    ventas = cur.fetchall()
+
+    cur.execute("""
+        SELECT COALESCE(SUM(valor_venta), 0) AS total
+        FROM ventas
+    """)
+
     total_vendido = cur.fetchone()['total']
 
-    cur.execute("SELECT COUNT(*) AS total FROM ventas WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")
-    ventas_mes = cur.fetchone()['total']
-
-    cur.execute("SELECT COUNT(*) AS total FROM ventas")
-    inmuebles_vendidos = cur.fetchone()['total']
-
     cur.execute("""
-        SELECT v.id, v.cliente, v.valor_venta, v.fecha, i.titulo
-        FROM ventas v
-        INNER JOIN inmuebles i ON v.inmueble_id = i.id
-        ORDER BY v.fecha DESC
-        LIMIT 5
-    """)
-    ultimas_ventas = cur.fetchall()
-
-    cur.execute("""
-        SELECT MONTH(fecha) AS mes, COUNT(*) AS total
+        SELECT COUNT(*) AS total
         FROM ventas
-        WHERE YEAR(fecha) = YEAR(CURDATE())
-        GROUP BY MONTH(fecha)
-        ORDER BY MONTH(fecha)
     """)
-    ventas_grafico = cur.fetchall()
+
+    total_ventas = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT COUNT(*) AS total
+        FROM ventas
+        WHERE MONTH(fecha) = MONTH(CURDATE())
+        AND YEAR(fecha) = YEAR(CURDATE())
+    """)
+
+    ventas_mes = cur.fetchone()['total']
 
     cur.close()
 
     return render_template(
         'ventas_admin.html',
+
+        inmuebles_disponibles=inmuebles_disponibles,
+        clientes=clientes,
+        ventas=ventas,
+
         total_vendido=total_vendido,
-        ventas_mes=ventas_mes,
-        inmuebles_vendidos=inmuebles_vendidos,
-        ultimas_ventas=ultimas_ventas,
-        ventas_grafico=ventas_grafico
+        total_ventas=total_ventas,
+        ventas_mes=ventas_mes
     )
+@app.route('/clientes_admin', methods=['GET', 'POST'])
+def clientes_admin():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        nombre = request.form['nombre'].strip()
+        documento = request.form['documento'].strip()
+        telefono = request.form['telefono'].strip()
+        email = request.form['email'].strip()
+        direccion = request.form['direccion'].strip()
+        tipo_interes = request.form['tipo_interes']
+        observacion = request.form['observacion'].strip()
+
+        if not nombre or not telefono:
+            flash('El nombre y el teléfono son obligatorios.', 'danger')
+            return redirect(url_for('clientes_admin'))
+
+        cur.execute("""
+            INSERT INTO clientes (nombre, documento, telefono, email, direccion, tipo_interes, observacion)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (nombre, documento, telefono, email, direccion, tipo_interes, observacion))
+
+        mysql.connection.commit()
+        flash('Cliente registrado correctamente.', 'success')
+        return redirect(url_for('clientes_admin'))
+
+    cur.execute("SELECT * FROM clientes ORDER BY id DESC")
+    clientes = cur.fetchall()
+
+    cur.execute("SELECT COUNT(*) AS total FROM clientes")
+    total_clientes = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM clientes WHERE tipo_interes = 'Compra'")
+    clientes_compra = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM clientes WHERE tipo_interes = 'Arriendo'")
+    clientes_arriendo = cur.fetchone()['total']
+
+    cur.close()
+
+    return render_template(
+        'clientes_admin.html',
+        clientes=clientes,
+        total_clientes=total_clientes,
+        clientes_compra=clientes_compra,
+        clientes_arriendo=clientes_arriendo
+    )
+
+
+@app.route('/eliminar_cliente/<int:id>')
+def eliminar_cliente(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM clientes WHERE id = %s", (id,))
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Cliente eliminado correctamente.', 'success')
+    return redirect(url_for('clientes_admin'))
 
 @app.route('/compras_admin')
 def compras_admin():
@@ -848,19 +1018,58 @@ def reportes_admin():
 
 @app.route('/proyectos')
 def proyectos_admin():
-    proyectos = get_proyectos_mysql(mysql)
-    return render_template('Proyectos_confi.html', proyectos=proyectos)
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
 
+    proyectos = get_proyectos_mysql(mysql)
+
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT id, nombre, tipo
+        FROM clientes_constructora
+        ORDER BY nombre ASC
+    """)
+    clientes = cur.fetchall()
+    cur.close()
+
+    return render_template(
+        'Proyectos_confi.html',
+        proyectos=proyectos,
+        clientes=clientes
+    )
+
+
+# EN app.py - REEMPLAZA TU RUTA /crear_proyecto
 
 @app.route('/crear_proyecto', methods=['POST'])
 def crear_proyecto():
     nombre = request.form['nombre']
+    tipo_trabajo = request.form['tipo_trabajo']
     descripcion = request.form['descripcion']
     estado = request.form['estado']
+    cliente_id = request.form['cliente_id']
 
-    add_proyecto_mysql(mysql, nombre, descripcion, estado)
+    cur = mysql.connection.cursor()
 
-    return redirect('/proyectos')
+    # Crear proyecto con tipo de trabajo
+    cur.execute("""
+        INSERT INTO proyectos_constructora (nombre, tipo_trabajo, descripcion, estado)
+        VALUES (%s, %s, %s, %s)
+    """, (nombre, tipo_trabajo, descripcion, estado))
+
+    proyecto_id = cur.lastrowid
+
+    # Relacionar cliente con proyecto
+    cur.execute("""
+        INSERT INTO cliente_proyecto (cliente_id, proyecto_id)
+        VALUES (%s, %s)
+    """, (cliente_id, proyecto_id))
+
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Proyecto creado y vinculado al cliente correctamente.', 'success')
+    return redirect(url_for('proyectos_admin'))
 
 
 @app.route('/editar_proyecto/<int:id>')
@@ -978,6 +1187,136 @@ def marcar_contactado(id):
     marcar_contactado_mysql(mysql, id)
     flash("Cliente marcado como contactado", "success")
     return redirect(url_for('admin_contactos'))
+
+
+
+@app.route('/clientes_constructora')
+def clientes_constructora():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT 
+            c.id,
+            c.nombre,
+            c.tipo,
+            c.telefono,
+            c.correo,
+            p.nombre AS proyecto
+        FROM clientes_constructora c
+        LEFT JOIN cliente_proyecto cp ON c.id = cp.cliente_id
+        LEFT JOIN proyectos_constructora p ON cp.proyecto_id = p.id
+        ORDER BY c.nombre ASC
+    """)
+
+    resultados = cur.fetchall()
+    cur.close()
+
+    clientes_dict = {}
+
+    for fila in resultados:
+        cliente_id = fila['id']
+
+        if cliente_id not in clientes_dict:
+            clientes_dict[cliente_id] = {
+                "nombre": fila['nombre'],
+                "tipo": fila['tipo'],
+                "telefono": fila['telefono'],
+                "correo": fila['correo'],
+                "proyectos": []
+            }
+
+        if fila['proyecto']:
+            clientes_dict[cliente_id]["proyectos"].append(fila['proyecto'])
+
+    clientes = list(clientes_dict.values())
+
+    return render_template(
+        'clientes_constructora.html',
+        clientes=clientes
+    )
+
+@app.route('/servicios_constructivos')
+def servicios_constructivos():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    # TOTAL GENERAL
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora")
+    total_proyectos = cur.fetchone()['total']
+
+    # CONTEOS PRINCIPALES
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Obras civiles'")
+    obras_civiles = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Diseño estructural'")
+    diseño_estructural = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Consultoría'")
+    consultoria = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Interventoría'")
+    interventoria = cur.fetchone()['total']
+
+    # TODOS LOS SERVICIOS AGRUPADOS
+    cur.execute("""
+        SELECT tipo_trabajo, COUNT(*) AS total
+        FROM proyectos_constructora
+        GROUP BY tipo_trabajo
+        ORDER BY total DESC
+    """)
+
+    resultados = cur.fetchall()
+    cur.close()
+
+    # ICONOS Y DESCRIPCIONES
+    iconos = {
+        "Obras civiles": "fa fa-helmet-safety",
+        "Construcción residencial": "fa fa-house",
+        "Construcción comercial": "fa fa-building",
+        "Diseño estructural": "fa fa-drafting-compass",
+        "Interventoría": "fa fa-list-check",
+        "Consultoría": "fa fa-file-signature",
+        "Remodelación": "fa fa-screwdriver-wrench",
+        "Urbanismo": "fa fa-city"
+    }
+
+    descripciones = {
+        "Obras civiles": "Infraestructura, vías, puentes y obras públicas.",
+        "Construcción residencial": "Viviendas, conjuntos y desarrollos habitacionales.",
+        "Construcción comercial": "Locales, oficinas y espacios empresariales.",
+        "Diseño estructural": "Cálculo, planificación y seguridad estructural.",
+        "Interventoría": "Supervisión técnica, financiera y administrativa.",
+        "Consultoría": "Asesoría profesional en ingeniería y ejecución.",
+        "Remodelación": "Mejoras, adecuaciones y renovación de espacios.",
+        "Urbanismo": "Planeación urbana y desarrollo territorial."
+    }
+
+    servicios = []
+
+    for r in resultados:
+        tipo = r['tipo_trabajo']
+
+        servicios.append({
+            "tipo": tipo,
+            "total": r['total'],
+            "icono": iconos.get(tipo, "fa fa-briefcase"),
+            "descripcion": descripciones.get(tipo, "Servicio constructivo especializado.")
+        })
+
+    return render_template(
+        'servicios_constructivos.html',
+        total_proyectos=total_proyectos,
+        obras_civiles=obras_civiles,
+        diseño_estructural=diseño_estructural,
+        interventoria=interventoria,
+        consultoria=consultoria,
+        servicios=servicios
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

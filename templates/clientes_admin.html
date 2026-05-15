@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111;
+            padding: 18px 55px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        .admin-logo img {
+            width: 190px;
+        }
+
+        .admin-actions a {
+            text-decoration: none;
+            color: white;
+            background: #981313;
+            padding: 13px 22px;
+            border-radius: 28px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: 45px auto;
+            padding: 0 35px;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 24px;
+            padding: 34px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #981313;
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 17px;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .stat-card i {
+            font-size: 34px;
+            color: #981313;
+            margin-bottom: 14px;
+        }
+
+        .stat-card h3 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #981313;
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        .section-box {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 35px;
+        }
+
+        .section-box h2 {
+            color: #981313;
+            font-size: 28px;
+            margin-bottom: 22px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #981313;
+            box-shadow: 0 0 0 3px rgba(152,19,19,0.12);
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            background: #981313;
+            color: white;
+            border: none;
+            padding: 15px 26px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 950px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #981313;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            color: #444;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            padding: 7px 13px;
+            border-radius: 18px;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .Compra {
+            background: #981313;
+        }
+
+        .Arriendo {
+            background: #1f9d55;
+        }
+
+        .Reserva {
+            background: #c58a00;
+        }
+
+        .btn-delete {
+            background: #111;
+            color: white;
+            text-decoration: none;
+            padding: 9px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .empty {
+            background: #f7f7f7;
+            border-radius: 18px;
+            padding: 35px;
+            text-align: center;
+            color: #666;
+        }
+
+        @media(max-width: 900px) {
+            .stats-grid,
+            form {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group.full,
+            .btn-submit {
+                grid-column: span 1;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="CiviWeb Manager">
+    </div>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('inmobiliaria_admin') }}">
+            <i class="fa fa-arrow-left"></i> Volver
+        </a>
+
+        <a href="{{ url_for('dashboard') }}">
+            <i class="fa fa-home"></i> Dashboard
+        </a>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h1>Gestión de Clientes</h1>
+        <p>Registra compradores, arrendatarios e interesados en propiedades inmobiliarias.</p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <i class="fa fa-users"></i>
+            <h3>Total clientes</h3>
+            <p>{{ total_clientes }}</p>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa fa-house-circle-check"></i>
+            <h3>Interesados en compra</h3>
+            <p>{{ clientes_compra }}</p>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa fa-key"></i>
+            <h3>Interesados en arriendo</h3>
+            <p>{{ clientes_arriendo }}</p>
+        </div>
+    </section>
+
+    <section class="section-box">
+        <h2><i class="fa fa-user-plus"></i> Registrar nuevo cliente</h2>
+
+        <form method="POST">
+
+            <div class="input-group">
+                <label>Nombre completo</label>
+                <input type="text" name="nombre" placeholder="Ej: María Gómez" required>
+            </div>
+
+            <div class="input-group">
+                <label>Documento</label>
+                <input type="text" name="documento" placeholder="Ej: 1002456789">
+            </div>
+
+            <div class="input-group">
+                <label>Teléfono</label>
+                <input type="text" name="telefono" placeholder="Ej: 3001234567" required>
+            </div>
+
+            <div class="input-group">
+                <label>Correo electrónico</label>
+                <input type="email" name="email" placeholder="Ej: cliente@gmail.com">
+            </div>
+
+            <div class="input-group">
+                <label>Dirección</label>
+                <input type="text" name="direccion" placeholder="Ej: Montería, Córdoba">
+            </div>
+
+            <div class="input-group">
+                <label>Tipo de interés</label>
+                <select name="tipo_interes" required>
+                    <option value="Compra">Compra</option>
+                    <option value="Arriendo">Arriendo</option>
+                    <option value="Reserva">Reserva</option>
+                </select>
+            </div>
+
+            <div class="input-group full">
+                <label>Observación</label>
+                <textarea name="observacion" placeholder="Ej: Cliente interesado en apartamento familiar en zona norte."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa fa-save"></i> Guardar cliente
+            </button>
+
+        </form>
+    </section>
+
+    <section class="section-box">
+        <h2><i class="fa fa-list"></i> Clientes registrados</h2>
+
+        {% if clientes %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Documento</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Dirección</th>
+                        <th>Interés</th>
+                        <th>Observación</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for c in clientes %}
+                    <tr>
+                        <td>{{ c.nombre }}</td>
+                        <td>{{ c.documento }}</td>
+                        <td>{{ c.telefono }}</td>
+                        <td>{{ c.email }}</td>
+                        <td>{{ c.direccion }}</td>
+                        <td>
+                            <span class="badge {{ c.tipo_interes }}">
+                                {{ c.tipo_interes }}
+                            </span>
+                        </td>
+                        <td>{{ c.observacion }}</td>
+                        <td>
+                            <a href="{{ url_for('eliminar_cliente', id=c.id) }}"
+                               class="btn-delete"
+                               onclick="return confirm('¿Eliminar este cliente?')">
+                                <i class="fa fa-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty">
+            <h3>No hay clientes registrados</h3>
+            <p>Cuando registres un cliente aparecerá en esta sección.</p>
+        </div>
+        {% endif %}
+    </section>
+
+</main>
+
+</body>
+</html>

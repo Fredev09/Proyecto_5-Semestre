@@ -395,18 +395,19 @@
             <h3>Registrar inmueble</h3>
             <p>Agrega nuevas propiedades disponibles para venta, arriendo o reserva.</p>
         </a>
-
+        
+<a href="{{ url_for('clientes_admin') }}" class="module-card">
+    <i class="fa fa-users"></i>
+    <h3>Clientes</h3>
+    <p>Controla clientes registrados, solicitudes, reservas y seguimiento inmobiliario.</p>
+</a>
         <a href="{{ url_for('ventas_admin') }}" class="module-card">
             <i class="fa fa-handshake"></i>
             <h3>Ventas</h3>
             <p>Consulta ventas registradas y revisa indicadores comerciales.</p>
         </a>
 
-        <a href="{{ url_for('compras_admin') }}" class="module-card">
-            <i class="fa fa-cart-shopping"></i>
-            <h3>Compras</h3>
-            <p>Controla compras, materiales, costos y gastos operativos.</p>
-        </a>
+        
 
         <a href="{{ url_for('reservas_admin') }}" class="module-card">
             <i class="fa fa-calendar-check"></i>

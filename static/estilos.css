@@ -881,9 +881,11 @@ body {
   background: white;
   width: 60px;
 }
-
-.proyectos {
-  padding: 70px 8%;
+  .proyectos {
+  width: 100%;
+  max-width: 1700px;
+  margin: auto;
+  padding: 80px 3%;
   background: #fff;
 }
 
@@ -891,23 +893,32 @@ body {
   color: #8B1E1E;
   font-size: 42px;
   font-weight: 800;
+  margin-bottom: 25px;
   text-align: center;
-  margin-bottom: 14px;
+
+  letter-spacing: -1px;
+  line-height: 1.2;
 }
 
 .proyectos-intro {
-  max-width: 850px;
-  margin: 0 auto 45px;
+  font-size: 20px;
+  color: #555;
+  line-height: 1.8;
   text-align: center;
-  color: #444;
-  font-size: 18px;
-  line-height: 1.7;
+  max-width: 850px;
+  margin: 0 auto 55px;
+  font-weight: 400;
 }
 
 .project-grid {
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  justify-content: center;
+align-items: stretch;
+  grid-template-columns: repeat(3, minmax(360px, 390px));
+  gap: 32px;
 }
 
 .project-card {
@@ -917,6 +928,11 @@ body {
   box-shadow: 0 12px 35px rgba(0,0,0,0.12);
   transition: 0.3s ease;
   border: 1px solid #eee;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 760px;
 }
 
 .project-card:hover {
@@ -926,7 +942,7 @@ body {
 
 .project-img {
   position: relative;
-  height: 260px;
+  height: 240px;
   overflow: hidden;
 }
 
@@ -956,6 +972,10 @@ body {
 .project-content {
   padding: 28px;
   text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .project-content h3 {
@@ -973,19 +993,32 @@ body {
 
 .project-content p {
   color: #555;
-  line-height: 1.7;
+  line-height: 1.6;
+  min-height: 95px;
   font-size: 15.5px;
   margin-bottom: 20px;
+  flex-grow: 1;
 }
 
 .project-btn {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  max-width: 260px;
+
+  margin: 25px auto 0;
+
   background: #8B1E1E;
   color: white;
-  padding: 12px 24px;
+
+  padding: 14px 24px;
+
   border-radius: 30px;
   text-decoration: none;
   font-weight: bold;
+
   transition: 0.3s;
 }
 
@@ -1151,9 +1184,6 @@ body {
     }
   } 
 }
-/* =========================
-CSS ADMIN CONTACTOS
-========================= */
 
 .table-responsive {
     overflow-x: auto;

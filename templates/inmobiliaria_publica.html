@@ -483,6 +483,208 @@ body {
     background: #25d366;
 }
 
+.nosotros-section {
+    padding: 90px 8%;
+    background: #fff;
+    text-align: center;
+}
+
+.nosotros-section h2 {
+    color: #8B1E1E;
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 35px;
+}
+
+.nosotros-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 45px;
+    align-items: center;
+    margin-bottom: 45px;
+}
+
+.nosotros-img img {
+    width: 100%;
+    height: 410px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.18);
+}
+
+.nosotros-text {
+    text-align: center;
+    color: #333;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.nosotros-text p {
+    margin-bottom: 18px;
+}
+
+.nosotros-text strong {
+    color: #8B1E1E;
+}
+
+.valores-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    border-top: 1px solid #ddd;
+    padding-top: 45px;
+}
+
+.valor-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    padding: 35px 25px;
+    transition: 0.3s;
+}
+
+.valor-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.valor-card i {
+    font-size: 40px;
+    color: #8B1E1E;
+    margin-bottom: 18px;
+}
+
+.valor-card h3 {
+    font-size: 22px;
+    margin-bottom: 12px;
+    color: #111;
+}
+
+.valor-card p {
+    color: #555;
+    line-height: 1.6;
+}
+
+.clientes-slider-section {
+    padding: 90px 8%;
+    background: #f8f8f8;
+}
+
+.clientes-slider {
+    position: relative;
+    overflow: hidden;
+}
+
+.cliente-slide {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 70px;
+    min-height: 520px;
+}
+
+.cliente-slide.active {
+    display: grid;
+}
+
+.cliente-text span {
+    color: #999;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.cliente-text h2 {
+    font-size: 46px;
+    line-height: 1.15;
+    color: #111;
+    margin: 25px 0 20px;
+    font-weight: 900;
+}
+
+.stars {
+    color: #f5a623;
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+.cliente-text p {
+    font-size: 21px;
+    line-height: 1.7;
+    color: #333;
+    font-style: italic;
+    max-width: 650px;
+    margin-bottom: 28px;
+}
+
+.cliente-text h4 {
+    font-size: 18px;
+    color: #111;
+    font-weight: 900;
+}
+
+.cliente-img img {
+    width: 100%;
+    height: 520px;
+    object-fit: cover;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.16);
+}
+
+.cliente-dots {
+    position: absolute;
+    left: 22%;
+    bottom: 15px;
+    display: flex;
+    gap: 12px;
+}
+
+.cliente-dot {
+    width: 11px;
+    height: 11px;
+    background: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cliente-dot.active {
+    background: #8B1E1E;
+    transform: scale(1.2);
+}
+
+@media(max-width: 900px) {
+    .cliente-slide {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+
+    .cliente-text h2 {
+        font-size: 34px;
+    }
+
+    .cliente-img img {
+        height: 340px;
+    }
+
+    .cliente-dots {
+        position: static;
+        justify-content: center;
+        margin-top: 25px;
+    }
+}
+
+@media(max-width: 900px) {
+    .nosotros-content,
+    .valores-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nosotros-img img {
+        height: 300px;
+    }
+}
+
 @media(max-width: 1050px) {
     .navbar {
         flex-direction: column;
@@ -551,6 +753,7 @@ body {
 
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="#nosotros-inmobiliaria">Nosotros</a>
             <a href="#arriendo">Arriendo</a>
             <a href="#venta" >Venta</a>
             <a href="#contacto" class="whatsapp-btn">
@@ -563,7 +766,7 @@ body {
 <section class="hero">
 
     <video autoplay muted loop playsinline class="hero-video">
-        <source src="{{ url_for('static', filename='imagenes/Inmobiliaria.mp4') }}" type="video/mp4">
+        <source src="{{ url_for('static', filename='imagenes/Videito.mp4') }}" type="video/mp4">
     </video>
 
     <div class="hero-overlay"></div>
@@ -583,6 +786,68 @@ body {
 
     </div>
 
+</section>
+
+<section id="nosotros-inmobiliaria" class="nosotros-section">
+    <h2>¿Por qué elegir nuestra inmobiliaria?</h2>
+
+    <div class="nosotros-content">
+        <div class="nosotros-img">
+            <img src="{{ url_for('static', filename='imagenes/Nosotros_inmobiliaria.jpg') }}" alt="Inmobiliaria Construgonp">
+        </div>
+
+        <div class="nosotros-text">
+            <p>
+                En <strong>Construgonp's S.A.S</strong> también ofrecemos soluciones inmobiliarias para quienes buscan comprar, vender o arrendar propiedades de forma segura y confiable.
+            </p>
+
+            <p>
+                Nuestro catálogo reúne casas, apartamentos, propiedades disponibles, actualizadas desde el panel administrativo para brindar información clara y organizada.
+            </p>
+
+            <p>
+                Acompañamos a cada cliente durante el proceso, ofreciendo orientación, transparencia y atención personalizada para encontrar la mejor opción según sus necesidades.
+            </p>
+        </div>
+    </div>
+
+    <div class="valores-grid">
+        <div class="valor-card">
+            <i class="fa-solid fa-house-chimney"></i>
+            <h3>Variedad</h3>
+            <p>Ofrecemos opciones de vivienda en venta y arriendo adaptadas a diferentes necesidades.</p>
+        </div>
+
+        <div class="valor-card">
+            <i class="fa-solid fa-handshake"></i>
+            <h3>Confianza</h3>
+            <p>Brindamos información clara y acompañamiento responsable en cada proceso.</p>
+        </div>
+
+        <div class="valor-card">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>Ubicación</h3>
+            <p>Presentamos propiedades ubicadas en zonas estratégicas y de interés para nuestros clientes.</p>
+        </div>
+
+        <div class="valor-card">
+            <i class="fa-solid fa-camera"></i>
+            <h3>Visualización</h3>
+            <p>Mostramos fotos y videos para que el usuario conozca mejor cada inmueble.</p>
+        </div>
+
+        <div class="valor-card">
+            <i class="fa-solid fa-file-signature"></i>
+            <h3>Gestión</h3>
+            <p>Organizamos la información de cada propiedad desde el panel administrativo.</p>
+        </div>
+
+        <div class="valor-card">
+            <i class="fa-solid fa-user-check"></i>
+            <h3>Acompañamiento</h3>
+            <p>Orientamos al cliente durante la búsqueda, selección y contacto por la propiedad.</p>
+        </div>
+    </div>
 </section>
 
 <section class="catalogo" id="arriendo">
@@ -846,6 +1111,96 @@ body {
     <i class="fa-brands fa-whatsapp"></i>
 </a>
 
+<section id="clientes" class="clientes-slider-section">
+    <div class="clientes-slider">
+
+        <div class="cliente-slide active">
+            <div class="cliente-text">
+                <span>CLIENTES</span>
+                <h2>Un compromiso con cada familia</h2>
+
+                <div class="stars">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <p>
+                    “Encontramos una casa cómoda y bien ubicada. La atención fue excelente
+                    y siempre nos acompañaron durante todo el proceso.”
+                </p>
+
+                <h4>María Fernanda López</h4>
+            </div>
+
+            <div class="cliente-img">
+                <img src="{{ url_for('static', filename='imagenes/Cliente1.jpg') }}" alt="Cliente inmobiliaria">
+            </div>
+        </div>
+
+        <div class="cliente-slide">
+            <div class="cliente-text">
+                <span>CLIENTES</span>
+                <h2>Confianza para encontrar tu hogar</h2>
+
+                <div class="stars">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <p>
+                    “El catálogo fue muy claro, las fotos ayudaron bastante y pudimos
+                    elegir el apartamento ideal para nuestra familia.”
+                </p>
+
+                <h4>Andrés Martínez</h4>
+            </div>
+
+            <div class="cliente-img">
+                <img src="{{ url_for('static', filename='imagenes/Cliente2.jpg') }}" alt="Cliente inmobiliaria">
+            </div>
+        </div>
+
+        <div class="cliente-slide">
+            <div class="cliente-text">
+                <span>CLIENTES</span>
+                <h2>Una experiencia segura y cercana</h2>
+
+                <div class="stars">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <p>
+                    “Recibimos asesoría rápida y organizada. Nos explicaron cada detalle
+                    y logramos arrendar sin complicaciones.”
+                </p>
+
+                <h4>Laura Gómez</h4>
+            </div>
+
+            <div class="cliente-img">
+                <img src="{{ url_for('static', filename='imagenes/Cliente3.png') }}" alt="Cliente inmobiliaria">
+            </div>
+        </div>
+
+        <div class="cliente-dots">
+            <span class="cliente-dot active" onclick="irCliente(0)"></span>
+            <span class="cliente-dot" onclick="irCliente(1)"></span>
+            <span class="cliente-dot" onclick="irCliente(2)"></span>
+        </div>
+
+    </div>
+</section>
+
  <footer class="footer">
     
     <section class="contact-section text-center">
@@ -902,6 +1257,29 @@ body {
             }
         });
     }
+</script>
+<script>
+    let clienteActual = 0;
+    const clientes = document.querySelectorAll('.cliente-slide');
+    const clienteDots = document.querySelectorAll('.cliente-dot');
+
+    function mostrarCliente(index) {
+        clientes.forEach(slide => slide.classList.remove('active'));
+        clienteDots.forEach(dot => dot.classList.remove('active'));
+
+        clientes[index].classList.add('active');
+        clienteDots[index].classList.add('active');
+        clienteActual = index;
+    }
+
+    function irCliente(index) {
+        mostrarCliente(index);
+    }
+
+    setInterval(() => {
+        clienteActual = (clienteActual + 1) % clientes.length;
+        mostrarCliente(clienteActual);
+    }, 5000);
 </script>
 
 </body>
