@@ -1,0 +1,19 @@
+<div class="container">
+    <h1>Editar Proyecto</h1>
+
+    <form action="{{ url_for('actualizar_proyecto', id=proyecto.id) }}" method="POST">
+
+        <input type="text" name="nombre" value="{{ proyecto.nombre }}" required>
+
+        <textarea name="descripcion" required>{{ proyecto.descripcion }}</textarea>
+
+        <select name="estado">
+            <option value="activo" {% if proyecto.estado == 'activo' %}selected{% endif %}>Activo</option>
+            <option value="en proceso" {% if proyecto.estado == 'en proceso' %}selected{% endif %}>En proceso</option>
+            <option value="finalizado" {% if proyecto.estado == 'finalizado' %}selected{% endif %}>Finalizado</option>
+        </select>
+
+        <button type="submit">Actualizar</button>
+
+    </form>
+</div>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Compras - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111;
+            color: white;
+            padding: 16px 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .admin-logo img {
+            width: 180px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .admin-actions a {
+            text-decoration: none;
+            color: white;
+            background: #981313;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 45px auto;
+            padding: 0 35px;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 22px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #981313;
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            color: #222;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border-left: 7px solid #981313;
+        }
+
+        .stat-card h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .stat-card p {
+            font-size: 30px;
+            font-weight: 800;
+            color: #981313;
+        }
+
+        /* Formulario de registro */
+        .form-panel {
+            background: white;
+            border-radius: 22px;
+            padding: 36px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .form-panel h2 {
+            color: #981313;
+            font-size: 22px;
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 13px 16px;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Segoe UI', sans-serif;
+            transition: 0.3s;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #981313;
+            background: white;
+        }
+
+        .form-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 14px;
+        }
+
+        .btn-primary {
+            background: #981313;
+            color: white;
+            border: none;
+            padding: 13px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #c11b1b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(152,19,19,0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 13px 26px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Alertas flash */
+        .flash-msg {
+            padding: 14px 22px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .flash-success { background: #d4edda; color: #1f6b35; border-left: 5px solid #1f9d55; }
+        .flash-danger  { background: #f8d7da; color: #7b1c24; border-left: 5px solid #981313; }
+
+        /* Grilla de contenido */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 26px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .panel h2 {
+            color: #981313;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        /* Tabla de compras */
+        .tabla-wrapper {
+            background: white;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .tabla-wrapper h2 {
+            color: #981313;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: #981313;
+            color: white;
+        }
+
+        thead th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        thead th:first-child { border-radius: 10px 0 0 10px; }
+        thead th:last-child  { border-radius: 0 10px 10px 0; }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: 0.2s;
+        }
+
+        tbody tr:hover { background: #fff5f5; }
+
+        tbody td {
+            padding: 14px 18px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-proveedor { background: #fff3cd; color: #856404; }
+        .badge-valor     { background: #d4edda; color: #1f6b35; }
+
+        .empty-row td {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 15px;
+        }
+
+        @media(max-width: 950px) {
+            .stats-grid,
+            .content-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Export bar */
+        .export-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 26px;
+        }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: #981313;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .btn-export:hover {
+            background: #c11b1b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(152,19,19,0.3);
+        }
+
+        .btn-export-csv {
+            background: #1f6b35;
+        }
+
+        .btn-export-csv:hover {
+            background: #17542a;
+        }
+
+        /* Botón eliminar en tabla */
+        .btn-delete {
+            background: none;
+            border: 2px solid #981313;
+            color: #981313;
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .btn-delete:hover {
+            background: #981313;
+            color: white;
+        }
+
+        /* Loading overlay PDF */
+        #pdf-loading {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            
+            gap: 18px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        #pdf-loading.active { display: flex; }
+
+        .spinner {
+            width: 52px;
+            height: 52px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
+    </div>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('dashboard') }}"><i class="fa fa-arrow-left"></i> Dashboard</a>
+        <a href="{{ url_for('logout') }}"><i class="fa fa-right-from-bracket"></i> Salir</a>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- Overlay PDF -->
+    <div id="pdf-loading">
+        <div class="spinner"></div>
+        <span>Generando PDF, un momento...</span>
+    </div>
+
+    <section class="page-title">
+        <h1><i class="fa fa-cart-shopping" style="color:#981313;margin-right:12px;"></i>Gestión de Compras</h1>
+        <p>Control de compras, proveedores, costos operativos y recursos del negocio.</p>
+    </section>
+
+    <!-- Barra de exportar -->
+    <div class="export-bar">
+        <button class="btn-export btn-export-csv" onclick="exportarCSV()">
+            <i class="fa fa-file-csv"></i> Exportar CSV
+        </button>
+        <button class="btn-export" onclick="exportarPDF()">
+            <i class="fa fa-file-pdf"></i> Exportar PDF
+        </button>
+    </div>
+
+    <div id="compras-contenido">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-msg flash-{{ category }}">
+                    <i class="fa fa-{% if category == 'success' %}circle-check{% else %}circle-exclamation{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Estadísticas -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <h3><i class="fa fa-dollar-sign"></i> Total compras</h3>
+            <p>${{ "{:,.0f}".format(total_compras) }}</p>
+        </div>
+        <div class="stat-card">
+            <h3><i class="fa fa-truck"></i> Proveedores</h3>
+            <p>{{ total_proveedores }}</p>
+        </div>
+        <div class="stat-card">
+            <h3><i class="fa fa-calendar-check"></i> Compras del mes</h3>
+            <p>{{ compras_mes }}</p>
+        </div>
+    </section>
+
+    <!-- Formulario de registro de compra -->
+    <section class="form-panel">
+        <h2><i class="fa fa-plus-circle"></i> Registrar nueva compra</h2>
+        <form method="POST" action="{{ url_for('registrar_compra') }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Concepto / Descripción</label>
+                    <input type="text" name="concepto" placeholder="Ej. Materiales de construcción" required>
+                </div>
+                <div class="form-group">
+                    <label>Proveedor</label>
+                    <input type="text" name="proveedor" placeholder="Nombre del proveedor" required>
+                </div>
+                <div class="form-group">
+                    <label>Valor ($)</label>
+                    <input type="number" name="valor" placeholder="0" min="0" step="1000" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select name="categoria">
+                        <option value="Materiales">Materiales</option>
+                        <option value="Equipos">Equipos</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Administración">Administración</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" name="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Notas (opcional)</label>
+                    <input type="text" name="notas" placeholder="Observaciones adicionales">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="fa fa-floppy-disk"></i> Guardar compra
+                </button>
+                <button type="reset" class="btn-secondary">
+                    <i class="fa fa-rotate-left"></i> Limpiar
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Gráfica + últimas compras -->
+    <section class="content-grid">
+        <div class="panel">
+            <h2><i class="fa fa-chart-donut"></i> Distribución por concepto</h2>
+            <canvas id="comprasChart"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2><i class="fa fa-clock-rotate-left"></i> Últimas compras</h2>
+            {% for compra in ultimas_compras %}
+            <div style="padding:14px 0; border-bottom:1px solid #eee;">
+                <strong style="color:#981313;">{{ compra.concepto }}</strong>
+                <p style="color:#666; font-size:14px; margin-top:4px;">
+                    <span class="badge badge-proveedor"><i class="fa fa-truck"></i> {{ compra.proveedor }}</span>
+                    <span class="badge badge-valor" style="margin-left:8px;">${{ "{:,.0f}".format(compra.valor) }}</span>
+                </p>
+                <p style="color:#aaa; font-size:13px; margin-top:5px;"><i class="fa fa-calendar"></i> {{ compra.fecha }}</p>
+            </div>
+            {% else %}
+            <p style="color:#999; text-align:center; padding:30px 0;">Aún no hay compras registradas.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Tabla completa -->
+    <section class="tabla-wrapper">
+        <h2><i class="fa fa-table"></i> Historial de compras</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Concepto</th>
+                    <th>Proveedor</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th>Valor</th>
+                    <th>Notas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in todas_compras %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><strong>{{ c.concepto }}</strong></td>
+                    <td><span class="badge badge-proveedor">{{ c.proveedor }}</span></td>
+                    <td>{{ c.categoria if c.categoria else '—' }}</td>
+                    <td>{{ c.fecha }}</td>
+                    <td><span class="badge badge-valor">${{ "{:,.0f}".format(c.valor) }}</span></td>
+                    <td style="color:#888;">{{ c.notas if c.notas else '—' }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('eliminar_compra', id=c.id) }}"
+                              onsubmit="return confirm('¿Eliminar esta compra?');"
+                              style="display:inline;">
+                            <button type="submit" class="btn-delete">
+                                <i class="fa fa-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="empty-row">
+                    <td colspan="8"><i class="fa fa-inbox" style="font-size:28px; display:block; margin-bottom:10px;"></i>No hay compras registradas</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    </div><!-- fin #compras-contenido -->
+
+</main>
+
+<script>
+    const comprasData = {{ compras_grafico | tojson }};
+
+    new Chart(document.getElementById('comprasChart'), {
+        type: 'doughnut',
+        data: {
+            labels: comprasData.map(item => item.concepto),
+            datasets: [{
+                data: comprasData.map(item => item.total),
+                backgroundColor: ['#981313', '#c11b1b', '#222', '#777', '#b85c5c', '#e07070']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 13 } }
+                }
+            }
+        }
+    });
+
+    async function exportarPDF() {
+        const loading = document.getElementById('pdf-loading');
+        loading.classList.add('active');
+        await new Promise(r => setTimeout(r, 120));
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+        const contenido = document.getElementById('compras-contenido');
+
+        const canvas = await html2canvas(contenido, { scale: 2, useCORS: true, backgroundColor: '#f4f5f7' });
+        loading.classList.remove('active');
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        doc.setFillColor(17, 17, 17);
+        doc.rect(0, 0, pdfWidth, 14, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(255, 255, 255);
+        doc.text('CiviWeb Manager — Gestión de Compras', 10, 9.5);
+        const fecha = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+        doc.setFontSize(9);
+        doc.text(fecha, pdfWidth - 10, 9.5, { align: 'right' });
+
+        const startY = 18;
+        const availableHeight = pageHeight - startY - 10;
+
+        if (pdfHeight <= availableHeight) {
+            doc.addImage(imgData, 'PNG', 5, startY, pdfWidth - 10, pdfHeight);
+        } else {
+            let remainingHeight = pdfHeight;
+            let srcY = 0;
+            let firstPage = true;
+            while (remainingHeight > 0) {
+                const sliceHeight = firstPage ? availableHeight : pageHeight - 14;
+                const slicePx = (sliceHeight / pdfHeight) * canvas.height;
+                const sliceCanvas = document.createElement('canvas');
+                sliceCanvas.width = canvas.width;
+                sliceCanvas.height = Math.min(slicePx, canvas.height - srcY);
+                const ctx = sliceCanvas.getContext('2d');
+                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+                const sliceImg = sliceCanvas.toDataURL('image/png');
+                const sliceHeightMM = (sliceCanvas.height * pdfWidth) / canvas.width;
+                if (!firstPage) {
+                    doc.addPage();
+                    doc.setFillColor(17, 17, 17);
+                    doc.rect(0, 0, pdfWidth, 14, 'F');
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(11);
+                    doc.setTextColor(255, 255, 255);
+                    doc.text('CiviWeb Manager — Compras (cont.)', 10, 9.5);
+                }
+                doc.addImage(sliceImg, 'PNG', 5, firstPage ? startY : 16, pdfWidth - 10, sliceHeightMM);
+                srcY += sliceCanvas.height;
+                remainingHeight -= sliceHeight;
+                firstPage = false;
+            }
+        }
+
+        doc.save('compras_civiweb_' + new Date().toISOString().slice(0, 10) + '.pdf');
+    }
+
+    function exportarCSV() {
+        const tabla = document.querySelector('.tabla-wrapper table');
+        if (!tabla) return;
+        const filas = Array.from(tabla.querySelectorAll('tr'));
+        const csvLineas = filas.map(fila => {
+            const celdas = Array.from(fila.querySelectorAll('th, td'));
+            // Excluye la última columna de acciones (botón eliminar)
+            return celdas.slice(0, celdas.length - 1)
+                .map(c => '"' + c.innerText.replace(/"/g, '""').trim() + '"')
+                .join(',');
+        });
+        const csvContent = '\uFEFF' + csvLineas.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'compras_civiweb_' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+
+</body>
+</html>

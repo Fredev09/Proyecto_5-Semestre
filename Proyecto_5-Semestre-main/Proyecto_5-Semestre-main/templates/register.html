@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Constructora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #891010);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            display: flex;
+            width: 850px;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .left-side {
+            width: 38%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-side img {
+            width: 150px;
+        }
+
+        .right-side {
+            width: 62%;
+            padding: 38px 50px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin: 0;
+            text-align: center;
+            color: #1a1a1a;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: #222;
+        }
+
+        .input-icon {
+            position: relative;
+            margin-top: 6px;
+        }
+
+        .input-icon i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .input-icon .left-icon {
+            left: 12px;
+        }
+
+        .input-icon input,
+        .input-icon select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 45px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+            background: white;
+        }
+
+        .input-icon input:focus,
+        .input-icon select:focus {
+            border-color: #891010;
+        }
+
+        .toggle-password {
+            right: 12px;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #891010;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #6f0c0c;
+        }
+
+        .links {
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .links a {
+            color: #b91c1c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            margin-bottom: 15px;
+            background: #891010;
+            color: white;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+.select-box select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: white;
+    cursor: pointer;
+}
+
+
+.select-arrow {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    color: #666;
+}
+
+.select-box select:focus + .select-arrow {
+    color: #891010;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <div class="register-container">
+
+        <div class="left-side">
+            <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO">
+        </div>
+
+        <div class="right-side">
+            <h2>Crear cuenta</h2>
+            <p class="subtitle">Registro de usuarios del sistema administrativo</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <div class="input-group">
+                    <label>Usuario</label>
+                    <div class="input-icon">
+                        <i class="fa fa-user left-icon"></i>
+                       <input 
+                       type="text" 
+                       id="username" 
+                       name="username" 
+                       placeholder="Ingresa tu usuario" 
+                       value="{% if not limpiar_username %}{{ form.username if form else '' }}{% endif %}"
+                       required
+                       >
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Correo electrónico</label>
+                    <div class="input-icon">
+                        <i class="fa fa-envelope left-icon"></i>
+                        <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="Ingresa tu correo" 
+                        value="{% if not limpiar_email %}{{ form.email if form else '' }}{% endif %}"
+                        required
+                        >
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    
+                    <div class="input-icon">
+                        <i class="fa fa-lock left-icon"></i>
+                        <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Ingresa tu contraseña" 
+                        required
+                        >
+
+        <i class="fa fa-eye toggle-password" onclick="togglePassword()"></i>
+    </div>
+</div>
+
+                
+
+                <div class="input-group">
+    <label>Rol</label>
+    <div class="input-icon select-box">
+        <i class="fa fa-user-shield left-icon"></i>
+
+        <select id="rol" name="rol">
+  <option value="usuario" {% if form and form.rol == 'usuario' %}selected{% endif %}>Usuario</option>
+  <option value="admin" {% if form and form.rol == 'admin' %}selected{% endif %}>Administrador</option>
+</select>
+
+        <i class="fa fa-chevron-down select-arrow"></i>
+    </div>
+</div>
+
+                <button type="submit">
+                    <i class="fa fa-user-plus"></i> Registrar
+                </button>
+
+            </form>
+
+            <div class="links">
+                <a href="{{ url_for('login') }}">¿Ya tienes cuenta? Inicia sesión</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("password");
+            const icon = document.querySelector(".toggle-password");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
+
+</body>
+</html>

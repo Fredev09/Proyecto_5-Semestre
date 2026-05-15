@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Inmueble - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #981313);
+            min-height: 100vh;
+            padding: 45px;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            border-radius: 26px;
+            overflow: hidden;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+        }
+
+        .form-header {
+            background: #111;
+            color: white;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: #ddd;
+        }
+
+        form {
+            padding: 35px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        input, select, textarea {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #981313;
+            box-shadow: 0 0 0 3px rgba(152,19,19,0.12);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .buttons {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        button, .btn-back {
+            border: none;
+            padding: 14px 24px;
+            border-radius: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        button {
+            background: #981313;
+            color: white;
+        }
+
+        button:hover {
+            background: #c11b1b;
+        }
+
+        .btn-back {
+            background: #eee;
+            color: #222;
+        }
+
+        .btn-back:hover {
+            background: #ddd;
+        }
+
+        .preview {
+            grid-column: span 2;
+            background: #f7f7f7;
+            border-radius: 18px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .preview img {
+            width: 130px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 14px;
+            background: #ddd;
+        }
+
+        .galeria-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.galeria-item {
+    background: #f4f4f4;
+    border-radius: 14px;
+    overflow: hidden;
+    padding-bottom: 12px;
+}
+
+.galeria-item img,
+.galeria-item video {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
+.galeria-item a {
+    display: block;
+    text-align: center;
+    margin: 10px auto 0;
+    color: white;
+    background: #981313;
+    padding: 9px 12px;
+    border-radius: 20px;
+    width: 80%;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+        .preview-info h3 {
+            color: #981313;
+            margin-bottom: 5px;
+        }
+
+        .preview-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal-eliminar {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.modal-eliminar.active {
+    display: flex;
+}
+
+.modal-card {
+    background: white;
+    width: 420px;
+    max-width: 90%;
+    border-radius: 24px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+}
+
+.modal-icon {
+    width: 72px;
+    height: 72px;
+    background: #981313;
+    color: white;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.modal-card h2 {
+    color: #981313;
+    margin-bottom: 12px;
+}
+
+.modal-card p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+}
+
+.btn-cancelar,
+.btn-eliminar {
+    border: none;
+    padding: 13px 22px;
+    border-radius: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.btn-cancelar {
+    background: #eee;
+    color: #222;
+}
+
+.btn-eliminar {
+    background: #981313;
+    color: white;
+}
+
+        @media(max-width: 800px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group.full,
+            .buttons,
+            .preview {
+                grid-column: span 1;
+            }
+
+            .preview {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-container">
+    <div class="form-header">
+        <h1>Editar Inmueble</h1>
+        <p>Actualiza la información del inmueble seleccionado.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="preview">
+            {% if inmueble.imagen %}
+                <img src="{{ url_for('static', filename='imagenes/' ~ inmueble.imagen) }}" alt="{{ inmueble.titulo }}">
+            {% else %}
+                <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Sin imagen">
+            {% endif %}
+
+            <div class="preview-info">
+                <h3>{{ inmueble.titulo }}</h3>
+                <p>{{ inmueble.tipo }} · {{ inmueble.ubicacion }}</p>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Título</label>
+            <input type="text" name="titulo" value="{{ inmueble.titulo }}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Tipo</label>
+            <select name="tipo" required>
+                <option value="Casa" {% if inmueble.tipo == 'Casa' %}selected{% endif %}>Casa</option>
+                <option value="Apartamento" {% if inmueble.tipo == 'Apartamento' %}selected{% endif %}>Apartamento</option>
+                <option value="Lote" {% if inmueble.tipo == 'Lote' %}selected{% endif %}>Lote</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+    <label>Tipo de negocio</label>
+    <select name="tipo_negocio" required>
+        <option value="Venta" {% if inmueble.tipo_negocio == 'Venta' %}selected{% endif %}>Venta</option>
+        <option value="Arriendo" {% if inmueble.tipo_negocio == 'Arriendo' %}selected{% endif %}>Arriendo</option>
+    </select>
+</div>
+
+        <div class="input-group">
+            <label>Ubicación</label>
+            <input type="text" name="ubicacion" value="{{ inmueble.ubicacion }}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Precio</label>
+            <input type="number" name="precio" value="{{ inmueble.precio }}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Estado</label>
+            <select name="estado">
+                <option value="Disponible" {% if inmueble.estado == 'Disponible' %}selected{% endif %}>Disponible</option>
+                <option value="Reservado" {% if inmueble.estado == 'Reservado' %}selected{% endif %}>Reservado</option>
+                <option value="Vendido" {% if inmueble.estado == 'Vendido' %}selected{% endif %}>Vendido</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Imagen</label>
+            <input type="text" name="imagen" value="{{ inmueble.imagen }}" placeholder="Ej: casa1.jpg">
+        </div>
+
+        <div class="input-group full">
+    <label>Agregar nuevas fotos o video</label>
+    <input type="file" name="galeria" accept="image/*,video/mp4" multiple>
+    <small>Puedes agregar más fotos o un video MP4 corto.</small>
+</div>
+
+        <div class="input-group full">
+            <label>Descripción</label>
+            <textarea name="descripcion">{{ inmueble.descripcion }}</textarea>
+        </div>
+
+        <div class="buttons">
+            <a href="{{ url_for('inmuebles') }}" class="btn-back">
+                <i class="fa fa-arrow-left"></i> Volver
+            </a>
+
+            <button type="submit">
+                <i class="fa fa-save"></i> Guardar cambios
+            </button>
+        </div>
+
+        {% if galeria %}
+<div class="input-group full">
+    <label>Galería actual</label>
+
+    <div class="galeria-grid">
+        {% for item in galeria %}
+            <div class="galeria-item">
+                {% if item.tipo == 'video' %}
+                    <video controls>
+                        <source src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}" type="video/mp4">
+                    </video>
+                {% else %}
+                    <img src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}" alt="Galería">
+                {% endif %}
+
+                <a href="#"
+   class="btn-eliminar-galeria"
+   data-url="{{ url_for('eliminar_multimedia', id=item.id, inmueble_id=inmueble.id) }}"
+   onclick="abrirModalGaleria(this.dataset.url)">
+    <i class="fa fa-trash"></i> Eliminar
+</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+    </form>
+</div>
+<div class="modal-eliminar" id="modalGaleria">
+    <div class="modal-card">
+        <div class="modal-icon">
+            <i class="fa fa-trash"></i>
+        </div>
+
+        <h2>¿Eliminar archivo?</h2>
+        <p>Esta foto o video se eliminará de la galería del inmueble.</p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-cancelar" onclick="cerrarModalGaleria()">
+                Cancelar
+            </button>
+
+            <a href="#" id="btnConfirmarGaleria" class="btn-eliminar">
+                Sí, eliminar
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModalGaleria(url) {
+    document.getElementById('btnConfirmarGaleria').href = url;
+    document.getElementById('modalGaleria').classList.add('active');
+}
+
+function cerrarModalGaleria() {
+    document.getElementById('modalGaleria').classList.remove('active');
+}
+</script>
+</body>
+</html>

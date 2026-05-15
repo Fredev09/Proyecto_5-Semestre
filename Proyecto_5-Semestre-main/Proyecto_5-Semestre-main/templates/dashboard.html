@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administrativo - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #111;
+            color: white;
+            padding: 22px 55px;
+            min-height: 115px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .admin-logo img {
+            width: 180px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        
+
+        .admin-nav {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .admin-nav a,
+        .dropbtn {
+            color: white;
+            background: transparent;
+            border: none;
+            text-decoration: none;
+            padding: 15px 22px;
+            border-radius: 30px;
+            font-weight: 700;
+            transition: 0.3s;
+            font-size: 18px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active,
+        .dropbtn:hover,
+        .logout-link {
+            background: #981313;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 48px;
+            left: 0;
+            min-width: 250px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.20);
+            padding: 10px;
+            z-index: 3000;
+        }
+
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #222;
+            padding: 13px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .dropdown-content a:hover {
+            background: #981313;
+            color: white;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .main-content {
+            padding: 45px 60px;
+            max-width: 1650px;
+            margin: auto;
+        }
+
+        .topbar {
+            background: white;
+            border-radius: 22px;
+            padding: 30px 34px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 32px;
+        }
+
+        .topbar h1 {
+            color: #981313;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .topbar p {
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: #981313;
+            color: white;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            background: #981313;
+            color: white;
+            padding: 13px 26px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c11b1b;
+        }
+
+        .module-title {
+            margin: 10px 0 22px;
+        }
+
+        .module-title h2 {
+            color: #981313;
+            font-size: 27px;
+            margin-bottom: 6px;
+        }
+
+        .module-title p {
+            color: #666;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 36px;
+        }
+
+        .card {
+            background: white;
+    border-radius: 24px;
+    padding: 28px;
+    min-height: 240px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+    position: relative;
+    overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(152,19,19,0.14);
+        }
+
+        .card i {
+            font-size: 42px;
+    color: #981313;
+    margin-bottom: 22px;
+}
+
+        .card h3 {
+            font-size: 20px;
+    margin-bottom: 14px;
+    color: #111;
+        }
+
+        .card p {
+            color: #666;
+    line-height: 1.7;
+    font-size: 15px;
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 26px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .panel h2 {
+            color: #981313;
+            margin-bottom: 22px;
+            font-size: 25px;
+        }
+
+        .info-list p {
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .quick-actions {
+            display: grid;
+            gap: 14px;
+        }
+
+        .quick-actions a {
+            display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f5f5f5;
+    padding: 18px 20px;
+    border-radius: 16px;
+    text-decoration: none;
+    color: #222;
+    font-weight: 700;
+    transition: 0.3s ease;
+    font-size: 16px;
+        }
+
+        .quick-actions a:hover {
+            background: #981313;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .info-list p {
+    padding: 18px 0;
+    border-bottom: 1px solid #ececec;
+    color: #444;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+            margin-bottom: 42px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #981313, #c11b1b);
+            min-height: 185px;
+            color: white;
+            overflow: hidden;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(152,19,19,0.25);
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
+            margin-bottom: 22px;
+            opacity: 0.9;
+        }
+
+        .stat-card p {
+            font-size: 58px;
+            font-weight: 900;
+        }
+
+        .stat-card .stat-icon {
+    position: absolute;
+    right: 28px;
+    bottom: 24px;
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card .stat-icon i {
+    font-size: 48px;
+    color: rgba(255,255,255,0.45);
+}
+
+        .card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.card-link:hover {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 75px;
+    background: white;
+    min-width: 330px;
+    border-radius: 24px;
+    padding: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropdown-content a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 18px 20px;
+    border-radius: 18px;
+
+    text-decoration: none;
+    color: #222;
+
+    font-size: 19px;
+    font-weight: 700;
+
+    transition: 0.3s;
+}
+
+.dropdown-content a i {
+    font-size: 20px;
+    width: 24px;
+}
+
+.dropdown-content a:hover {
+    background: #981313;
+    color: white;
+    transform: translateX(4px);
+}
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 65px;
+    left: 0;
+    min-width: 330px;
+    background: white;
+    border-radius: 24px;
+    padding: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3000;
+}
+
+.dropdown-content.show {
+    display: flex;
+}
+
+
+        @media (max-width: 1050px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .admin-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .cards,
+            .panel-grid,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 25px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                text-align: center;
+                gap: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
+        
+    </div>
+<nav class="admin-nav">
+
+    <a href="{{ url_for('dashboard') }}" class="active">
+        <i class="fa fa-home"></i> Inicio
+    </a>
+
+    <div class="dropdown">
+        <button type="button" class="dropbtn" onclick="toggleMenu('menuConstructora')">
+            <i class="fa fa-helmet-safety"></i> Constructora
+            <i class="fa fa-chevron-down"></i>
+        </button>
+
+        <div class="dropdown-content" id="menuConstructora">
+            <a href="{{ url_for('proyectos_admin') }}"><i class="fa fa-building"></i> Proyectos de obra</a>
+            <a href="#"><i class="fa fa-screwdriver-wrench"></i> Servicios</a>
+            <a href="#"><i class="fa fa-map-location-dot"></i> Zonas de trabajo</a>
+            <a href="#"><i class="fa fa-users"></i> Clientes</a>
+            <a href="#"><i class="fa fa-file-invoice-dollar"></i> Presupuestos</a>
+            <a href="#"><i class="fa fa-chart-line"></i> Reportes de obra</a>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <button type="button" class="dropbtn" onclick="toggleMenu('menuInmobiliaria')">
+            <i class="fa fa-house-chimney"></i> Inmobiliaria
+            <i class="fa fa-chevron-down"></i>
+        </button>
+
+        <div class="dropdown-content" id="menuInmobiliaria">
+            <a href="{{ url_for('inmuebles') }}"><i class="fa fa-city"></i> Inmuebles</a>
+            <a href="{{ url_for('registrar_inmueble') }}"><i class="fa fa-house"></i> Registrar inmueble</a>
+            <a href="{{ url_for('ventas_admin') }}"><i class="fa fa-handshake"></i> Ventas</a>
+            <a href="{{ url_for('compras_admin') }}"><i class="fa fa-cart-shopping"></i> Compras</a>
+            <a href="#"><i class="fa fa-calendar-check"></i> Reservas</a>
+            <a href="{{ url_for('reportes_admin') }}"><i class="fa fa-chart-pie"></i> Reportes inmobiliarios</a>
+        </div>
+    </div>
+
+    {% if rol == 'admin' %}
+    <div class="dropdown">
+        <button type="button" class="dropbtn" onclick="toggleMenu('menuUsuarios')">
+            <i class="fa fa-users-gear"></i> Usuarios
+            <i class="fa fa-chevron-down"></i>
+        </button>
+
+        <div class="dropdown-content" id="menuUsuarios">
+            <a href="{{ url_for('register') }}"><i class="fa fa-user-plus"></i> Crear usuario</a>
+            <a href="{{ url_for('usuarios') }}"><i class="fa fa-list"></i> Listar usuarios</a>
+            <a href="#"><i class="fa fa-user-shield"></i> Roles y permisos</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="dropdown">
+        <button type="button" class="dropbtn" onclick="toggleMenu('menuConfig')">
+            <i class="fa fa-gear"></i> Configuración
+            <i class="fa fa-chevron-down"></i>
+        </button>
+
+        <div class="dropdown-content" id="menuConfig">
+            <a href="{{ url_for('modificar_correo') }}"><i class="fa fa-envelope"></i> Modificar correo</a>
+            <a href="{{ url_for('index') }}"><i class="fa fa-globe"></i> Ver sitio web</a>
+            <a href="{{ url_for('logout') }}"><i class="fa fa-right-from-bracket"></i> Cerrar sesión</a>
+        </div>
+    </div>
+
+</nav>
+</header>
+
+<main class="main-content">
+
+    <div class="topbar">
+        <div>
+            <h1>Panel Administrativo</h1>
+            <p>Bienvenido/a, {{ usuario }}. Gestiona los módulos internos de la constructora e inmobiliaria.</p>
+            <span class="role-badge">{{ rol }}</span>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <i class="fa fa-right-from-bracket"></i> Salir
+        </a>
+    </div>
+
+    <section class="stats-grid">
+    <div class="stat-card">
+        <h3>Proyectos activos</h3>
+        <p>{{ proyectos_activos }}</p>
+        <div class="stat-icon">
+            <i class="fa fa-building"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Inmuebles disponibles</h3>
+        <p>{{ inmuebles_disponibles }}</p>
+        <div class="stat-icon">
+            <i class="fa fa-house-chimney"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Ventas registradas</h3>
+        <p>{{ ventas_registradas }}</p>
+        <div class="stat-icon">
+            <i class="fa fa-chart-line"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Usuarios del sistema</h3>
+        <p>{{ usuarios_sistema }}</p>
+        <div class="stat-icon">
+            <i class="fa fa-users"></i>
+        </div>
+    </div>
+</section>
+
+    <div class="module-title">
+        <h2>Módulos administrativos</h2>
+        <p>Accede rápidamente a las áreas principales del sistema.</p>
+    </div>
+
+    <section class="cards">
+
+    <a href="{{ url_for('constructora_admin') }}" class="card card-link">
+        <i class="fa fa-hard-hat"></i>
+        <h3>Constructora</h3>
+        <p>Control de proyectos, obras, servicios, zonas de trabajo y reportes técnicos.</p>
+    </a>
+
+    <a href="{{ url_for('inmobiliaria_admin') }}" class="card card-link">
+        <i class="fa fa-house-chimney"></i>
+        <h3>Inmobiliaria</h3>
+        <p>Administración de casas, apartamentos, reservas, ventas y disponibilidad.</p>
+    </a>
+
+    <a href="{{ url_for('usuarios') }}" class="card card-link">
+        <i class="fa fa-users"></i>
+        <h3>Usuarios</h3>
+        <p>Gestión de cuentas, roles, permisos y acceso al sistema administrativo.</p>
+    </a>
+
+    <a href="{{ url_for('ventas_admin') }}" class="card card-link">
+        <i class="fa fa-handshake"></i>
+        <h3>Ventas</h3>
+        <p>Seguimiento de ventas inmobiliarias, clientes compradores y valores comerciales.</p>
+    </a>
+
+    <a href="{{ url_for('compras_admin') }}" class="card card-link">
+        <i class="fa fa-cart-shopping"></i>
+        <h3>Compras</h3>
+        <p>Control de compras, proveedores, costos operativos y recursos del negocio.</p>
+    </a>
+
+    <a href="{{ url_for('reportes_admin') }}" class="card card-link">
+        <i class="fa fa-chart-line"></i>
+        <h3>Reportes</h3>
+        <p>Indicadores generales de gestión, rendimiento comercial y control financiero.</p>
+    </a>
+
+</section>
+
+    <section class="panel-grid">
+        <div class="panel">
+            <h2>Resumen del sistema</h2>
+
+            <div class="info-list">
+                <p><strong>Estado:</strong> Sistema activo y funcional.</p>
+                <p><strong>Base de datos:</strong> MySQL conectada y operativa.</p>
+                <p><strong>Seguridad:</strong> Login, roles, sesiones y control de acceso habilitados.</p>
+                <p><strong>Correo:</strong> Confirmación y recuperación de contraseña por correo.</p>
+                <p><strong>Áreas:</strong> Constructora, inmobiliaria, usuarios, ventas, compras y reportes.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Accesos rápidos</h2>
+
+            <div class="quick-actions">
+                {% if rol == 'admin' %}
+                <a href="{{ url_for('register') }}">
+                    <i class="fa fa-user-plus"></i> Crear nuevo usuario
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('modificar_correo') }}">
+                    <i class="fa fa-pen"></i> Actualizar correo
+                </a>
+
+                <a href="{{ url_for('registrar_inmueble') }}"><i class="fa fa-house-chimney"></i> Registrar inmueble</a>
+
+                <a href="#">
+                    <i class="fa fa-building"></i> Registrar proyecto
+                </a>
+
+                <a href="{{ url_for('index') }}">
+                    <i class="fa fa-eye"></i> Ir a la página principal
+                </a>
+
+                <a href="{{ url_for('logout') }}">
+                    <i class="fa fa-lock"></i> Cerrar sesión segura
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+function toggleMenu(id) {
+    document.querySelectorAll('.dropdown-content').forEach(menu => {
+        if (menu.id !== id) {
+            menu.classList.remove('show');
+        }
+    });
+
+    document.getElementById(id).classList.toggle('show');
+}
+
+window.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-content').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    }
+});
+</script>
+</body>
+</html>

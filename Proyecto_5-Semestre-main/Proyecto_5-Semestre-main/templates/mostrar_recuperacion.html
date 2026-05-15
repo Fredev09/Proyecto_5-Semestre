@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar contraseña - Constructora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #891010);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recover-container {
+            display: flex;
+            width: 800px;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .left-side {
+            width: 40%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-side img {
+            width: 150px;
+        }
+
+        .right-side {
+            width: 60%;
+            padding: 45px 50px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #1a1a1a;
+        }
+
+        .alert {
+            margin: 15px 0;
+            background: #891010;
+            color: white;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .link-box {
+            margin: 20px 0;
+        }
+
+        .link-box a {
+            display: inline-block;
+            background: #891010;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link-box a:hover {
+            background: #6f0c0c;
+        }
+
+        .links {
+            margin-top: 25px;
+        }
+
+        .links a {
+            color: #b91c1c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .info {
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="recover-container">
+
+        <!-- IZQUIERDA -->
+        <div class="left-side">
+            <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO">
+        </div>
+
+        <!-- DERECHA -->
+        <div class="right-side">
+
+            <h2><i class="fa fa-key"></i> Recuperar contraseña</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+
+  {% if 'http' in message %}
+
+    <div class="alert">
+        Se ha generado un enlace de recuperación.
+    </div>
+
+    <div class="link-box">
+        <a href="{{ message }}">
+            <i class="fa fa-rotate"></i> Restablecer contraseña
+        </a>
+    </div>
+
+  {% else %}
+
+    <div class="alert">
+        {{ message }}
+    </div>
+
+  {% endif %}
+
+{% endfor %}
+
+              {% endif %}
+            {% endwith %}
+
+            <p class="info">
+                Si el correo existe en el sistema, podrás restablecer tu contraseña desde el enlace.
+            </p>
+
+            <div class="links">
+                <a href="{{ url_for('login') }}">
+                    <i class="fa fa-arrow-left"></i> Volver al login
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

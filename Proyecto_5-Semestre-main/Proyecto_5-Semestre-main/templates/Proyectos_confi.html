@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Proyectos de Obra - CiviWeb Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
+    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111;
+            color: white;
+            padding: 18px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        .admin-logo img {
+            width: 180px;
+            height: auto;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .admin-actions a {
+            text-decoration: none;
+            background: #981313;
+            color: white;
+            padding: 13px 22px;
+            border-radius: 28px;
+            font-weight: 800;
+            transition: 0.3s;
+        }
+
+        .admin-actions a:hover {
+            background: #c11b1b;
+            transform: translateY(-3px);
+        }
+
+        .container {
+            max-width: 1350px;
+            margin: 45px auto;
+            padding: 0 35px;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 24px;
+            padding: 34px;
+            margin-bottom: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .page-title h1 {
+            color: #981313;
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 17px;
+        }
+
+        .form-card,
+        .table-card {
+            background: white;
+            border-radius: 24px;
+            padding: 34px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 32px;
+        }
+
+        .form-card h2,
+        .table-card h2 {
+            color: #981313;
+            font-size: 28px;
+            margin-bottom: 24px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #222;
+        }
+
+        input,
+        textarea,
+        select {
+            padding: 15px 16px;
+            border-radius: 14px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #981313;
+            box-shadow: 0 0 0 4px rgba(152,19,19,0.12);
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            border: none;
+            background: linear-gradient(135deg, #981313, #c11b1b);
+            color: white;
+            padding: 15px;
+            border-radius: 30px;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(152,19,19,0.25);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .project-card {
+            background: #fff;
+            border-radius: 22px;
+            padding: 28px;
+            border: 1px solid #eee;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 18px 40px rgba(152,19,19,0.15);
+        }
+
+        .project-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: rgba(152,19,19,0.10);
+            color: #981313;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 18px;
+        }
+
+        .project-card h3 {
+            font-size: 23px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .project-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 18px;
+        }
+
+        .Activo {
+            background: #1f9d55;
+        }
+
+        .Finalizado {
+            background: #981313;
+        }
+
+        .Pausado {
+            background: #c58a00;
+        }
+
+        .Pendiente {
+            background: #555;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .actions a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 22px;
+            font-weight: 800;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .edit {
+            background: #981313;
+            color: white;
+        }
+
+        .delete {
+            background: #222;
+            color: white;
+        }
+
+        .actions a:hover {
+            transform: translateY(-2px);
+        }
+
+        .empty {
+            background: #f6f6f6;
+            border-radius: 20px;
+            padding: 45px;
+            text-align: center;
+            color: #666;
+        }
+
+        .empty i {
+            font-size: 48px;
+            color: #981313;
+            margin-bottom: 15px;
+        }
+
+        @media(max-width: 1000px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            form {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group.full,
+            .btn-submit {
+                grid-column: span 1;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 18px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="CiviWeb Manager">
+    </div>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('dashboard') }}">
+            <i class="fa fa-arrow-left"></i> Dashboard
+        </a>
+
+        <a href="{{ url_for('constructora_admin') }}">
+            <i class="fa fa-helmet-safety"></i> Constructora
+        </a>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h1>Proyectos de Obra</h1>
+        <p>Administra los proyectos constructivos activos, pendientes, pausados o finalizados.</p>
+    </section>
+
+    <section class="form-card">
+        <h2><i class="fa fa-plus"></i> Registrar nuevo proyecto</h2>
+
+        <form action="{{ url_for('crear_proyecto') }}" method="POST">
+            <div class="input-group">
+                <label>Nombre del proyecto</label>
+                <input type="text" name="nombre" placeholder="Ej: Pavimentación vía principal" required>
+            </div>
+
+            <div class="input-group">
+                <label>Estado</label>
+                <select name="estado" required>
+                    <option value="">Seleccione estado</option>
+                    <option value="Activo">Activo</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Pausado">Pausado</option>
+                    <option value="Finalizado">Finalizado</option>
+                </select>
+            </div>
+
+            <div class="input-group full">
+                <label>Descripción del proyecto</label>
+                <textarea name="descripcion" placeholder="Describe el alcance, ubicación o detalles técnicos del proyecto" required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa fa-save"></i> Crear proyecto
+            </button>
+        </form>
+    </section>
+
+    <section class="table-card">
+        <h2><i class="fa fa-list"></i> Lista de proyectos</h2>
+
+        {% if proyectos %}
+        <div class="projects-grid">
+            {% for p in proyectos %}
+            <div class="project-card">
+                <div class="project-icon">
+                    <i class="fa fa-building"></i>
+                </div>
+
+                <span class="status {{ p.estado }}">{{ p.estado }}</span>
+
+                <h3>{{ p.nombre }}</h3>
+                <p>{{ p.descripcion }}</p>
+
+                <div class="actions">
+                    <a href="{{ url_for('editar_proyecto', id=p.id) }}" class="edit">
+                        <i class="fa fa-pen"></i> Editar
+                    </a>
+
+                    <a href="#" class="delete">
+                        <i class="fa fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">
+            <i class="fa fa-folder-open"></i>
+            <h3>No hay proyectos registrados</h3>
+            <p>Cuando registres un proyecto de obra, aparecerá aquí.</p>
+        </div>
+        {% endif %}
+    </section>
+
+</main>
+
+</body>
+</html>

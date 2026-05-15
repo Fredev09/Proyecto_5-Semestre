@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construgonp's S.A.S</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="shortcut icon" href="../static/imagenes/ICONO.png">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+</head>
+<body>
+
+  <header class="header">
+    <nav class="navbar">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}"alt="Logo Construgonp's S.A.S">
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="{{ url_for('inmobiliaria_publica') }}">Inmobiliaria</a></li>
+        <li><a href="#zonas">Zonas</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+        <li><a href="{{ url_for('login') }}" class="login-btn">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="inicio" class="hero">
+
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="{{ url_for('static', filename='imagenes/VideitoConstru.mp4') }}" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content" data-aos="fade-up">
+   <h1>
+    Construimos el futuro con
+    <span>CALIDAD Y COMPROMISO</span>
+</h1>
+    <p>Soluciones integrales en ingeniería civil, construcción y desarrollo de proyectos.</p>
+    <a href="#servicios" class="btn-primary">Servicios</a>
+    <a href="{{ url_for('inmobiliaria_publica') }}" class="btn-primary">Inmobiliaria</a>
+  </div>
+
+</section>
+
+  <section id="nosotros" class="nosotros-section">
+  <h2>¿Quiénes somos?</h2>
+
+  <div class="nosotros-content">
+    <div class="nosotros-img">
+      <img src="{{ url_for('static', filename='imagenes/Quienes_Somos.jpg') }}" alt="Equipo de construcción">
+    </div>
+
+    <div class="nosotros-text">
+      <p>
+        En <strong>Construgonp's S.A.S</strong> somos una empresa especializada en el desarrollo de proyectos integrales de construcción, interventoría y consultoría para sectores públicos y privados.
+      </p>
+
+      <p>
+        Trabajamos con compromiso, calidad y responsabilidad, ofreciendo soluciones eficientes que aportan al desarrollo de las comunidades y al crecimiento de nuestros clientes.
+      </p>
+
+      <p>
+        Nuestro enfoque combina experiencia técnica, innovación y acompañamiento constante en cada etapa del proyecto.
+      </p>
+    </div>
+  </div>
+
+  <div class="valores-grid">
+    <div class="valor-card">
+      <i class="fa-solid fa-helmet-safety"></i>
+      <h3>Calidad</h3>
+      <p>Ejecutamos proyectos con altos estándares técnicos y materiales confiables.</p>
+    </div>
+
+    <div class="valor-card destacado">
+      <i class="fa-solid fa-lightbulb"></i>
+      <h3>Innovación</h3>
+      <p>Aplicamos herramientas modernas para optimizar cada proceso constructivo.</p>
+    </div>
+
+    <div class="valor-card">
+      <i class="fa-solid fa-handshake"></i>
+      <h3>Compromiso</h3>
+      <p>Acompañamos a nuestros clientes con responsabilidad, cumplimiento y transparencia.</p>
+    </div>
+
+    <div class="valor-card">
+  <i class="fa-solid fa-clock"></i>
+  <h3>Cumplimiento</h3>
+  <p>Garantizamos la entrega oportuna de cada proyecto según los tiempos establecidos.</p>
+</div>
+
+<div class="valor-card">
+  <i class="fa-solid fa-users"></i>
+  <h3>Trabajo en equipo</h3>
+  <p>Fomentamos la colaboración entre profesionales para lograr resultados eficientes.</p>
+</div>
+
+<div class="valor-card">
+  <i class="fa-solid fa-shield-halved"></i>
+  <h3>Seguridad</h3>
+  <p>Priorizamos la seguridad en cada obra, cumpliendo normas y protocolos establecidos.</p>
+</div>
+  </div>
+</section>
+
+  <section id="servicios" class="servicios-slider-section">
+  <h2>Nuestros Servicios</h2>
+
+  <div class="servicios-slider">
+    <div class="servicio-slide active">
+      <img src="{{ url_for('static', filename='imagenes/Construccion_Obras.jpg') }}" alt="Construcción de obras">
+      <div class="servicio-overlay">
+        <h3>Construcción de Obras</h3>
+        <p>Desarrollo de proyectos residenciales, comerciales e institucionales.</p>
+        <a href="#contacto">Consultar servicio</a>
+      </div>
+    </div>
+
+    <div class="servicio-slide">
+      <img src="{{ url_for('static', filename='imagenes/Diseño_Estructural.jpg') }}" alt="Diseño estructural">
+      <div class="servicio-overlay">
+        <h3>Diseño Estructural</h3>
+        <p>Planeación y diseño de estructuras seguras y eficientes.</p>
+        <a href="#contacto">Consultar servicio</a>
+      </div>
+    </div>
+
+    <div class="servicio-slide">
+      <img src="{{ url_for('static', filename='imagenes/Inventoria.jpg') }}" alt="Interventoría">
+      <div class="servicio-overlay">
+        <h3>Interventoría</h3>
+        <p>Supervisión técnica, administrativa y financiera de proyectos.</p>
+        <a href="#contacto">Consultar servicio</a>
+      </div>
+    </div>
+
+    <div class="servicio-slide">
+      <img src="{{ url_for('static', filename='imagenes/Consultoria.jpg') }}" alt="Consultoría">
+      <div class="servicio-overlay">
+        <h3>Consultoría</h3>
+        <p>Asesoría profesional en procesos de ingeniería civil.</p>
+        <a href="#contacto">Consultar servicio</a>
+      </div>
+    </div>
+
+    <button class="servicio-btn prev-servicio" onclick="cambiarServicio(-1)">&#10094;</button>
+    <button class="servicio-btn next-servicio" onclick="cambiarServicio(1)">&#10095;</button>
+
+    <div class="servicio-dots">
+      <span class="dot active" onclick="irServicio(0)"></span>
+      <span class="dot" onclick="irServicio(1)"></span>
+      <span class="dot" onclick="irServicio(2)"></span>
+      <span class="dot" onclick="irServicio(3)"></span>
+    </div>
+  </div>
+</section>
+
+
+
+  <section id="zonas" class="section zonas">
+    <h2 data-aos="fade-up">Zonas donde hemos trabajado</h2>
+    <center><p data-aos="fade-up">
+      Presencia en diferentes regiones de Colombia mediante proyectos de ingeniería civil.
+    </p></center>
+
+    <br>
+
+    <div id="map" data-aos="zoom-in"></div>
+  </section>
+
+    <section id="proyectos" class="section proyectos">
+  <h2 data-aos="fade-up">Proyectos Destacados</h2>
+  <p class="proyectos-intro" data-aos="fade-up">
+    Conoce algunos de los proyectos donde hemos aportado experiencia, calidad y compromiso técnico.
+  </p>
+
+  <div class="project-grid">
+
+    <div class="project-card" id="montelibano" data-aos="fade-up">
+      <div class="project-img">
+        <img src="{{ url_for('static', filename='imagenes/Montelibano.jpeg') }}" alt="Proyecto Montelíbano">
+        <span>Montelíbano, Córdoba</span>
+      </div>
+
+      <div class="project-content">
+        <h3>Montelíbano</h3>
+        <p class="project-subtitle">Supervisión técnica, administrativa y financiera.</p>
+        <p>
+          Prestación de servicios profesionales para la supervisión del convenio interadministrativo del municipio.
+        </p>
+        <a href="#contacto" class="project-btn">Solicitar información</a>
+      </div>
+    </div>
+
+    <div class="project-card" id="monitos" data-aos="fade-up">
+      <div class="project-img">
+        <img src="{{ url_for('static', filename='imagenes/moñitos.jpeg') }}" alt="Proyecto Moñitos">
+        <span>Moñitos, Córdoba</span>
+      </div>
+
+      <div class="project-content">
+        <h3>Moñitos</h3>
+        <p class="project-subtitle">Construcción de pavimento rígido.</p>
+        <p>
+          Interventoría técnica, administrativa y financiera para obras de infraestructura vial urbana.
+        </p>
+        <a href="#contacto" class="project-btn">Solicitar información</a>
+      </div>
+    </div>
+
+    <div class="project-card" id="majagual" data-aos="fade-up">
+      <div class="project-img">
+        <img src="{{ url_for('static', filename='imagenes/Majuagal.jpeg') }}" alt="Proyecto Majagual">
+        <span>Majagual, Sucre</span>
+      </div>
+
+      <div class="project-content">
+        <h3>Majagual</h3>
+        <p class="project-subtitle">Formulación y evaluación técnica.</p>
+        <p>
+          Estudios y diseños para proyectos de alumbrado público y evaluación financiera del servicio.
+        </p>
+        <a href="#contacto" class="project-btn">Solicitar información</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="contacto" class="section contacto contact-modern">
+  <div class="contact-box" data-aos="fade-up">
+
+    <!-- INFORMACIÓN -->
+    <div class="contact-info">
+      <span class="contact-tag">Hablemos de tu proyecto</span>
+      <h2>Contáctanos</h2>
+      <p>
+        Cuéntanos qué necesitas y nuestro equipo te responderá lo antes posible.
+      </p>
+
+      <div class="contact-detail">
+        <i class="fas fa-location-dot"></i>
+        <span>Cl 30 #35-43, Montería - Córdoba</span>
+      </div>
+
+      <div class="contact-detail">
+        <i class="fas fa-phone"></i>
+        <span>7919575 / 3214816995</span>
+      </div>
+
+      <div class="contact-detail">
+        <i class="fas fa-envelope"></i>
+        <span>construgonps@gmail.com</span>
+      </div>
+    </div>
+
+    <!-- MENSAJES FLASK -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-message {{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    <!-- FORMULARIO -->
+    <form
+      class="contact-form"
+      action="{{ url_for('guardar_contacto') }}"
+      method="POST"
+    >
+
+      <!-- NOMBRE + TELÉFONO -->
+      <div class="form-row">
+
+        <div class="input-group">
+          <label for="nombre">Nombre completo</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            placeholder="Ej: Juan Pérez"
+            required
+          >
+        </div>
+
+        <div class="input-group">
+          <label for="telefono">Teléfono</label>
+          <input
+            type="tel"
+            id="telefono"
+            name="telefono"
+            placeholder="Ej: 3001234567"
+            required
+          >
+        </div>
+
+      </div>
+
+      <!-- CORREO -->
+      <div class="input-group">
+        <label for="correo">Correo electrónico</label>
+        <input
+          type="email"
+          id="correo"
+          name="correo"
+          placeholder="Ej: correo@gmail.com"
+          required
+        >
+      </div>
+
+      <!-- SERVICIO -->
+      <div class="input-group">
+        <label for="servicio">Servicio de interés</label>
+        <select
+          id="servicio"
+          name="servicio"
+          required
+        >
+          <option value="">Selecciona una opción</option>
+          <option value="Construcción de obras">Construcción de obras</option>
+          <option value="Diseño estructural">Diseño estructural</option>
+          <option value="Interventoría">Interventoría</option>
+          <option value="Consultoría">Consultoría</option>
+        </select>
+      </div>
+
+      <!-- MENSAJE -->
+      <div class="input-group">
+        <label for="mensaje">Mensaje</label>
+        <textarea
+          id="mensaje"
+          name="mensaje"
+          placeholder="Cuéntanos brevemente sobre tu proyecto..."
+          required
+        ></textarea>
+      </div>
+
+      <!-- BOTÓN -->
+      <button type="submit">
+        Enviar mensaje <i class="fas fa-paper-plane"></i>
+      </button>
+
+    </form>
+
+  </div>
+</section>
+
+  <footer class="footer">
+    
+    <section class="contact-section text-center">
+
+  <div class="container">
+    <h2>Canales de Comunicación</h2>
+    <p>Contáctanos a través de nuestros canales oficiales</p>
+
+    <div class="social-icons">
+
+      <a href="mailto:construgonps@gmail.com" class="social email">
+        <i class="fas fa-envelope"></i>
+      </a>
+
+      <a href="https://wa.me/573001112233" target="_blank" class="social whatsapp">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+
+    </div>
+
+  </div>
+
+
+    <P>Correo electronico: construgonps@gmail.com</P>
+    <p>Ingeniería civil | Construcción | Consultoría</p>
+    <p>© 2026 CONSTRUGONP'S S.A.S - Todos los derechos reservados</p>
+    </section>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="{{ url_for('static', filename='animaciones.js') }}"></script>
+
+</body>
+</html>
