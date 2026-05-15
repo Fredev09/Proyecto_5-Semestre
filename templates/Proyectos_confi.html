@@ -5,7 +5,6 @@
     <title>Proyectos de Obra - CiviWeb Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
-    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
     <style>
         * {
             margin: 0;
@@ -305,8 +304,8 @@
     </div>
 
     <div class="admin-actions">
-        <a href="{{ url_for('dashboard') }}">
-            <i class="fa fa-arrow-left"></i> Dashboard
+        <a href="{{ url_for('constructora_admin') }}">
+            <i class="fa fa-arrow-left"></i> Volver
         </a>
 
         <a href="{{ url_for('constructora_admin') }}">
@@ -325,7 +324,9 @@
     <section class="form-card">
         <h2><i class="fa fa-plus"></i> Registrar nuevo proyecto</h2>
 
+                <!-- REEMPLAZA EL FORMULARIO ACTUAL EN Proyectos_confi.html POR ESTE -->
         <form action="{{ url_for('crear_proyecto') }}" method="POST">
+
             <div class="input-group">
                 <label>Nombre del proyecto</label>
                 <input type="text" name="nombre" placeholder="Ej: Pavimentación vía principal" required>
@@ -342,6 +343,39 @@
                 </select>
             </div>
 
+            <div class="input-group">
+                <label>Cliente / Empresa contratante</label>
+                <select name="cliente_id" required>
+                    <option value="">Seleccione cliente o empresa</option>
+
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">
+                        {{ cliente.nombre }} - {{ cliente.tipo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Teléfono de contacto</label>
+                <input type="text" name="telefono" placeholder="Teléfono del cliente o empresa">
+            </div>
+
+            <div class="input-group">
+                <label>Tipo de trabajo</label>
+                <select name="tipo_trabajo" required>
+                    <option value="">Seleccione tipo de trabajo</option>
+                    <option value="Obras civiles">Obras civiles</option>
+                    <option value="Construcción residencial">Construcción residencial</option>
+                    <option value="Construcción comercial">Construcción comercial</option>
+                    <option value="Diseño estructural">Diseño estructural</option>
+                    <option value="Interventoría">Interventoría</option>
+                    <option value="Consultoría">Consultoría</option>
+                    <option value="Remodelación">Remodelación</option>
+                    <option value="Urbanismo">Urbanismo</option>
+                </select>
+            </div>
+
             <div class="input-group full">
                 <label>Descripción del proyecto</label>
                 <textarea name="descripcion" placeholder="Describe el alcance, ubicación o detalles técnicos del proyecto" required></textarea>
@@ -350,6 +384,7 @@
             <button type="submit" class="btn-submit">
                 <i class="fa fa-save"></i> Crear proyecto
             </button>
+
         </form>
     </section>
 
@@ -365,10 +400,11 @@
                 </div>
 
                 <span class="status {{ p.estado }}">{{ p.estado }}</span>
-
                 <h3>{{ p.nombre }}</h3>
+                <p>
+                    <strong>Tipo:</strong> {{ p.tipo_trabajo }}
+                </p>
                 <p>{{ p.descripcion }}</p>
-
                 <div class="actions">
                     <a href="{{ url_for('editar_proyecto', id=p.id) }}" class="edit">
                         <i class="fa fa-pen"></i> Editar

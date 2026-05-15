@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes Interesados - CiviWeb Manager</title>
+    <link rel="shortcut icon" href="../static/imagenes/Logo Civi.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -250,19 +251,6 @@
         <h1>Clientes Interesados</h1>
         <p>Consulta, organiza y prioriza solicitudes recibidas desde el formulario del sitio web.</p>
     </section>
-
-    <!-- MENSAJES FLASH -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    {% endwith %}
 
     <section class="table-card">
         <h2><i class="fa fa-users"></i> Solicitudes de Clientes</h2>
