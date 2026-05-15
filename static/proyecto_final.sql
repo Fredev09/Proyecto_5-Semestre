@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-05-2026 a las 13:29:45
+-- Tiempo de generación: 15-05-2026 a las 22:46:48
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -26,6 +26,58 @@ USE `proyecto_final`;
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `clientes_constructora`
+--
+
+DROP TABLE IF EXISTS `clientes_constructora`;
+CREATE TABLE `clientes_constructora` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `tipo` enum('Entidad pública','Empresa privada','Cliente particular') NOT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `correo` varchar(120) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `clientes_constructora`
+--
+
+INSERT INTO `clientes_constructora` (`id`, `nombre`, `tipo`, `telefono`, `correo`, `direccion`, `fecha_registro`) VALUES
+(1, 'Alcaldía Municipal de San Juan', 'Entidad pública', '3001234567', 'infraestructura@sanjuan.gov', 'Centro administrativo San Juan', '2026-05-15 04:57:06'),
+(2, 'Constructora Delta S.A.', 'Empresa privada', '3109876543', 'contacto@deltasa.com', 'Zona industrial Bogotá', '2026-05-15 04:57:06'),
+(3, 'Inversiones Rivera', 'Cliente particular', '3204567890', 'rivera@email.com', 'Villa Campestre', '2026-05-15 04:57:06');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `clientes_inmobiliaria`
+--
+
+DROP TABLE IF EXISTS `clientes_inmobiliaria`;
+CREATE TABLE `clientes_inmobiliaria` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `documento` varchar(30) DEFAULT NULL,
+  `telefono` varchar(30) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `direccion` varchar(150) DEFAULT NULL,
+  `tipo_interes` varchar(50) DEFAULT NULL,
+  `observacion` text DEFAULT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `clientes_inmobiliaria`
+--
+
+INSERT INTO `clientes_inmobiliaria` (`id`, `nombre`, `documento`, `telefono`, `email`, `direccion`, `tipo_interes`, `observacion`, `fecha_registro`) VALUES
+(1, 'Lorena Calle', '1066280317', '3205178088', 'lorena2001@gmail.com', 'Monteria, cordoba', 'Arriendo', 'Interesado en arriendo urbina', '2026-05-15 03:36:42');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `clientes_interesados`
 --
 
@@ -41,6 +93,28 @@ CREATE TABLE `clientes_interesados` (
   `estado` enum('Pendiente','Contactado','Prioridad Alta') DEFAULT 'Pendiente',
   `fecha_contacto` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cliente_proyecto`
+--
+
+DROP TABLE IF EXISTS `cliente_proyecto`;
+CREATE TABLE `cliente_proyecto` (
+  `id` int(11) NOT NULL,
+  `cliente_id` int(11) NOT NULL,
+  `proyecto_id` int(11) NOT NULL,
+  `fecha_asignacion` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `cliente_proyecto`
+--
+
+INSERT INTO `cliente_proyecto` (`id`, `cliente_id`, `proyecto_id`, `fecha_asignacion`) VALUES
+(11, 1, 2, '2026-05-15 05:18:22'),
+(12, 3, 3, '2026-05-15 05:29:02');
 
 -- --------------------------------------------------------
 
@@ -121,6 +195,7 @@ DROP TABLE IF EXISTS `proyectos_constructora`;
 CREATE TABLE `proyectos_constructora` (
   `id` int(11) NOT NULL,
   `nombre` varchar(120) NOT NULL,
+  `tipo_trabajo` varchar(150) NOT NULL,
   `ubicacion` varchar(150) DEFAULT NULL,
   `estado` varchar(50) DEFAULT 'Activo',
   `presupuesto` decimal(15,2) DEFAULT NULL,
@@ -133,8 +208,10 @@ CREATE TABLE `proyectos_constructora` (
 -- Volcado de datos para la tabla `proyectos_constructora`
 --
 
-INSERT INTO `proyectos_constructora` (`id`, `nombre`, `ubicacion`, `estado`, `presupuesto`, `descripcion`, `fecha_inicio`, `fecha_fin`) VALUES
-(1, 'Pavimentacion', NULL, 'Activo', NULL, 'Por la calle', NULL, NULL);
+INSERT INTO `proyectos_constructora` (`id`, `nombre`, `tipo_trabajo`, `ubicacion`, `estado`, `presupuesto`, `descripcion`, `fecha_inicio`, `fecha_fin`) VALUES
+(1, 'Primer proyecto', 'Obras civiles', NULL, 'Activo', NULL, 'Descripcion del primer proyecto', NULL, NULL),
+(2, 'Pavimentación Calle principal', 'Espacio público', NULL, 'Finalizado', NULL, 'Se pavimentó la calle principal del municipio de San Juan.', NULL, NULL),
+(3, 'Proyecto 2', 'Obras civiles', NULL, 'Pendiente', NULL, 'Este es el proyecto 2', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -157,13 +234,9 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `username`, `password_hash`, `email`, `rol`, `email_confirmado`) VALUES
-(4, 'daniela01', 'scrypt:32768:8:1$vXdgSzGsnDNM8IFV$929d07df61307215b8dbc6fd8ab7b2b6704335c8e544b9280cac9649ad40dda31c1dfb7e1b7f14f54fe540c4c5eb3ea8e62c87d510da9f9f54fb11cf44e8f676', 'daniela@correo.com', 'usuario', 0),
-(6, 'lorena02', 'scrypt:32768:8:1$DPcPDKjrgv9iJX8n$a1ef7b22b9a89da03a4a9ec5adad52c6bf5c5bea20d04dfb3571d934ef6898593c48cf7855b6ce05824e404ef7d7f781b045cec1e0b1f39aa30be8efb1e35484', 'lorena@gmail.com', 'usuario', 0),
-(7, 'angel04', 'scrypt:32768:8:1$14zr4jVW2RrceOcN$de0261930507753f515bf9880e09cd351943df6b7515109f26d07bc6587f365020150dc8744354427e431af07ee5db0bf727239775e2439fdbf55a7597c613ae', 'angel@correo.com', 'usuario', 0),
-(19, 'dinaluna', 'scrypt:32768:8:1$YJVqvRASxQLlrllc$90b977087b79b3977989c3d8059592230fcc666061e0ab8a14dbbc66eef9be15a9fd879f8a0f2e4a672039cb9279a9f2bc2d597d30971ac1d88fde4c93a03959', 'ddelahozluna@gmail.com', 'usuario', 1),
-(20, 'Franklin01', 'scrypt:32768:8:1$tylaNYpBEaXXG1oh$67e89c62be992c30b2bff13b77704072a79b76ed2039c8fd1501c347f3ae06bf82724b381f2f57210130b482e13939e8efe44a1b3c27090ae46aa49c70b1d9ae', 'Frankilito06@gmail.com', 'usuario', 1),
-(22, 'danielalopez', 'scrypt:32768:8:1$upAu5e6LTfDaZq18$fdb1c9c039b002e989903779798f608317a20f01888df6a09c8f80a86caa99a838c7f0d2939e42d2b1ed97bdc909fab12ab490e051b98bb1ff69f73aa735c972', 'lopezdelahozlaura@gmail.com', 'usuario', 1),
-(27, 'Javierlopez', 'scrypt:32768:8:1$ow2HldvkrsWOhyVh$980029b1d0216c9453a2271b923f2d6fe71b07e295a3f26c55a3156e3f67810a3cd4dcbe61b0255fb8bd6dbbae74e9ac8980475af437bf9a52bfc2db8eab42a8', 'lopezvelandiajavier45@gmail.com', 'usuario', 1),
+(6, 'Jpipe', 'scrypt:32768:8:1$c5QdQ50ldi7lv36U$e54dbde025e054f1b5f7018c34ec922158c3961375150c6ba274c1b2946793e2e97b103dc281d5382155f0672902ac7bdb9703dcb057771d8518777984598786', 'juanfelipearbu7@gmail.com', 'usuario', 1),
+(19, 'sarith.10', 'scrypt:32768:8:1$RkBzBzVi5ZWExUq8$4d7314f1d09da6cb3a89be3ed3a294eff3eaed596d46bb5ea31dab1fcf639130f747d40f36fa801eb8f8ff7683fdddbf271bfe3748db272221aa53eb7e12fbf4', 'callessarith@gmail.com', 'usuario', 1),
+(20, 'KarolinaGarcia', 'scrypt:32768:8:1$jAZBI6bRXlgtZ8l5$25c1a719ce5b5a27c50d599ba2bd5755bf7b0c3e256a19823cfad68141e5a33d1d373b3761f542567350fc1080db66a35abcbc310c4bfd8a58c2777231437ef3', 'karolinaospina0311@gmail.com', 'usuario', 1),
 (28, 'FabianMuñoz', 'scrypt:32768:8:1$d7AAkUykHvQ8TClK$49fb10c48a8edb40f5dc975a7e09d6b3a3726f948b18bdd7045704d5edfedb123fefc394fe180d8891fcddb7790dfee129df2b350faba2957adc56d33028a882', 'fabianmunozpadilla2006@gmail.com', 'usuario', 1),
 (29, 'CamiLopez', 'scrypt:32768:8:1$VrGhnb7yj7nmrhtR$37a5f27a144414262b2586cf65dc52f66bb60906cf265c68c50a139985da162c02f4851d2ce91e8ba6bb530f19d684ff51fbd51d0a184bde09038067473e92ca', 'camila2001super@gmail.com', 'admin', 1),
 (31, 'EileenPeña', 'scrypt:32768:8:1$rpjYlxTb1dsHOu42$c946c47afa29414ca660923570d40805933e08b5cbff23d48d4939b3b3b3faaaf32dd88ecc78318b068a08621b05a6fbdfcf6caa95c5eaca7e26ec54390fc154', 'eileenandreap009@gmail.com', 'admin', 1);
@@ -178,21 +251,52 @@ DROP TABLE IF EXISTS `ventas`;
 CREATE TABLE `ventas` (
   `id` int(11) NOT NULL,
   `inmueble_id` int(11) NOT NULL,
-  `cliente` varchar(100) NOT NULL,
-  `documento` varchar(50) DEFAULT NULL,
+  `cliente_id` int(11) NOT NULL,
   `valor_venta` decimal(15,2) NOT NULL,
-  `fecha` date NOT NULL
+  `fecha` date NOT NULL,
+  `observacion` text DEFAULT NULL,
+  `metodo_pago` varchar(100) DEFAULT NULL,
+  `anticipo` decimal(15,2) DEFAULT NULL,
+  `saldo` decimal(15,2) DEFAULT NULL,
+  `estado_pago` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `ventas`
+--
+
+INSERT INTO `ventas` (`id`, `inmueble_id`, `cliente_id`, `valor_venta`, `fecha`, `observacion`, `metodo_pago`, `anticipo`, `saldo`, `estado_pago`) VALUES
+(1, 4, 1, 580000000.00, '2026-05-02', 'Registrado con pago incial y proceso de venta ', NULL, NULL, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
 --
 
 --
+-- Indices de la tabla `clientes_constructora`
+--
+ALTER TABLE `clientes_constructora`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `clientes_inmobiliaria`
+--
+ALTER TABLE `clientes_inmobiliaria`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `clientes_interesados`
 --
 ALTER TABLE `clientes_interesados`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `cliente_proyecto`
+--
+ALTER TABLE `cliente_proyecto`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `cliente_id` (`cliente_id`),
+  ADD KEY `proyecto_id` (`proyecto_id`);
 
 --
 -- Indices de la tabla `compras`
@@ -232,17 +336,36 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `ventas`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `inmueble_id` (`inmueble_id`);
+  ADD KEY `inmueble_id` (`inmueble_id`),
+  ADD KEY `cliente_id` (`cliente_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
+-- AUTO_INCREMENT de la tabla `clientes_constructora`
+--
+ALTER TABLE `clientes_constructora`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `clientes_inmobiliaria`
+--
+ALTER TABLE `clientes_inmobiliaria`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `clientes_interesados`
 --
 ALTER TABLE `clientes_interesados`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `cliente_proyecto`
+--
+ALTER TABLE `cliente_proyecto`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `compras`
@@ -266,7 +389,7 @@ ALTER TABLE `inmueble_multimedia`
 -- AUTO_INCREMENT de la tabla `proyectos_constructora`
 --
 ALTER TABLE `proyectos_constructora`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -278,11 +401,18 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `cliente_proyecto`
+--
+ALTER TABLE `cliente_proyecto`
+  ADD CONSTRAINT `cliente_proyecto_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes_constructora` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `cliente_proyecto_ibfk_2` FOREIGN KEY (`proyecto_id`) REFERENCES `proyectos_constructora` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `inmueble_multimedia`
@@ -294,7 +424,8 @@ ALTER TABLE `inmueble_multimedia`
 -- Filtros para la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`inmueble_id`) REFERENCES `inmuebles` (`id`);
+  ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`inmueble_id`) REFERENCES `inmuebles` (`id`),
+  ADD CONSTRAINT `ventas_ibfk_2` FOREIGN KEY (`cliente_id`) REFERENCES `clientes_inmobiliaria` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

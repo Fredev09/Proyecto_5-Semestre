@@ -709,12 +709,11 @@ def ventas_admin():
     cur = mysql.connection.cursor()
     cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
     total_vendido = cur.fetchone()['total']
-
     cur.execute("SELECT COUNT(*) AS total FROM ventas WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")
 
+    if request.method == 'POST':
         inmueble_id = request.form['inmueble_id']
         cliente_id = request.form['cliente_id']
-
         valor_venta = float(request.form['valor_venta'])
         anticipo = float(request.form['anticipo'])
 
@@ -775,7 +774,7 @@ def ventas_admin():
     inmuebles_disponibles = cur.fetchall()
     cur.execute("""
         SELECT *
-        FROM clientes
+        FROM clientes_inmobiliaria
         ORDER BY nombre ASC
     """)
 
@@ -803,7 +802,7 @@ def ventas_admin():
         INNER JOIN inmuebles i 
             ON v.inmueble_id = i.id
 
-        INNER JOIN clientes c 
+        INNER JOIN clientes_inmobiliaria c 
             ON v.cliente_id = c.id
 
         ORDER BY v.fecha DESC
@@ -896,16 +895,16 @@ def clientes_admin():
         flash('Cliente registrado correctamente.', 'success')
         return redirect(url_for('clientes_admin'))
 
-    cur.execute("SELECT * FROM clientes ORDER BY id DESC")
+    cur.execute("SELECT * FROM clientes_inmobiliaria ORDER BY id DESC")
     clientes = cur.fetchall()
 
-    cur.execute("SELECT COUNT(*) AS total FROM clientes")
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria")
     total_clientes = cur.fetchone()['total']
 
-    cur.execute("SELECT COUNT(*) AS total FROM clientes WHERE tipo_interes = 'Compra'")
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria WHERE tipo_interes = 'Compra'")
     clientes_compra = cur.fetchone()['total']
 
-    cur.execute("SELECT COUNT(*) AS total FROM clientes WHERE tipo_interes = 'Arriendo'")
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria WHERE tipo_interes = 'Arriendo'")
     clientes_arriendo = cur.fetchone()['total']
 
     cur.close()
@@ -1038,7 +1037,21 @@ def reportes_admin():
 @app.route('/proyectos')
 def proyectos_admin():
     proyectos = get_proyectos_mysql(mysql)
-    return render_template('Proyectos_confi.html', proyectos=proyectos)
+
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT id, nombre, tipo
+        FROM clientes_constructora
+        ORDER BY nombre ASC
+    """)
+    clientes = cur.fetchall()
+    cur.close()
+
+    return render_template(
+        'Proyectos_confi.html',
+        proyectos=proyectos,
+        clientes=clientes
+    )
 
 
 @app.route('/crear_proyecto', methods=['POST'])
