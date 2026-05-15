@@ -1,0 +1,45 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+
+# Variables sensibles
+.env
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configuración de VS Code
+.vscode/
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Base de datos local (si usas SQLite en algún momento)
+*.db
+*.sqlite3
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Subidas de usuarios / archivos generados
+#static/imagenes/
+
+# Archivos de pruebas o backups
+*.bak
+*.swp
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribución
+build/
+dist/
+*.egg-info/
