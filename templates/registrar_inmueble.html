@@ -14,12 +14,14 @@
             font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #1a1a1a, #981313);
             min-height: 100vh;
-            padding: 45px;
+            padding: 20px;
         }
 
         .form-container {
             max-width: 900px;
-            margin: auto;
+            width: 100%;
+            margin: 30px auto;
+
             background: white;
             border-radius: 26px;
             overflow: hidden;
@@ -289,6 +291,154 @@
 
         /* =========================================
         FIN RESPONSIVE REGISTRAR INMUEBLE
+        ========================================= */
+
+        /* =========================================
+        CORRECCION VISUAL REAL REGISTRAR INMUEBLE
+        PEGAR AL FINAL
+        ========================================= */
+
+        /* Mejor ancho real */
+        .form-container {
+            width: 100%;
+        }
+
+        /* Inputs archivo premium */
+        input[type="file"] {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            border-radius: 12px;
+        }
+
+        /* Botón archivo */
+        input[type="file"]::-webkit-file-upload-button {
+            background: #981313;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        /* Precio mejor */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* TABLET */
+        @media(max-width: 800px) {
+
+            body {
+                padding: 10px !important;
+            }
+
+            .form-container {
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+
+            form {
+                padding: 18px !important;
+            }
+        }
+
+        /* MOVIL REAL */
+        @media(max-width: 600px) {
+
+            body {
+                padding: 14px !important;
+            }
+
+            .form-container {
+                border-radius: 12px !important;
+            }
+
+            .form-header {
+                padding: 16px 12px !important;
+            }
+
+            .form-header h1 {
+                font-size: 22px !important;
+            }
+
+            .form-header p {
+                font-size: 12px !important;
+            }
+
+            form {
+                padding: 12px !important;
+                gap: 14px !important;
+            }
+
+            label {
+                font-size: 13px !important;
+            }
+
+            input,
+            select,
+            textarea {
+                padding: 12px !important;
+                font-size: 16px !important;
+                border-radius: 10px !important;
+            }
+
+            textarea {
+                min-height: 90px !important;
+            }
+
+            input[type="file"] {
+                padding: 8px !important;
+                font-size: 12px !important;
+            }
+
+            input[type="file"]::-webkit-file-upload-button {
+                padding: 7px 10px;
+                font-size: 12px;
+            }
+
+            small {
+                font-size: 11px !important;
+            }
+
+            .buttons {
+                gap: 10px !important;
+            }
+
+            button,
+            .btn-back {
+                padding: 12px !important;
+                font-size: 14px !important;
+                border-radius: 12px !important;
+            }
+        }
+
+        /* iPhone SE / pequeños */
+        @media(max-width: 400px) {
+
+            .form-header h1 {
+                font-size: 20px !important;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 15px !important;
+            }
+
+            button,
+            .btn-back {
+                font-size: 13px !important;
+            }
+        }
+
+        /* =========================================
+        FIN CORRECCION VISUAL REAL REGISTRAR INMUEBLE
         ========================================= */
     </style>
 </head>
