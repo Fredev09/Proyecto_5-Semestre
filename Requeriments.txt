@@ -1,0 +1,7 @@
+Flask==3.0.3
+flask-mysqldb==2.0.0
+Flask-Mail==0.9.1
+Werkzeug==3.0.3
+python-dotenv==1.0.1
+PyMySQL==1.1.1
+email-validator==2.2.0
