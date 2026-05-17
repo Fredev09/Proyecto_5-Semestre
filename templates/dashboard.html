@@ -23,11 +23,10 @@
 
         <div class="dropdown-content" id="menuConstructora">
             <a href="{{ url_for('proyectos_admin') }}"><i class="fa fa-building"></i> Proyectos de obra</a>
-            <a href="#"><i class="fa fa-screwdriver-wrench"></i> Servicios</a>
+            <a href="{{ url_for('servicios_Constructivos') }}"><i class="fa fa-screwdriver-wrench"></i> Servicios</a>
             <a href="{{ url_for('admin_contactos') }}"><i class="fa fa-list-check"></i> Clientes interesados</a>
-            <a href="{{ url_for('clientes_admin') }}"><i class="fa fa-users"></i> Clientes</a>
+            <a href="{{ url_for('clientes_constructora') }}"><i class="fa fa-users"></i> Clientes</a>
             <a href="#"><i class="fa fa-file-invoice-dollar"></i> Presupuestos</a>
-            <a href="#"><i class="fa fa-chart-line"></i> Reportes de obra</a>
         </div>
     </div>
 
@@ -40,10 +39,8 @@
         <div class="dropdown-content" id="menuInmobiliaria">
             <a href="{{ url_for('inmuebles') }}"><i class="fa fa-city"></i> Inmuebles</a>
             <a href="{{ url_for('registrar_inmueble') }}"><i class="fa fa-house"></i> Registrar inmueble</a>
-            <a href="{{ url_for('ventas_admin') }}"><i class="fa fa-handshake"></i> Ventas</a>
-            <a href="{{ url_for('compras_admin') }}"><i class="fa fa-cart-shopping"></i> Compras</a>
-            <a href="#"><i class="fa fa-calendar-check"></i> Reservas</a>
-            <a href="{{ url_for('reportes_admin') }}"><i class="fa fa-chart-pie"></i> Reportes inmobiliarios</a>
+            <a href="{{ url_for('clientes_admin') }}"><i class="fa fa-cart-shopping"></i> Clientes</a>
+            <a href="{{ url_for('reservas_admin') }}"><i class="fa fa-calendar-check"></i> Reservas</a>
         </div>
     </div>
 
@@ -172,12 +169,32 @@
             <h2>Resumen del sistema</h2>
 
             <div class="info-list">
-                <p><strong>Estado:</strong> Sistema activo y funcional.</p>
-                <p><strong>Base de datos:</strong> MySQL conectada y operativa.</p>
-                <p><strong>Seguridad:</strong> Login, roles, sesiones y control de acceso habilitados.</p>
-                <p><strong>Correo:</strong> Confirmación y recuperación de contraseña por correo.</p>
-                <p><strong>Áreas:</strong> Constructora, inmobiliaria, usuarios, ventas, compras y reportes.</p>
-            </div>
+
+    <p>
+        Bienvenido al panel administrativo de <strong>CiviWeb Manager</strong>.
+    </p>
+
+    <p>
+        Desde aquí puedes gestionar inmuebles, clientes, reservas y proyectos
+        de manera centralizada y segura.
+    </p>
+
+    <p>
+        Utiliza los accesos rápidos para navegar entre los diferentes módulos
+        del sistema y administrar la información de la constructora.
+    </p>
+
+    <p>
+        El sistema permite controlar procesos inmobiliarios, administración
+        interna y seguimiento de operaciones desde un solo lugar.
+    </p>
+
+    <p>
+        Mantén actualizada la información de propiedades, usuarios y clientes
+        para un mejor control administrativo y comercial.
+    </p>
+
+</div>
         </div>
 
         <div class="panel">

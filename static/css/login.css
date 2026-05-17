@@ -440,7 +440,6 @@
         padding: 16px;
         font-size: 24px;
         text-align: center;
-        letter-spacing: 8px;
         border: 1px solid #ccc;
         border-radius: 14px;
         margin-bottom: 20px;
@@ -599,7 +598,6 @@
         .codigo-input {
           padding: 14px;
           font-size: 22px;
-          letter-spacing: 6px;
         }
 
         .btn-confirmar {
@@ -664,7 +662,6 @@
         .codigo-input {
           padding: 13px;
           font-size: 20px;
-          letter-spacing: 4px;
           border-radius: 12px;
         }
 
@@ -684,7 +681,6 @@
 
         .codigo-input {
           font-size: 18px;
-          letter-spacing: 3px;
         }
 
         h2 {
@@ -2457,7 +2453,6 @@
             border: 1px solid #ccc;
             text-align: center;
             font-size: 18px;
-            letter-spacing: 4px;
             font-weight: bold;
         }
 
@@ -2542,7 +2537,6 @@
         /* Input premium */
         .input-icon input {
             font-size: 20px;
-            letter-spacing: 6px;
             outline: none;
         }
 
@@ -2621,7 +2615,6 @@
             .input-icon input {
                 padding: 12px 42px;
                 font-size: 18px;
-                letter-spacing: 5px;
             }
 
             .input-icon i {
@@ -2677,7 +2670,7 @@
             .input-icon input {
                 padding: 12px 38px;
                 font-size: 17px;
-                letter-spacing: 4px;
+
             }
 
             .alert {
@@ -2708,7 +2701,6 @@
 
             .input-icon input {
                 font-size: 15px;
-                letter-spacing: 3px;
             }
         }
 
@@ -2716,3 +2708,75 @@
         FIN RESPONSIVE VERIFICAR CODIGO
         ========================================= */
     /*Fin de estilo de verificar_codigo_recuperacion.html*/
+
+    /* ARREGLO FINAL PARA LOGIN Y REGISTRO */
+
+.login-container input,
+.login-container select {
+    text-align: left !important;
+    letter-spacing: normal !important;
+    font-weight: normal !important;
+    font-size: 15px !important;
+}
+
+.login-container input::placeholder {
+    letter-spacing: normal !important;
+}
+
+.login-container .input-icon input,
+.login-container .input-icon select {
+    padding-left: 45px !important;
+    padding-right: 45px !important;
+}
+
+.login-container .toggle-password {
+    left: auto !important;
+    right: 14px !important;
+}
+
+.login-container .input-icon i.fa-user,
+.login-container .input-icon i.fa-lock,
+.login-container .input-icon i.fa-envelope,
+.login-container .input-icon i.fa-user-shield {
+    left: 14px !important;
+    right: auto !important;
+}
+
+.login-container button {
+    font-size: 15px !important;
+}
+
+/* ARREGLO OJITO DENTRO DEL INPUT */
+
+.input-icon {
+    position: relative;
+    width: 100%;
+}
+
+.input-icon input {
+    width: 100%;
+    padding-left: 45px !important;
+    padding-right: 50px !important;
+}
+
+.input-icon .toggle-password {
+    position: absolute !important;
+    right: 16px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    cursor: pointer;
+    z-index: 5;
+}
+
+/* ARREGLO TEXTO REGISTRO */
+
+.right-side input,
+.right-side select {
+    text-align: left ;
+    font-weight: normal ;
+}
+
+.right-side input::placeholder {
+    text-align: left;
+}

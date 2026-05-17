@@ -4433,3 +4433,29 @@ MODULO CONSTRUCTORA
         ========================================= */
 
     /*Fin de estilo de reportes_admin.html*/
+
+    /* =========================================
+RESERVAS ADMIN
+========================================= */
+
+.badge.Activa {
+    background: #1f9d55;
+    color: white;
+}
+
+.badge.Cancelada {
+    background: #981313;
+    color: white;
+}
+
+.done {
+    color: #1f9d55;
+    font-weight: bold;
+}
+
+.empty i {
+    font-size: 45px;
+    color: #981313;
+    margin-bottom: 14px;
+}
+

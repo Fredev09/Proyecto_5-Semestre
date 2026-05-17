@@ -1,14 +1,163 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas</title>
-</head>
-<body>
-    <h1>Reservas Inmobiliarias</h1>
-    <p>Este módulo está en construcción.</p>
+{% extends "base_admin.html" %}
 
-    <a href="{{ url_for('inmuebles') }}">Volver a inmobiliaria</a>
-</body>
-</html>
+{% block title %}Reservas - CiviWeb Manager{% endblock %}
+
+{% block admin_actions %}
+<a href="{{ url_for('inmobiliaria_admin') }}">
+    <i class="fa fa-arrow-left"></i> Inmobiliaria
+</a>
+
+<a href="{{ url_for('dashboard') }}">
+    <i class="fa fa-home"></i> Dashboard
+</a>
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Inicio</a>
+    <span>/</span>
+    <a href="{{ url_for('inmobiliaria_admin') }}">Inmobiliaria</a>
+    <span>/</span>
+    <strong>Reservas</strong>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<section class="page-title">
+    <h1>Gestión de Reservas</h1>
+    <p>Registra reservas de inmuebles, controla clientes interesados y fechas límite de separación.</p>
+</section>
+
+<section class="section-box">
+    <h2><i class="fa fa-calendar-plus"></i> Registrar nueva reserva</h2>
+
+    <form method="POST" class="form-admin">
+
+        <div class="input-group">
+            <label>Inmueble disponible</label>
+            <select name="inmueble_id" required>
+                <option value="">Seleccione un inmueble</option>
+                {% for i in inmuebles %}
+                    <option value="{{ i.id }}">
+                        {{ i.titulo }} - {{ i.ubicacion }} - ${{ "{:,.0f}".format(i.precio) }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Cliente</label>
+            <select name="cliente_id" required>
+                <option value="">Seleccione un cliente</option>
+                {% for c in clientes %}
+                    <option value="{{ c.id }}">
+                        {{ c.nombre }} - {{ c.telefono }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Fecha límite</label>
+            <input type="date" name="fecha_limite" required>
+        </div>
+
+        <div class="input-group">
+            <label>Valor de reserva</label>
+            <input type="number" name="valor_reserva" placeholder="Ej: 500000" required>
+        </div>
+
+        <div class="input-group full">
+            <label>Observación</label>
+            <textarea name="observacion" placeholder="Ej: Cliente separa el inmueble mientras completa documentos."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fa fa-save"></i> Guardar reserva
+        </button>
+
+    </form>
+</section>
+
+<section class="section-box">
+    <h2><i class="fa fa-list"></i> Reservas registradas</h2>
+
+    {% if reservas %}
+    <div class="table-responsive">
+        <table class="clientes-table">
+            <thead>
+                <tr>
+                    <th>Fecha reserva</th>
+                    <th>Inmueble</th>
+                    <th>Cliente</th>
+                    <th>Fecha límite</th>
+                    <th>Valor</th>
+                    <th>Estado</th>
+                    <th>Observación</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reservas %}
+                <tr>
+                    <td>
+                        {% if r.fecha_reserva %}
+                            {{ r.fecha_reserva.strftime('%d/%m/%Y') }}<br>
+                            {{ r.fecha_reserva.strftime('%H:%M') }}
+                        {% else %}
+                            Sin fecha
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <strong>{{ r.inmueble }}</strong><br>
+                        <small>{{ r.ubicacion }}</small>
+                    </td>
+
+                    <td>
+                        <strong>{{ r.cliente }}</strong><br>
+                        <small>{{ r.telefono }}</small>
+                    </td>
+
+                    <td>{{ r.fecha_limite }}</td>
+
+                    <td>${{ "{:,.0f}".format(r.valor_reserva) }}</td>
+
+                    <td>
+                        <span class="badge {{ r.estado }}">
+                            {{ r.estado }}
+                        </span>
+                    </td>
+
+                    <td>{{ r.observacion }}</td>
+
+                    <td>
+                        {% if r.estado == 'Activa' %}
+                        <a href="{{ url_for('cancelar_reserva', id=r.id, inmueble_id=r.inmueble_id) }}"
+                           class="btn-delete"
+                           onclick="return confirm('¿Cancelar esta reserva? El inmueble volverá a Disponible.')">
+                            <i class="fa fa-ban"></i> Cancelar
+                        </a>
+                        {% else %}
+                        <span class="done">
+                            <i class="fa fa-circle-check"></i> Finalizada
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty">
+        <i class="fa fa-calendar-xmark"></i>
+        <h3>No hay reservas registradas</h3>
+        <p>Cuando registres una reserva aparecerá en esta sección.</p>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}
