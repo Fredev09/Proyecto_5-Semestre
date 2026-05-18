@@ -9,8 +9,6 @@ from werkzeug.utils import secure_filename
 import re
 import uuid
 from datetime import datetime
-from dotenv import load_dotenv
-import pymysql
 
 from db_utils_mysql import (
     add_usuario_mysql,
@@ -28,9 +26,8 @@ from db_utils_mysql import (
     marcar_contactado_mysql
 )
 
-load_dotenv()
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = 'contraseña01'
 
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 
@@ -46,23 +43,21 @@ def index():
     return render_template ('index.html')
 
 # Configuración de MySQL (ajusta según tu XAMPP)
-app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
-app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
-app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'proyecto_final'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 #Configuracion e-mail
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'False'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
-
-mail = Mail(app)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'camila2001super@gmail.com'
+app.config['MAIL_PASSWORD'] = 'rcqq nctn duou vyow'
+app.config['MAIL_DEFAULT_SENDER'] = 'camila2001super@gmail.com'
 
 mail = Mail(app)
 
@@ -353,6 +348,12 @@ def dashboard():
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
+    rol = session.get('rol', 'usuario')
+
+    # Redirigir usuarios no-admin a su propio panel
+    if rol != 'admin':
+        return redirect(url_for('dashboard_usuario'))
+
     cur = mysql.connection.cursor()
 
     cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE estado = 'Activo'")
@@ -384,6 +385,124 @@ def logout():
     session.clear()
     flash('Sesion cerrada correctamente.', 'success')
     return redirect(url_for('login'))
+
+
+# Permisos por rol
+PERMISOS_POR_ROL = {
+    'admin': {
+        'constructora': True,
+        'inmobiliaria': True,
+        'ver_proyectos': True,
+        'ver_servicios': True,
+        'ver_contactos': True,
+        'ver_clientes_constructora': True,
+        'ver_inmuebles': True,
+        'registrar_inmueble': True,
+        'ver_clientes_inmobiliaria': True,
+        'ver_reservas': True,
+        'ver_ventas': True,
+        'ver_reportes': True,
+        'gestionar_usuarios': True,
+    },
+    'vendedor': {
+        'constructora': False,
+        'inmobiliaria': True,
+        'ver_proyectos': False,
+        'ver_servicios': False,
+        'ver_contactos': True,
+        'ver_clientes_constructora': False,
+        'ver_inmuebles': True,
+        'registrar_inmueble': True,
+        'ver_clientes_inmobiliaria': True,
+        'ver_reservas': True,
+        'ver_ventas': True,
+        'ver_reportes': False,
+        'gestionar_usuarios': False,
+    },
+    'supervisor': {
+        'constructora': True,
+        'inmobiliaria': True,
+        'ver_proyectos': True,
+        'ver_servicios': True,
+        'ver_contactos': True,
+        'ver_clientes_constructora': True,
+        'ver_inmuebles': True,
+        'registrar_inmueble': True,
+        'ver_clientes_inmobiliaria': True,
+        'ver_reservas': True,
+        'ver_ventas': True,
+        'ver_reportes': False,
+        'gestionar_usuarios': False,
+    },
+    'usuario': {
+        'constructora': True,
+        'inmobiliaria': True,
+        'ver_proyectos': True,
+        'ver_servicios': True,
+        'ver_contactos': False,
+        'ver_clientes_constructora': False,
+        'ver_inmuebles': True,
+        'registrar_inmueble': False,
+        'ver_clientes_inmobiliaria': False,
+        'ver_reservas': False,
+        'ver_ventas': False,
+        'ver_reportes': False,
+        'gestionar_usuarios': False,
+    },
+}
+
+def get_permisos(rol):
+    """Retorna el diccionario de permisos para el rol dado.
+       Si el rol no está definido, se usa el perfil más restrictivo ('usuario')."""
+    return PERMISOS_POR_ROL.get(rol, PERMISOS_POR_ROL['usuario'])
+
+
+@app.route('/mi-panel')
+def dashboard_usuario():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    rol = session.get('rol', 'usuario')
+    if rol == 'admin':
+        return redirect(url_for('dashboard'))
+
+    permisos = get_permisos(rol)
+    cur = mysql.connection.cursor()
+
+    inmuebles_disponibles = 0
+    proyectos_activos = 0
+    ventas_registradas = 0
+    reservas_activas = 0
+
+    if permisos.get('ver_inmuebles'):
+        cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
+        inmuebles_disponibles = cur.fetchone()['total']
+
+    if permisos.get('ver_proyectos'):
+        cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE estado = 'Activo'")
+        proyectos_activos = cur.fetchone()['total']
+
+    if permisos.get('ver_ventas'):
+        cur.execute("SELECT COUNT(*) AS total FROM ventas")
+        ventas_registradas = cur.fetchone()['total']
+
+    if permisos.get('ver_reservas'):
+        cur.execute("SELECT COUNT(*) AS total FROM reservas WHERE estado = 'Activa'")
+        reservas_activas = cur.fetchone()['total']
+
+    cur.close()
+
+    return render_template(
+        'dashboard_usuario.html',
+        usuario=session['usuario'],
+        rol=rol,
+        permisos=permisos,
+        inmuebles_disponibles=inmuebles_disponibles,
+        proyectos_activos=proyectos_activos,
+        ventas_registradas=ventas_registradas,
+        reservas_activas=reservas_activas
+    )
+
 
 @app.route('/usuarios')
 def usuarios():
@@ -657,16 +776,20 @@ def editar_inmueble(id):
         flash('Inmueble actualizado correctamente.', 'success')
         cur.close()
         return redirect(url_for('inmuebles'))
-
-    cur.execute("SELECT * FROM inmueble_multimedia WHERE inmueble_id = %s", (id,))
+    cur.execute("SELECT * FROM inmuebles WHERE id = %s", (id,))
+    inmueble = cur.fetchone()
+    cur.execute("""
+                 SELECT *
+                FROM inmueble_multimedia
+                WHERE inmueble_id = %s
+                """, (id,))
     galeria = cur.fetchall()
-
     cur.close()
     return render_template(
         'editar_inmueble.html',
         inmueble=inmueble,
         galeria=galeria
-    )
+        )
 
 @app.route('/eliminar_inmueble/<int:id>')
 def eliminar_inmueble(id):
@@ -699,10 +822,9 @@ def constructora_admin():
         return redirect(url_for('login'))
     return render_template('constructora_admin.html')
 
-
 @app.route('/ventas_admin', methods=['GET', 'POST'])
-def ventas_admin():
 
+def ventas_admin():
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
@@ -710,16 +832,13 @@ def ventas_admin():
     cur = conexion.cursor()
 
     if request.method == 'POST':
-
         inmueble_id = request.form['inmueble_id']
         cliente_id = request.form['cliente_id']
-
         valor_venta = float(request.form['valor_venta'])
         anticipo = float(request.form['anticipo'])
-
         metodo_pago = ", ".join(request.form.getlist('metodo_pago'))
-
         observacion = request.form['observacion']
+
         saldo = valor_venta - anticipo
 
         if saldo <= 0:
@@ -731,25 +850,13 @@ def ventas_admin():
 
         cur.execute("""
             INSERT INTO ventas (
-                inmueble_id,
-                cliente_id,
-                valor_venta,
-                metodo_pago,
-                anticipo,
-                saldo,
-                estado_pago,
-                observacion
+                inmueble_id, cliente_id, valor_venta, metodo_pago,
+                anticipo, saldo, estado_pago, observacion
             )
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
-            inmueble_id,
-            cliente_id,
-            valor_venta,
-            metodo_pago,
-            anticipo,
-            saldo,
-            estado_pago,
-            observacion
+            inmueble_id, cliente_id, valor_venta, metodo_pago,
+            anticipo, saldo, estado_pago, observacion
         ))
 
         cur.execute("""
@@ -759,9 +866,7 @@ def ventas_admin():
         """, (inmueble_id,))
 
         conexion.commit()
-
         flash('Venta registrada correctamente.', 'success')
-
         return redirect(url_for('ventas_admin'))
 
     cur.execute("""
@@ -770,14 +875,13 @@ def ventas_admin():
         WHERE estado = 'Disponible'
         ORDER BY id DESC
     """)
-
     inmuebles_disponibles = cur.fetchall()
+
     cur.execute("""
         SELECT *
-        FROM clientes
+        FROM clientes_inmobiliaria
         ORDER BY nombre ASC
     """)
-
     clientes = cur.fetchall()
 
     cur.execute("""
@@ -790,38 +894,21 @@ def ventas_admin():
             v.anticipo,
             v.saldo,
             v.estado_pago,
-
             i.titulo AS inmueble,
             i.ubicacion,
-
             c.nombre AS cliente,
             c.documento
-
         FROM ventas v
-
-        INNER JOIN inmuebles i 
-            ON v.inmueble_id = i.id
-
-        INNER JOIN clientes c 
-            ON v.cliente_id = c.id
-
+        INNER JOIN inmuebles i ON v.inmueble_id = i.id
+        INNER JOIN clientes_inmobiliaria c ON v.cliente_id = c.id
         ORDER BY v.fecha DESC
     """)
-
     ventas = cur.fetchall()
 
-    cur.execute("""
-        SELECT COALESCE(SUM(valor_venta), 0) AS total
-        FROM ventas
-    """)
-
+    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
     total_vendido = cur.fetchone()['total']
 
-    cur.execute("""
-        SELECT COUNT(*) AS total
-        FROM ventas
-    """)
-
+    cur.execute("SELECT COUNT(*) AS total FROM ventas")
     total_ventas = cur.fetchone()['total']
 
     cur.execute("""
@@ -830,22 +917,54 @@ def ventas_admin():
         WHERE MONTH(fecha) = MONTH(CURDATE())
         AND YEAR(fecha) = YEAR(CURDATE())
     """)
-
     ventas_mes = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT COUNT(*) AS total
+        FROM inmuebles
+        WHERE estado = 'Vendido'
+    """)
+    inmuebles_vendidos = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT 
+            v.id,
+            c.nombre AS cliente,
+            v.valor_venta,
+            v.fecha,
+            i.titulo
+        FROM ventas v
+        INNER JOIN inmuebles i ON v.inmueble_id = i.id
+        INNER JOIN clientes_inmobiliaria c ON v.cliente_id = c.id
+        ORDER BY v.fecha DESC
+        LIMIT 5
+    """)
+    ultimas_ventas = cur.fetchall()
+
+    cur.execute("""
+        SELECT MONTH(fecha) AS mes, COUNT(*) AS total
+        FROM ventas
+        WHERE YEAR(fecha) = YEAR(CURDATE())
+        GROUP BY MONTH(fecha)
+        ORDER BY MONTH(fecha)
+    """)
+    ventas_grafico = cur.fetchall()
 
     cur.close()
 
     return render_template(
         'ventas_admin.html',
-
         inmuebles_disponibles=inmuebles_disponibles,
         clientes=clientes,
         ventas=ventas,
-
         total_vendido=total_vendido,
         total_ventas=total_ventas,
-        ventas_mes=ventas_mes
+        ventas_mes=ventas_mes,
+        inmuebles_vendidos=inmuebles_vendidos,
+        ultimas_ventas=ultimas_ventas,
+        ventas_grafico=ventas_grafico
     )
+
 @app.route('/clientes_admin', methods=['GET', 'POST'])
 def clientes_admin():
     if 'usuario' not in session:
@@ -875,16 +994,16 @@ def clientes_admin():
         flash('Cliente registrado correctamente.', 'success')
         return redirect(url_for('clientes_admin'))
 
-    cur.execute("SELECT * FROM clientes ORDER BY id DESC")
+    cur.execute("SELECT * FROM clientes_inmobiliaria ORDER BY id DESC")
     clientes = cur.fetchall()
 
-    cur.execute("SELECT COUNT(*) AS total FROM clientes")
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria")
     total_clientes = cur.fetchone()['total']
 
-    cur.execute("SELECT COUNT(*) AS total FROM clientes WHERE tipo_interes = 'Compra'")
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria WHERE tipo_interes = 'Compra'")
     clientes_compra = cur.fetchone()['total']
 
-    cur.execute("SELECT COUNT(*) AS total FROM clientes WHERE tipo_interes = 'Arriendo'")
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria WHERE tipo_interes = 'Arriendo'")
     clientes_arriendo = cur.fetchone()['total']
 
     cur.close()
@@ -910,6 +1029,7 @@ def eliminar_cliente(id):
 
     flash('Cliente eliminado correctamente.', 'success')
     return redirect(url_for('clientes_admin'))
+
 
 @app.route('/compras_admin')
 def compras_admin():
@@ -1015,9 +1135,6 @@ def reportes_admin():
 
 @app.route('/proyectos')
 def proyectos_admin():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-
     proyectos = get_proyectos_mysql(mysql)
 
     cur = mysql.connection.cursor()
@@ -1036,37 +1153,17 @@ def proyectos_admin():
     )
 
 
-# EN app.py - REEMPLAZA TU RUTA /crear_proyecto
+
 
 @app.route('/crear_proyecto', methods=['POST'])
 def crear_proyecto():
     nombre = request.form['nombre']
-    tipo_trabajo = request.form['tipo_trabajo']
     descripcion = request.form['descripcion']
     estado = request.form['estado']
-    cliente_id = request.form['cliente_id']
 
-    cur = mysql.connection.cursor()
+    add_proyecto_mysql(mysql, nombre, descripcion, estado)
 
-    # Crear proyecto con tipo de trabajo
-    cur.execute("""
-        INSERT INTO proyectos_constructora (nombre, tipo_trabajo, descripcion, estado)
-        VALUES (%s, %s, %s, %s)
-    """, (nombre, tipo_trabajo, descripcion, estado))
-
-    proyecto_id = cur.lastrowid
-
-    # Relacionar cliente con proyecto
-    cur.execute("""
-        INSERT INTO cliente_proyecto (cliente_id, proyecto_id)
-        VALUES (%s, %s)
-    """, (cliente_id, proyecto_id))
-
-    mysql.connection.commit()
-    cur.close()
-
-    flash('Proyecto creado y vinculado al cliente correctamente.', 'success')
-    return redirect(url_for('proyectos_admin'))
+    return redirect('/proyectos')
 
 
 @app.route('/editar_proyecto/<int:id>')
@@ -1100,12 +1197,84 @@ def inmobiliaria_publica():
         inmuebles_publicos=inmuebles_publicos
     )
 
-@app.route('/reservas_admin')
+@app.route('/reservas_admin', methods=['GET', 'POST'])
 def reservas_admin():
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
-    return render_template('reservas_admin.html')
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        inmueble_id  = request.form['inmueble_id']
+        cliente_id   = request.form['cliente_id']
+        fecha_limite = request.form['fecha_limite']
+        valor_reserva = float(request.form['valor_reserva'])
+        observacion  = request.form.get('observacion', '').strip()
+
+        cur.execute("""
+            INSERT INTO reservas (inmueble_id, cliente_id, fecha_limite, valor_reserva, observacion)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (inmueble_id, cliente_id, fecha_limite, valor_reserva, observacion))
+
+        cur.execute("UPDATE inmuebles SET estado = 'Reservado' WHERE id = %s", (inmueble_id,))
+
+        mysql.connection.commit()
+        flash('Reserva registrada correctamente.', 'success')
+        cur.close()
+        return redirect(url_for('reservas_admin'))
+
+    cur.execute("""
+        SELECT id, titulo, ubicacion, precio
+        FROM inmuebles
+        WHERE estado = 'Disponible'
+        ORDER BY titulo ASC
+    """)
+    inmuebles = cur.fetchall()
+
+    cur.execute("""
+        SELECT id, nombre, telefono
+        FROM clientes_inmobiliaria
+        ORDER BY nombre ASC
+    """)
+    clientes = cur.fetchall()
+
+    cur.execute("""
+        SELECT
+            r.id, r.fecha_reserva, r.fecha_limite,
+            r.valor_reserva, r.estado, r.observacion,
+            r.inmueble_id,
+            i.titulo AS inmueble, i.ubicacion,
+            c.nombre AS cliente, c.telefono
+        FROM reservas r
+        INNER JOIN inmuebles i ON r.inmueble_id = i.id
+        INNER JOIN clientes_inmobiliaria c ON r.cliente_id = c.id
+        ORDER BY r.fecha_reserva DESC
+    """)
+    reservas = cur.fetchall()
+
+    cur.close()
+
+    return render_template(
+        'reservas_admin.html',
+        inmuebles=inmuebles,
+        clientes=clientes,
+        reservas=reservas
+    )
+
+
+@app.route('/cancelar_reserva/<int:id>/<int:inmueble_id>')
+def cancelar_reserva(id, inmueble_id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE reservas SET estado = 'Cancelada' WHERE id = %s", (id,))
+    cur.execute("UPDATE inmuebles SET estado = 'Disponible' WHERE id = %s", (inmueble_id,))
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Reserva cancelada. El inmueble vuelve a estar disponible.', 'success')
+    return redirect(url_for('reservas_admin'))
 
 @app.route('/guardar_contacto', methods=['POST'])
 def guardar_contacto():
@@ -1185,135 +1354,20 @@ def marcar_contactado(id):
     flash("Cliente marcado como contactado", "success")
     return redirect(url_for('admin_contactos'))
 
+@app.route('/servicios_Constructivos')
+def servicios_Constructivos():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
 
+    return render_template('servicios_Constructivos.html')
 
 @app.route('/clientes_constructora')
 def clientes_constructora():
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
-    cur = mysql.connection.cursor()
+    return render_template('clientes_constructora.html')
 
-    cur.execute("""
-        SELECT 
-            c.id,
-            c.nombre,
-            c.tipo,
-            c.telefono,
-            c.correo,
-            p.nombre AS proyecto
-        FROM clientes_constructora c
-        LEFT JOIN cliente_proyecto cp ON c.id = cp.cliente_id
-        LEFT JOIN proyectos_constructora p ON cp.proyecto_id = p.id
-        ORDER BY c.nombre ASC
-    """)
-
-    resultados = cur.fetchall()
-    cur.close()
-
-    clientes_dict = {}
-
-    for fila in resultados:
-        cliente_id = fila['id']
-
-        if cliente_id not in clientes_dict:
-            clientes_dict[cliente_id] = {
-                "nombre": fila['nombre'],
-                "tipo": fila['tipo'],
-                "telefono": fila['telefono'],
-                "correo": fila['correo'],
-                "proyectos": []
-            }
-
-        if fila['proyecto']:
-            clientes_dict[cliente_id]["proyectos"].append(fila['proyecto'])
-
-    clientes = list(clientes_dict.values())
-
-    return render_template(
-        'clientes_constructora.html',
-        clientes=clientes
-    )
-
-@app.route('/servicios_constructivos')
-def servicios_constructivos():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-
-    # TOTAL GENERAL
-    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora")
-    total_proyectos = cur.fetchone()['total']
-
-    # CONTEOS PRINCIPALES
-    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Obras civiles'")
-    obras_civiles = cur.fetchone()['total']
-
-    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Diseño estructural'")
-    diseño_estructural = cur.fetchone()['total']
-
-    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Consultoría'")
-    consultoria = cur.fetchone()['total']
-
-    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Interventoría'")
-    interventoria = cur.fetchone()['total']
-
-    # TODOS LOS SERVICIOS AGRUPADOS
-    cur.execute("""
-        SELECT tipo_trabajo, COUNT(*) AS total
-        FROM proyectos_constructora
-        GROUP BY tipo_trabajo
-        ORDER BY total DESC
-    """)
-
-    resultados = cur.fetchall()
-    cur.close()
-
-    # ICONOS Y DESCRIPCIONES
-    iconos = {
-        "Obras civiles": "fa fa-helmet-safety",
-        "Construcción residencial": "fa fa-house",
-        "Construcción comercial": "fa fa-building",
-        "Diseño estructural": "fa fa-drafting-compass",
-        "Interventoría": "fa fa-list-check",
-        "Consultoría": "fa fa-file-signature",
-        "Remodelación": "fa fa-screwdriver-wrench",
-        "Urbanismo": "fa fa-city"
-    }
-
-    descripciones = {
-        "Obras civiles": "Infraestructura, vías, puentes y obras públicas.",
-        "Construcción residencial": "Viviendas, conjuntos y desarrollos habitacionales.",
-        "Construcción comercial": "Locales, oficinas y espacios empresariales.",
-        "Diseño estructural": "Cálculo, planificación y seguridad estructural.",
-        "Interventoría": "Supervisión técnica, financiera y administrativa.",
-        "Consultoría": "Asesoría profesional en ingeniería y ejecución.",
-        "Remodelación": "Mejoras, adecuaciones y renovación de espacios.",
-        "Urbanismo": "Planeación urbana y desarrollo territorial."
-    }
-
-    servicios = []
-
-    for r in resultados:
-        tipo = r['tipo_trabajo']
-
-        servicios.append({
-            "tipo": tipo,
-            "total": r['total'],
-            "icono": iconos.get(tipo, "fa fa-briefcase"),
-            "descripcion": descripciones.get(tipo, "Servicio constructivo especializado.")
-        })
-
-    return render_template(
-        'servicios_constructivos.html',
-        total_proyectos=total_proyectos,
-        obras_civiles=obras_civiles,
-        diseño_estructural=diseño_estructural,
-        interventoria=interventoria,
-        consultoria=consultoria,
-        servicios=servicios
-    )
 
 if __name__ == '__main__':
     app.run(debug=True)

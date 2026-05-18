@@ -1,0 +1,282 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Mi Panel - CiviWeb Manager{% endblock %}
+
+{% block header %}
+<header class="admin-header">
+    <div class="admin-logo">
+        <img src="{{ url_for('static', filename='Imagenes/Civi.png') }}" alt="Logo">
+    </div>
+
+    <nav class="admin-nav">
+
+        <a href="{{ url_for('dashboard_usuario') }}" class="active">
+            <i class="fa fa-home"></i> Inicio
+        </a>
+
+        {% if permisos.constructora %}
+        <div class="dropdown">
+            <button type="button" class="dropbtn" onclick="toggleMenu('menuConstructora')">
+                <i class="fa fa-helmet-safety"></i> Constructora
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-content" id="menuConstructora">
+                {% if permisos.ver_proyectos %}
+                <a href="{{ url_for('proyectos_admin') }}"><i class="fa fa-building"></i> Proyectos de obra</a>
+                {% endif %}
+                {% if permisos.ver_servicios %}
+                <a href="{{ url_for('servicios_Constructivos') }}"><i class="fa fa-screwdriver-wrench"></i> Servicios</a>
+                {% endif %}
+                {% if permisos.ver_contactos %}
+                <a href="{{ url_for('admin_contactos') }}"><i class="fa fa-list-check"></i> Clientes interesados</a>
+                {% endif %}
+                {% if permisos.ver_clientes_constructora %}
+                <a href="{{ url_for('clientes_constructora') }}"><i class="fa fa-users"></i> Clientes</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if permisos.inmobiliaria %}
+        <div class="dropdown">
+            <button type="button" class="dropbtn" onclick="toggleMenu('menuInmobiliaria')">
+                <i class="fa fa-house-chimney"></i> Inmobiliaria
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-content" id="menuInmobiliaria">
+                {% if permisos.ver_inmuebles %}
+                <a href="{{ url_for('inmuebles') }}"><i class="fa fa-city"></i> Inmuebles</a>
+                {% endif %}
+                {% if permisos.registrar_inmueble %}
+                <a href="{{ url_for('registrar_inmueble') }}"><i class="fa fa-house"></i> Registrar inmueble</a>
+                {% endif %}
+                {% if permisos.ver_clientes_inmobiliaria %}
+                <a href="{{ url_for('clientes_admin') }}"><i class="fa fa-cart-shopping"></i> Clientes</a>
+                {% endif %}
+                {% if permisos.ver_reservas %}
+                <a href="{{ url_for('reservas_admin') }}"><i class="fa fa-calendar-check"></i> Reservas</a>
+                {% endif %}
+                {% if permisos.ver_ventas %}
+                <a href="{{ url_for('ventas_admin') }}"><i class="fa fa-handshake"></i> Ventas</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="dropdown">
+            <button type="button" class="dropbtn" onclick="toggleMenu('menuConfig')">
+                <i class="fa fa-gear"></i> Configuración
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-content" id="menuConfig">
+                <a href="{{ url_for('modificar_correo') }}"><i class="fa fa-envelope"></i> Modificar correo</a>
+                <a href="{{ url_for('index') }}"><i class="fa fa-globe"></i> Ver sitio web</a>
+                <a href="{{ url_for('logout') }}"><i class="fa fa-right-from-bracket"></i> Cerrar sesión</a>
+            </div>
+        </div>
+
+    </nav>
+</header>
+{% endblock %}
+
+{% block content %}
+
+    <div class="topbar">
+        <div>
+            <h1>Bienvenido/a, {{ usuario }}</h1>
+            <p>Este es tu panel de acceso según los permisos asignados a tu cuenta.</p>
+            <span class="role-badge">{{ rol }}</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <i class="fa fa-right-from-bracket"></i> Salir
+        </a>
+    </div>
+
+    <!-- Estadísticas permitidas -->
+    <section class="stats-grid">
+
+        {% if permisos.ver_inmuebles %}
+        <div class="stat-card">
+            <h3>Inmuebles disponibles</h3>
+            <p>{{ inmuebles_disponibles }}</p>
+            <div class="stat-icon">
+                <i class="fa fa-house-chimney"></i>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if permisos.ver_proyectos %}
+        <div class="stat-card">
+            <h3>Proyectos activos</h3>
+            <p>{{ proyectos_activos }}</p>
+            <div class="stat-icon">
+                <i class="fa fa-building"></i>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if permisos.ver_ventas %}
+        <div class="stat-card">
+            <h3>Ventas registradas</h3>
+            <p>{{ ventas_registradas }}</p>
+            <div class="stat-icon">
+                <i class="fa fa-chart-line"></i>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if permisos.ver_reservas %}
+        <div class="stat-card">
+            <h3>Reservas activas</h3>
+            <p>{{ reservas_activas }}</p>
+            <div class="stat-icon">
+                <i class="fa fa-calendar-check"></i>
+            </div>
+        </div>
+        {% endif %}
+
+    </section>
+
+    <!-- Módulos disponibles -->
+    <div class="module-title">
+        <h2>Módulos disponibles</h2>
+        <p>Accede a las áreas del sistema según tus permisos.</p>
+    </div>
+
+    <section class="dashboard-cards">
+
+        {% if permisos.ver_proyectos %}
+        <a href="{{ url_for('proyectos_admin') }}" class="dashboard-card card-link">
+            <i class="fa fa-hard-hat"></i>
+            <h3>Proyectos</h3>
+            <p>Consulta y gestiona los proyectos de construcción activos.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_servicios %}
+        <a href="{{ url_for('servicios_Constructivos') }}" class="dashboard-card card-link">
+            <i class="fa fa-screwdriver-wrench"></i>
+            <h3>Servicios Constructivos</h3>
+            <p>Revisa los servicios disponibles de la constructora.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_inmuebles %}
+        <a href="{{ url_for('inmuebles') }}" class="dashboard-card card-link">
+            <i class="fa fa-house-chimney"></i>
+            <h3>Inmuebles</h3>
+            <p>Administración de casas, apartamentos y disponibilidad.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_clientes_inmobiliaria %}
+        <a href="{{ url_for('clientes_admin') }}" class="dashboard-card card-link">
+            <i class="fa fa-users"></i>
+            <h3>Clientes</h3>
+            <p>Gestión de clientes de la inmobiliaria.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_ventas %}
+        <a href="{{ url_for('ventas_admin') }}" class="dashboard-card card-link">
+            <i class="fa fa-handshake"></i>
+            <h3>Ventas</h3>
+            <p>Seguimiento de ventas inmobiliarias y valores comerciales.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_reservas %}
+        <a href="{{ url_for('reservas_admin') }}" class="dashboard-card card-link">
+            <i class="fa fa-calendar-check"></i>
+            <h3>Reservas</h3>
+            <p>Consulta y gestiona las reservas de inmuebles.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_contactos %}
+        <a href="{{ url_for('admin_contactos') }}" class="dashboard-card card-link">
+            <i class="fa fa-list-check"></i>
+            <h3>Contactos</h3>
+            <p>Clientes interesados y solicitudes de la página principal.</p>
+        </a>
+        {% endif %}
+
+        {% if permisos.ver_clientes_constructora %}
+        <a href="{{ url_for('clientes_constructora') }}" class="dashboard-card card-link">
+            <i class="fa fa-people-group"></i>
+            <h3>Clientes Constructora</h3>
+            <p>Clientes vinculados a proyectos de la constructora.</p>
+        </a>
+        {% endif %}
+
+    </section>
+
+    <!-- Panel lateral -->
+    <section class="panel-grid">
+        <div class="panel">
+            <h2>Información de tu cuenta</h2>
+            <div class="info-list">
+                <p><strong>Usuario:</strong> {{ usuario }}</p>
+                <p><strong>Rol asignado:</strong> {{ rol }}</p>
+                <p>
+                    Tu cuenta tiene acceso a los módulos mostrados arriba.
+                    Si necesitas permisos adicionales, comunícate con el administrador del sistema.
+                </p>
+                <p>
+                    Recuerda mantener segura tu contraseña y actualizar tu correo
+                    si cambia, para recibir notificaciones importantes.
+                </p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Accesos rápidos</h2>
+            <div class="quick-actions">
+
+                {% if permisos.registrar_inmueble %}
+                <a href="{{ url_for('registrar_inmueble') }}">
+                    <i class="fa fa-house-chimney"></i> Registrar inmueble
+                </a>
+                {% endif %}
+
+                {% if permisos.ver_proyectos %}
+                <a href="{{ url_for('proyectos_admin') }}">
+                    <i class="fa fa-building"></i> Ver proyectos
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('modificar_correo') }}">
+                    <i class="fa fa-pen"></i> Actualizar correo
+                </a>
+
+                <a href="{{ url_for('index') }}">
+                    <i class="fa fa-eye"></i> Ir al sitio web
+                </a>
+
+                <a href="{{ url_for('logout') }}">
+                    <i class="fa fa-lock"></i> Cerrar sesión
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+function toggleMenu(id) {
+    document.querySelectorAll('.dropdown-content').forEach(menu => {
+        if (menu.id !== id) menu.classList.remove('show');
+    });
+    document.getElementById(id).classList.toggle('show');
+}
+
+window.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-content').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    }
+});
+</script>
+
+{% endblock %}
