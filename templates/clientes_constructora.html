@@ -22,46 +22,265 @@
 </div>
 {% endblock %}
 
-{% block content %}
+   {% block content %}
 
-    <section class="page-title">
-        <h1>Clientes Históricos</h1>
-        <p>Consulta empresas, entidades o clientes antiguos y relaciona cada uno con los proyectos desarrollados.</p>
-    </section>
+<section class="page-title">
 
-    <section class="table-card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Cliente / Empresa</th>
-                    <th>Tipo</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Proyectos realizados</th>
-                </tr>
-            </thead>
+    <h1>Clientes Históricos</h1>
 
-            <tbody>
-                {% for cliente in clientes %}
-                <tr>
-                    <td><strong>{{ cliente.nombre }}</strong></td>
-                    <td><span class="badge">{{ cliente.tipo }}</span></td>
-                    <td>{{ cliente.telefono }}</td>
-                    <td>{{ cliente.correo }}</td>
-                    <td>
-                        <div class="project-list">
-                            {% for proyecto in cliente.proyectos %}
-                            <div class="project-item">
-                                {{ proyecto }}
-                            </div>
-                            {% endfor %}
+    <p>
+        Consulta empresas, entidades o clientes antiguos y relaciona
+        cada uno con los proyectos desarrollados.
+    </p>
+
+</section>
+
+<!-- FILTROS -->
+
+<form method="GET" class="filters">
+
+    <input
+        type="text"
+        name="buscar"
+        placeholder="Buscar cliente..."
+        value="{{ buscar }}">
+
+    <select name="tipo">
+
+        <option value="">Todos los tipos</option>
+
+        <option value="Entidad pública"
+            {% if tipo == 'Entidad pública' %}selected{% endif %}>
+            Entidad pública
+        </option>
+
+        <option value="Empresa privada"
+            {% if tipo == 'Empresa privada' %}selected{% endif %}>
+            Empresa privada
+        </option>
+
+        <option value="Cliente particular"
+            {% if tipo == 'Cliente particular' %}selected{% endif %}>
+            Cliente particular
+        </option>
+
+    </select>
+
+    <button type="submit">
+
+        <i class="fa fa-search"></i>
+
+        Filtrar
+
+    </button>
+
+    <button
+        type="button"
+        class="add-btn"
+        id="open-client-modal">
+
+        <i class="fa fa-plus"></i>
+
+        Agregar cliente
+
+        </button>
+</form>
+
+<section class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Cliente / Empresa</th>
+                <th>Tipo</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Proyectos realizados</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for cliente in clientes %}
+
+            <tr>
+
+                <td>
+                    <strong>{{ cliente.nombre }}</strong>
+                </td>
+
+                <td>
+                    <span class="badge">
+                        {{ cliente.tipo }}
+                    </span>
+                </td>
+
+                <td>
+                    {{ cliente.telefono }}
+                </td>
+
+                <td>
+                    {{ cliente.correo }}
+                </td>
+
+                <td>
+
+                    <div class="project-list">
+
+                        {% for proyecto in cliente.proyectos %}
+
+                        <div class="project-item">
+
+                            {{ proyecto }}
+
                         </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
 
-        </table>
-    </section>
+                        {% endfor %}
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</section>
+
+<!-- PAGINACIÓN -->
+
+<div class="pagination">
+
+    {% if pagina > 1 %}
+
+    <a href="?page={{ pagina - 1 }}&buscar={{ buscar }}&tipo={{ tipo }}">
+
+        ← Anterior
+
+    </a>
+
+    {% endif %}
+
+    {% for p in range(1, total_paginas + 1) %}
+
+        <a href="?page={{ p }}&buscar={{ buscar }}&tipo={{ tipo }}"
+           class="{% if p == pagina %}active{% endif %}">
+
+            {{ p }}
+
+        </a>
+
+    {% endfor %}
+
+    {% if pagina < total_paginas %}
+
+    <a href="?page={{ pagina + 1 }}&buscar={{ buscar }}&tipo={{ tipo }}">
+
+        Siguiente →
+
+    </a>
+
+    {% endif %}
+
+</div>
+
+<div class="modal-overlay" id="client-modal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Nuevo Cliente</h2>
+
+            <button
+                type="button"
+                class="close-modal"
+                id="close-client-modal">
+
+                <i class="fa fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+        <form
+            method="POST"
+            action="{{ url_for('guardar_cliente_constructora') }}">
+
+            <div class="modal-grid">
+
+                <div class="input-group">
+
+                    <label>Nombre cliente</label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Tipo</label>
+
+                    <select name="tipo" required>
+
+                        <option value="">Selecciona</option>
+
+                        <option>Entidad pública</option>
+
+                        <option>Empresa privada</option>
+
+                        <option>Cliente particular</option>
+
+                    </select>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Teléfono</label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        required>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>Correo</label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        required>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="save-btn">
+
+                <i class="fa fa-floppy-disk"></i>
+
+                Guardar cliente
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
 
 {% endblock %}

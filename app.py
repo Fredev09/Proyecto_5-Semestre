@@ -9,6 +9,8 @@ from werkzeug.utils import secure_filename
 import re
 import uuid
 from datetime import datetime
+from dotenv import load_dotenv
+import pymysql
 
 from db_utils_mysql import (
     add_usuario_mysql,
@@ -26,8 +28,9 @@ from db_utils_mysql import (
     marcar_contactado_mysql
 )
 
+load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'contraseña01'
+app.secret_key = os.getenv("SECRET_KEY")
 
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 
@@ -43,21 +46,21 @@ def index():
     return render_template ('index.html')
 
 # Configuración de MySQL (ajusta según tu XAMPP)
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'proyecto_final'
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 #Configuracion e-mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'camila2001super@gmail.com'
-app.config['MAIL_PASSWORD'] = 'rcqq nctn duou vyow'
-app.config['MAIL_DEFAULT_SENDER'] = 'camila2001super@gmail.com'
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'False'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
@@ -1029,17 +1032,35 @@ def proyectos_admin():
     )
 
 
-
-
 @app.route('/crear_proyecto', methods=['POST'])
 def crear_proyecto():
     nombre = request.form['nombre']
+    tipo_trabajo = request.form['tipo_trabajo']
     descripcion = request.form['descripcion']
     estado = request.form['estado']
+    cliente_id = request.form['cliente_id']
 
-    add_proyecto_mysql(mysql, nombre, descripcion, estado)
+    cur = mysql.connection.cursor()
 
-    return redirect('/proyectos')
+    # Crear proyecto con tipo de trabajo
+    cur.execute("""
+        INSERT INTO proyectos_constructora (nombre, tipo_trabajo, descripcion, estado)
+        VALUES (%s, %s, %s, %s)
+    """, (nombre, tipo_trabajo, descripcion, estado))
+
+    proyecto_id = cur.lastrowid
+
+    # Relacionar cliente con proyecto
+    cur.execute("""
+        INSERT INTO cliente_proyecto (cliente_id, proyecto_id)
+        VALUES (%s, %s)
+    """, (cliente_id, proyecto_id))
+
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Proyecto creado y vinculado al cliente correctamente.', 'success')
+    return redirect(url_for('proyectos_admin'))
 
 
 @app.route('/editar_proyecto/<int:id>')
@@ -1117,20 +1138,91 @@ def guardar_contacto():
 
 @app.route('/admin_contactos')
 def admin_contactos():
+
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
+    pagina = request.args.get('page', 1, type=int)
+    buscar = request.args.get('buscar', '')
+    estado = request.args.get('estado', '')
+    por_pagina = 10
+    offset = (pagina - 1) * por_pagina
     actualizar_prioridades_mysql(mysql)
-    contactos = get_contactos_mysql(mysql)
+    cur = mysql.connection.cursor()
 
+    sql = """
+        SELECT SQL_CALC_FOUND_ROWS
+            id,
+            nombre,
+            telefono,
+            correo,
+            servicio,
+            mensaje,
+            fecha_envio,
+            estado,
+            fecha_contacto
+        FROM clientes_interesados
+        WHERE 1=1
+    """
+
+    valores = []
+
+    # BUSCADOR
+    if buscar:
+
+        sql += """
+            AND (
+                nombre LIKE %s
+                OR correo LIKE %s
+                OR telefono LIKE %s
+            )
+        """
+
+        busqueda = f"%{buscar}%"
+
+        valores.extend([
+            busqueda,
+            busqueda,
+            busqueda
+        ])
+
+    # FILTRO
+    if estado:
+
+        sql += " AND estado = %s "
+
+        valores.append(estado)
+
+    sql += """
+        ORDER BY
+        CASE
+            WHEN estado = 'Prioridad Alta' THEN 1
+            WHEN estado = 'Pendiente' THEN 2
+            WHEN estado = 'Contactado' THEN 3
+            ELSE 4
+        END,
+        fecha_envio DESC
+        LIMIT %s OFFSET %s
+    """
+
+    valores.extend([por_pagina, offset])
+    cur.execute(sql, valores)
+    contactos = cur.fetchall()
+
+    # TOTAL
+    cur.execute("SELECT FOUND_ROWS() AS total")
+    total = cur.fetchone()['total']
+    total_paginas = (total + por_pagina - 1) // por_pagina
+    cur.close()
     contactos_procesados = []
 
     for c in contactos:
+
         fecha_envio = c['fecha_envio']
         fecha_contacto = c['fecha_contacto']
-        estado = c['estado']
+        estado_actual = c['estado']
 
-        if estado == "Contactado" and fecha_contacto:
+        if estado_actual == "Contactado" and fecha_contacto:
             tiempo = fecha_contacto - fecha_envio
         else:
             tiempo = datetime.now() - fecha_envio
@@ -1143,13 +1235,17 @@ def admin_contactos():
             "servicio": c['servicio'],
             "mensaje": c['mensaje'],
             "fecha_envio": fecha_envio,
-            "estado": estado,
+            "estado": estado_actual,
             "tiempo": f"{tiempo.days} días"
         })
 
     return render_template(
         'admin_contactos.html',
-        contactos=contactos_procesados
+        contactos=contactos_procesados,
+        pagina=pagina,
+        total_paginas=total_paginas,
+        buscar=buscar,
+        estado=estado
     )
 
 @app.route('/marcar_contactado/<int:id>')
@@ -1158,20 +1254,234 @@ def marcar_contactado(id):
     flash("Cliente marcado como contactado", "success")
     return redirect(url_for('admin_contactos'))
 
-@app.route('/servicios_Constructivos')
-def servicios_Constructivos():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-
-    return render_template('servicios_Constructivos.html')
-
 @app.route('/clientes_constructora')
 def clientes_constructora():
+
     if 'usuario' not in session:
         return redirect(url_for('login'))
 
-    return render_template('clientes_constructora.html')
+    pagina = request.args.get('page', 1, type=int)
 
+    buscar = request.args.get('buscar', '')
+
+    tipo = request.args.get('tipo', '')
+
+    por_pagina = 10
+
+    offset = (pagina - 1) * por_pagina
+
+    cur = mysql.connection.cursor()
+
+    sql = """
+        SELECT SQL_CALC_FOUND_ROWS
+            c.id,
+            c.nombre,
+            c.tipo,
+            c.telefono,
+            c.correo,
+            p.nombre AS proyecto
+
+        FROM clientes_constructora c
+
+        LEFT JOIN cliente_proyecto cp
+            ON c.id = cp.cliente_id
+
+        LEFT JOIN proyectos_constructora p
+            ON cp.proyecto_id = p.id
+
+        WHERE 1=1
+    """
+
+    valores = []
+
+    # BUSCADOR
+    if buscar:
+
+        sql += """
+            AND (
+                c.nombre LIKE %s
+                OR c.correo LIKE %s
+                OR c.telefono LIKE %s
+            )
+        """
+
+        busqueda = f"%{buscar}%"
+
+        valores.extend([
+            busqueda,
+            busqueda,
+            busqueda
+        ])
+
+    # FILTRO TIPO
+    if tipo:
+
+        sql += " AND c.tipo = %s "
+
+        valores.append(tipo)
+
+    sql += """
+        ORDER BY c.nombre ASC
+        LIMIT %s OFFSET %s
+    """
+
+    valores.extend([por_pagina, offset])
+
+    cur.execute(sql, valores)
+
+    resultados = cur.fetchall()
+
+    # TOTAL
+    cur.execute("SELECT FOUND_ROWS() AS total")
+
+    total = cur.fetchone()['total']
+
+    total_paginas = (total + por_pagina - 1) // por_pagina
+
+    cur.close()
+
+    clientes_dict = {}
+
+    for fila in resultados:
+
+        cliente_id = fila['id']
+
+        if cliente_id not in clientes_dict:
+
+            clientes_dict[cliente_id] = {
+                "nombre": fila['nombre'],
+                "tipo": fila['tipo'],
+                "telefono": fila['telefono'],
+                "correo": fila['correo'],
+                "proyectos": []
+            }
+
+        if fila['proyecto']:
+
+            clientes_dict[cliente_id]["proyectos"].append(
+                fila['proyecto']
+            )
+
+    clientes = list(clientes_dict.values())
+
+    return render_template(
+        'clientes_constructora.html',
+        clientes=clientes,
+        pagina=pagina,
+        total_paginas=total_paginas,
+        buscar=buscar,
+        tipo=tipo
+    )
+
+@app.route('/guardar_cliente_constructora', methods=['POST'])
+def guardar_cliente_constructora():
+
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    nombre = request.form.get('nombre')
+    tipo = request.form.get('tipo')
+    telefono = request.form.get('telefono')
+    correo = request.form.get('correo')
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        INSERT INTO clientes_constructora
+        (nombre, tipo, telefono, correo)
+
+        VALUES (%s, %s, %s, %s)
+    """, (
+        nombre,
+        tipo,
+        telefono,
+        correo
+    ))
+
+    mysql.connection.commit()
+    cur.close()
+    flash('Cliente agregado correctamente.', 'success')
+
+    return redirect(url_for('clientes_constructora'))
+
+@app.route('/servicios_constructivos')
+def servicios_constructivos():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    # TOTAL GENERAL
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora")
+    total_proyectos = cur.fetchone()['total']
+
+    # CONTEOS PRINCIPALES
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Obras civiles'")
+    obras_civiles = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Diseño estructural'")
+    diseño_estructural = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Consultoría'")
+    consultoria = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM proyectos_constructora WHERE tipo_trabajo = 'Interventoría'")
+    interventoria = cur.fetchone()['total']
+
+    # TODOS LOS SERVICIOS AGRUPADOS
+    cur.execute("""
+        SELECT tipo_trabajo, COUNT(*) AS total
+        FROM proyectos_constructora
+        GROUP BY tipo_trabajo
+        ORDER BY total DESC
+    """)
+
+    resultados = cur.fetchall()
+    cur.close()
+
+    # ICONOS Y DESCRIPCIONES
+    iconos = {
+        "Obras civiles": "fa fa-helmet-safety",
+        "Construcción residencial": "fa fa-house",
+        "Construcción comercial": "fa fa-building",
+        "Diseño estructural": "fa fa-drafting-compass",
+        "Interventoría": "fa fa-list-check",
+        "Consultoría": "fa fa-file-signature",
+        "Remodelación": "fa fa-screwdriver-wrench",
+        "Urbanismo": "fa fa-city"
+    }
+
+    descripciones = {
+        "Obras civiles": "Infraestructura, vías, puentes y obras públicas.",
+        "Construcción residencial": "Viviendas, conjuntos y desarrollos habitacionales.",
+        "Construcción comercial": "Locales, oficinas y espacios empresariales.",
+        "Diseño estructural": "Cálculo, planificación y seguridad estructural.",
+        "Interventoría": "Supervisión técnica, financiera y administrativa.",
+        "Consultoría": "Asesoría profesional en ingeniería y ejecución.",
+        "Remodelación": "Mejoras, adecuaciones y renovación de espacios.",
+        "Urbanismo": "Planeación urbana y desarrollo territorial."
+    }
+
+    servicios = []
+
+    for r in resultados:
+        tipo = r['tipo_trabajo']
+
+        servicios.append({
+            "tipo": tipo,
+            "total": r['total'],
+            "icono": iconos.get(tipo, "fa fa-briefcase"),
+            "descripcion": descripciones.get(tipo, "Servicio constructivo especializado.")
+        })
+
+    return render_template(
+        'servicios_constructivos.html',
+        total_proyectos=total_proyectos,
+        obras_civiles=obras_civiles,
+        diseño_estructural=diseño_estructural,
+        interventoria=interventoria,
+        consultoria=consultoria,
+        servicios=servicios
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

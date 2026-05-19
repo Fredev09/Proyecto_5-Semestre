@@ -163,7 +163,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (elemento) {
       elemento.scrollIntoView({ behavior: "smooth" });
 
-      // efecto visual opcional 🔥
       elemento.style.boxShadow = "0 0 25px rgba(198,40,40,0.7)";
       setTimeout(() => {
         elemento.style.boxShadow = "";
@@ -177,34 +176,38 @@ document.addEventListener("DOMContentLoaded", function () {
   // ======================
   // FORMULARIO
   // ======================
-        const form = document.querySelector(".contact-form");
+    const form = document.querySelector(".contact-form");
+    const popup = document.getElementById("custom-popup");
+    const popupBtn = document.getElementById("popup-btn");
 
-        if (form) {
+          if (form) {
+
           form.addEventListener("submit", function(e) {
 
-            // VALIDACIÓN BÁSICA
-            const nombre = form.querySelector('[name="nombre"]').value.trim();
-            const telefono = form.querySelector('[name="telefono"]').value.trim();
-            const correo = form.querySelector('[name="correo"]').value.trim();
-            const servicio = form.querySelector('[name="servicio"]').value.trim();
-            const mensaje = form.querySelector('[name="mensaje"]').value.trim();
+          e.preventDefault();
 
-            if (!nombre || !telefono || !correo || !servicio || !mensaje) {
-              e.preventDefault();
-              alert("Por favor completa todos los campos.");
-              return;
-            }
+          const nombre = form.querySelector('[name="nombre"]').value.trim();
+          const telefono = form.querySelector('[name="telefono"]').value.trim();
+          const correo = form.querySelector('[name="correo"]').value.trim();
+          const servicio = form.querySelector('[name="servicio"]').value.trim();
+          const mensaje = form.querySelector('[name="mensaje"]').value.trim();
 
-            // IMPORTANTE:
-            // NO BLOQUEAR EL SUBMIT
-            // Flask necesita recibir el POST
+          if (!nombre || !telefono || !correo || !servicio || !mensaje) {
 
-            alert("Mensaje enviado correctamente.");
-            
-            // NO uses form.reset() aquí
-            // porque puede limpiar antes del envío
-          });
-        } 
+            alert("Por favor completa todos los campos.");
+
+            return;
+          }
+          popup.classList.add("active");
+        });
+      }
+        popupBtn.addEventListener("click", () => {
+        popup.classList.remove("active");
+        setTimeout(() => {
+          form.submit();
+        }, 500);
+
+});
 
   // ======================
   // CARRUSEL SERVICIOS
@@ -281,3 +284,46 @@ function irServicio(index) {
   servicioActual = index;
   mostrarSlideServicio(servicioActual);
 }
+
+// ======================
+// MODAL CLIENTES CONSTRUCTORA
+// ======================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const clientModal = document.getElementById("client-modal");
+    const openClientModal = document.getElementById("open-client-modal");
+    const closeClientModal = document.getElementById("close-client-modal");
+
+    // ABRIR
+    if(openClientModal){
+        openClientModal.addEventListener("click", () => {
+            clientModal.classList.add("active");
+
+        });
+
+    }
+
+    // CERRAR X
+
+    if(closeClientModal){
+        closeClientModal.addEventListener("click", () => {
+            clientModal.classList.remove("active");
+        });
+
+    }
+
+    // CERRAR AFUERA
+
+    if(clientModal){
+        clientModal.addEventListener("click", (e) => {
+            if(e.target === clientModal){
+                clientModal.classList.remove("active");
+
+            }
+
+        });
+
+    }
+
+});

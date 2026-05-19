@@ -29,6 +29,37 @@
     <p>Consulta, organiza y prioriza solicitudes recibidas desde el formulario del sitio web.</p>
 </section>
 
+<form method="GET" class="filters">
+
+    <input
+        type="text"
+        name="buscar"
+        placeholder="Buscar cliente..."
+        value="{{ buscar }}">
+
+    <select name="estado">
+
+        <option value="">Todos los estados</option>
+
+        <option value="Pendiente"
+            {% if estado == 'Pendiente' %}selected{% endif %}>
+            Pendiente
+        </option>
+
+        <option value="Contactado"
+            {% if estado == 'Contactado' %}selected{% endif %}>
+            Contactado
+        </option>
+
+    </select>
+
+    <button type="submit">
+        <i class="fa fa-search"></i>
+        Filtrar
+    </button>
+
+</form>
+
 <section class="table-card">
 
     <h2>
@@ -120,6 +151,35 @@
         </table>
 
     </div>
+    
+    <div class="pagination">
+
+    {% if pagina > 1 %}
+
+    <a href="?page={{ pagina - 1 }}&buscar={{ buscar }}&estado={{ estado }}">
+        ← Anterior
+    </a>
+
+    {% endif %}
+
+    {% for p in range(1, total_paginas + 1) %}
+
+        <a href="?page={{ p }}&buscar={{ buscar }}&estado={{ estado }}"
+           class="{% if p == pagina %}active{% endif %}">
+            {{ p }}
+        </a>
+
+    {% endfor %}
+
+    {% if pagina < total_paginas %}
+
+    <a href="?page={{ pagina + 1 }}&buscar={{ buscar }}&estado={{ estado }}">
+        Siguiente →
+    </a>
+
+    {% endif %}
+
+</div>
 
     {% else %}
 

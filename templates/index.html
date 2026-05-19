@@ -251,7 +251,6 @@
 </section>
 
 
-
 <section id="contacto" class="section contacto contact-modern">
   <div class="contact-box" data-aos="fade-up">
     
@@ -278,27 +277,70 @@
       </div>
     </div>
 
-    <form class="contact-form">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        {% if category == 'contact-success' %}
+
+          <div class="contact-toast">
+            <i class="fa fa-circle-check"></i>
+            {{ message }}
+          </div>
+
+        {% endif %}
+
+      {% endfor %}
+
+    {% endwith %}
+
+        <form class="contact-form"
+          method="POST"
+          action="{{ url_for('guardar_contacto') }}">
+
       <div class="form-row">
+
         <div class="input-group">
-          <label>Nombre completo</label>
-          <input type="text" placeholder="Ej: Juan Pérez" required>
+          <label>Nombre completo
+          <span class="required">*</span>
+        </label>
+          <input
+            type="text"
+            name="nombre"
+            placeholder="Ej: Juan Pérez"
+            required>
         </div>
 
         <div class="input-group">
-          <label>Teléfono</label>
-          <input type="tel" placeholder="Ej: 300 123 4567" required>
+          <label>Teléfono
+            <span class="required">*</span>
+          </label>
+
+          <input
+            type="tel"
+            name="telefono"
+            placeholder="Ej: 300 123 4567"
+            required>
         </div>
+
       </div>
 
       <div class="input-group">
-        <label>Correo electrónico</label>
-        <input type="email" placeholder="Ej: correo@gmail.com" required>
+        <label>Correo electrónico
+          <span class="required">*</span>
+        </label>
+
+        <input
+          type="email"
+          name="correo"
+          placeholder="Ej: correo@gmail.com"
+          required>
       </div>
 
       <div class="input-group">
-        <label>Servicio de interés</label>
-        <select required>
+        <label>Servicio de interés
+          <span class="required">*</span>
+        </label>
+
+        <select name="servicio" required>
           <option value="">Selecciona una opción</option>
           <option>Construcción de obras</option>
           <option>Diseño estructural</option>
@@ -308,17 +350,37 @@
       </div>
 
       <div class="input-group">
-        <label>Mensaje</label>
-        <textarea placeholder="Cuéntanos brevemente sobre tu proyecto..." required></textarea>
+        <label>Mensaje
+          <span class="required">*</span>
+        </label>
+
+        <textarea
+          name="mensaje"
+          placeholder="Cuéntanos brevemente sobre tu proyecto..."
+          required></textarea>
       </div>
 
       <button type="submit">
-        Enviar mensaje <i class="fas fa-paper-plane"></i>
+          Enviar mensaje
+        <i class="fas fa-paper-plane"></i>
       </button>
-    </form>
+
+      </form>
 
   </div>
 </section>
+    <div id="custom-popup" class="custom-popup">
+        <div class="popup-box">
+          <i class="fa fa-circle-check"></i>
+
+          <h3>Mensaje enviado</h3>
+          <p>Tu solicitud fue enviada correctamente.</p>
+
+          <button id="popup-btn">
+            Aceptar
+          </button>
+        </div>
+    </div>
 
   <footer class="footer">
     

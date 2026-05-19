@@ -2,11 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}CiviWeb Manager{% endblock %}</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -15,13 +18,16 @@
 
 {% block header %}
 <header class="admin-header">
+
     <div class="admin-logo">
-        <img src="{{ url_for('static', filename='Imagenes/Civi.png') }}" alt="CiviWeb Manager">
+        <img src="{{ url_for('static', filename='Imagenes/Civi.png') }}"
+             alt="CiviWeb Manager">
     </div>
 
     <div class="admin-actions">
         {% block admin_actions %}{% endblock %}
     </div>
+
 </header>
 {% endblock %}
 
@@ -29,21 +35,11 @@
 
     {% block breadcrumb %}{% endblock %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert {{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     {% block content %}{% endblock %}
 
 </main>
 
 {% block extra_js %}{% endblock %}
-
+<script src="{{ url_for('static', filename='js/animaciones.js') }}"></script>
 </body>
 </html>
