@@ -9,13 +9,62 @@
 
         <!-- IZQUIERDA -->
         <div class="left-side">
-            <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO">
+
+    <div class="overlay"></div>
+
+    <div class="content-left">
+
+        <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO" class="logo">
+
+        <h1>
+            Construimos confianza,
+            <span>creamos futuro</span>
+        </h1>
+
+        <p>
+            Portal administrativo de la constructora.
+            Accede al sistema para gestionar proyectos,
+            usuarios y recursos.
+        </p>
+
+        <div class="feature-container">
+
+            <div class="feature-box">
+                <i class="fa fa-shield"></i>
+                <h3>Seguro</h3>
+                <small>Protegemos tu información</small>
+            </div>
+
+            <div class="feature-box">
+                <i class="fa fa-chart-column"></i>
+                <h3>Eficiente</h3>
+                <small>Mayor productividad</small>
+            </div>
+
+            <div class="feature-box">
+                <i class="fa fa-users"></i>
+                <h3>Confiable</h3>
+                <small>Gestión profesional</small>
+            </div>
+
         </div>
+
+    </div>
+
+</div>
 
         <!-- DERECHA -->
         <div class="right-side">
-            <center><h2>Bienvenido al portal administrativo</h2></center>
-           <center> <p>Acceso al sistema de la constructora</p></center>
+
+    <div class="login-icon">
+        <i class="fa fa-lock"></i>
+    </div>
+
+    <h2>Bienvenido al portal administrativo</h2>
+
+    <p class="subtitle">
+        Acceso al sistema de la constructora
+    </p>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -45,6 +94,7 @@
         <i class="fa fa-eye toggle-password" onclick="togglePassword()"></i>
     </div>
 </div>
+
 
                 <button type="submit">Iniciar sesión</button>
 
