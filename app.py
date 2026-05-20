@@ -744,6 +744,7 @@ def ventas_admin():
         porcentaje_anticipo = int(request.form['porcentaje_anticipo'])
         anticipo = float(request.form['anticipo'])
         saldo = float(request.form['saldo'])
+        fecha = request.form['fecha']
 
         if saldo <= 0:
             estado_pago = 'Pagado'
@@ -755,12 +756,12 @@ def ventas_admin():
         cur.execute("""
                     INSERT INTO ventas (
                     inmueble_id, cliente_id, valor_venta, metodo_pago,
-                    porcentaje_anticipo, anticipo, saldo, estado_pago, observacion
+                    porcentaje_anticipo, anticipo, saldo, estado_pago, observacion, fecha
                     )
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                     """, (
                         inmueble_id, cliente_id, valor_venta, metodo_pago,
-                        porcentaje_anticipo, anticipo, saldo, estado_pago, observacion
+                        porcentaje_anticipo, anticipo, saldo, estado_pago, observacion, fecha
                         ))
 
         cur.execute("""
@@ -904,6 +905,65 @@ ORDER BY id DESC
     buscar=buscar,
     metodo_pago=metodo_pago
 )
+
+@app.route('/completar_pago/<int:id>')
+def completar_pago(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        UPDATE ventas
+        SET anticipo = valor_venta,
+            saldo = 0,
+            estado_pago = 'Pagado'
+        WHERE id = %s
+    """, (id,))
+
+    mysql.connection.commit()
+    cur.close()
+
+    flash('Pago completado correctamente.', 'success')
+    return redirect(url_for('ventas_admin'))
+
+@app.route('/factura_venta/<int:id>')
+def factura_venta(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT 
+            v.id,
+            v.fecha,
+            v.valor_venta,
+            v.metodo_pago,
+            v.anticipo,
+            v.saldo,
+            v.estado_pago,
+            v.observacion,
+            i.titulo AS inmueble,
+            i.ubicacion,
+            c.nombre AS cliente,
+            c.documento,
+            c.telefono,
+            c.email
+        FROM ventas v
+        INNER JOIN inmuebles i ON v.inmueble_id = i.id
+        INNER JOIN clientes_inmobiliaria c ON v.cliente_id = c.id
+        WHERE v.id = %s
+    """, (id,))
+
+    venta = cur.fetchone()
+    cur.close()
+
+    if not venta:
+        flash('La venta no existe.', 'danger')
+        return redirect(url_for('ventas_admin'))
+
+    return render_template('factura_venta.html', venta=venta)
 
 @app.route('/clientes_admin', methods=['GET', 'POST'])
 def clientes_admin():
@@ -1062,13 +1122,14 @@ def eliminar_cliente(id):
         return redirect(url_for('login'))
 
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM clientes WHERE id = %s", (id,))
+
+    cur.execute("DELETE FROM clientes_inmobiliaria WHERE id = %s", (id,))
+
     mysql.connection.commit()
     cur.close()
 
     flash('Cliente eliminado correctamente.', 'success')
     return redirect(url_for('clientes_admin'))
-
 
 @app.route('/compras_admin')
 def compras_admin():
@@ -1159,6 +1220,8 @@ def reportes_admin():
     """)
     egresos_grafico = cur.fetchall()
 
+    cur.execute("SELECT COUNT(*) AS total FROM ventas")
+    total_ventas = cur.fetchone()['total']
     cur.close()
 
     return render_template(
@@ -1169,7 +1232,8 @@ def reportes_admin():
         inmuebles_disponibles=inmuebles_disponibles,
         estado_inmuebles=estado_inmuebles,
         ingresos_grafico=ingresos_grafico,
-        egresos_grafico=egresos_grafico
+        egresos_grafico=egresos_grafico,
+        total_ventas=total_ventas
     )
 
 @app.route('/proyectos')
@@ -1210,7 +1274,6 @@ def crear_proyecto():
 
     proyecto_id = cur.lastrowid
 
-    # Relacionar cliente con proyecto
     cur.execute("""
         INSERT INTO cliente_proyecto (cliente_id, proyecto_id)
         VALUES (%s, %s)
@@ -1499,8 +1562,6 @@ def admin_contactos():
     """
 
     valores = []
-
-    # BUSCADOR
     if buscar:
 
         sql += """

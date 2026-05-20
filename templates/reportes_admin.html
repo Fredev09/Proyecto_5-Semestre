@@ -22,102 +22,81 @@
 
 {% block content %}
 
-    <section class="page-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-        <div>
-            <h1>Reportes Generales</h1>
-            <p>Indicadores financieros, comerciales y administrativos del sistema.</p>
-        </div>
-        <button id="btnExportarPDF" onclick="exportarPDF()" style="background:#981313;color:white;border:none;padding:14px 26px;border-radius:30px;font-weight:bold;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:10px;">
-            <i class="fa fa-file-pdf"></i> Exportar PDF
-        </button>
-    </section>
-
-   <div id="reporte-pdf">
-
-    <section class="page-title">
+<section class="page-title reportes-title">
+    <div>
         <h1>Reportes Generales</h1>
-        <p>Indicadores financieros, comerciales y administrativos del sistema.</p>
-    </section>
+        <p>Indicadores comerciales e inmobiliarios del sistema.</p>
+    </div>
 
-   <section class="stats-grid reportes-stats">
-        <div class="stat-card">
-            <h3>Ingresos</h3>
-            <p>${{ "{:,.0f}".format(ingresos) }}</p>
+    <a href="#" class="btn-pdf">
+        <i class="fa fa-file-pdf"></i> Exportar PDF
+    </a>
+</section>
+
+<section class="reportes-grid">
+
+    <div class="reporte-card">
+        <div class="reporte-icon">
+            <i class="fa fa-dollar-sign"></i>
         </div>
+        <h3>Ingresos por ventas</h3>
+        <p>${{ "{:,.0f}".format(ingresos) }}</p>
+    </div>
 
-        <div class="stat-card">
-            <h3>Egresos</h3>
-            <p>${{ "{:,.0f}".format(egresos) }}</p>
+    <div class="reporte-card">
+        <div class="reporte-icon">
+            <i class="fa fa-handshake"></i>
         </div>
+        <h3>Ventas registradas</h3>
+        <p>{{ total_ventas }}</p>
+    </div>
 
-        <div class="stat-card">
-            <h3>Utilidad estimada</h3>
-            <p>${{ "{:,.0f}".format(utilidad) }}</p>
+    <div class="reporte-card">
+        <div class="reporte-icon">
+            <i class="fa fa-house"></i>
         </div>
+        <h3>Inmuebles disponibles</h3>
+        <p>{{ inmuebles_disponibles }}</p>
+    </div>
 
-        <div class="stat-card">
-            <h3>Inmuebles disponibles</h3>
-            <p>{{ (inmuebles_disponibles) }}</p>
-            <p>${{ (inmuebles_disponibles) }}</p>
+    <div class="reporte-card">
+        <div class="reporte-icon">
+            <i class="fa fa-chart-line"></i>
         </div>
-    </section>
+        <h3>Utilidad estimada</h3>
+        <p>${{ "{:,.0f}".format(ingresos) }}</p>
+    </div>
 
-    <section class="chart-grid">
-        <div class="panel">
-            <h2>Ingresos vs Egresos</h2>
-            <canvas id="finanzasChart"></canvas>
-        </div>
+</section>
 
-        <div class="panel">
-            <h2>Estado de inmuebles</h2>
-            <canvas id="inmueblesChart"></canvas>
-        </div>
-    </section>
-    </div><!-- fin #reporte-pdf -->
+<section class="chart-grid">
+    <div class="panel">
+        <h2>Ingresos mensuales</h2>
+        <canvas id="finanzasChart"></canvas>
+    </div>
 
+    <div class="panel">
+        <h2>Estado de inmuebles</h2>
+        <canvas id="inmueblesChart"></canvas>
+    </div>
+</section>
 
 {% endblock %}
+
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-    function exportarPDF() {
-        const btn = document.getElementById('btnExportarPDF');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generando PDF...';
-
-        const elemento = document.getElementById('reporte-pdf');
-        const opciones = {
-            margin: [10, 10, 10, 10],
-            filename: 'Reporte_CiviWeb_Manager.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opciones).from(elemento).save().then(() => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa fa-file-pdf"></i> Exportar PDF';
-        });
-    }
     const ingresosData = {{ ingresos_grafico | tojson }};
-    const egresosData = {{ egresos_grafico | tojson }};
     const estados = {{ estado_inmuebles | tojson }};
 
     const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
     const ingresosPorMes = Array(12).fill(0);
-    const egresosPorMes = Array(12).fill(0);
 
     ingresosData.forEach(item => {
         ingresosPorMes[item.mes - 1] = item.ingresos;
-    });
-
-    egresosData.forEach(item => {
-        egresosPorMes[item.mes - 1] = item.egresos;
     });
 
     new Chart(document.getElementById('finanzasChart'), {
@@ -129,12 +108,6 @@
                     label: 'Ingresos',
                     data: ingresosPorMes,
                     backgroundColor: '#981313',
-                    borderRadius: 8
-                },
-                {
-                    label: 'Egresos',
-                    data: egresosPorMes,
-                    backgroundColor: '#222',
                     borderRadius: 8
                 }
             ]

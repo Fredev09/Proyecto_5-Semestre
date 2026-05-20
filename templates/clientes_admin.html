@@ -129,12 +129,13 @@
                         </td>
                         <td>{{ c.observacion }}</td>
                         <td>
-                            <a href="{{ url_for('eliminar_cliente', id=c.id) }}"
-                               class="btn-delete"
-                               onclick="return confirm('¿Eliminar este cliente?')">
-                                <i class="fa fa-trash"></i> Eliminar
-                            </a>
-                        </td>
+                            <a href="#"
+                            class="btn-delete btn-delete-cliente"
+                            onclick="abrirModalEliminarCliente('{{ url_for('eliminar_cliente', id=c.id) }}')">
+                            <i class="fa fa-trash"></i>
+                            <span>Eliminar</span>
+                        </a>
+                    </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -274,4 +275,82 @@
     </div>
 </div>
 
+<div class="modal-eliminar" id="modalEliminarCliente">
+
+    <div class="modal-card">
+
+        <div class="modal-icon">
+            <i class="fa fa-trash"></i>
+        </div>
+
+        <h2>¿Eliminar cliente?</h2>
+
+        <p>
+            Esta acción eliminará el cliente del sistema.
+            No podrás recuperarlo después.
+        </p>
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cerrarModalEliminarCliente()">
+
+                Cancelar
+
+            </button>
+
+            <a href="#"
+               id="btnConfirmarEliminarCliente"
+               class="btn-eliminar">
+
+                Sí, eliminar
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal-eliminar" id="modalEliminarCliente">
+    <div class="modal-card">
+        <div class="modal-icon">
+            <i class="fa fa-trash"></i>
+        </div>
+
+        <h2>¿Eliminar cliente?</h2>
+
+        <p>
+            Esta acción eliminará el cliente del sistema.
+        </p>
+
+        <div class="modal-actions">
+            <button type="button"
+                    class="btn-cancelar"
+                    onclick="cerrarModalEliminarCliente()">
+                Cancelar
+            </button>
+
+            <a href="#"
+               id="btnConfirmarEliminarCliente"
+               class="btn-eliminar">
+                Sí, eliminar
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModalEliminarCliente(url) {
+    document.getElementById('btnConfirmarEliminarCliente').href = url;
+    document.getElementById('modalEliminarCliente').classList.add('active');
+}
+
+function cerrarModalEliminarCliente() {
+    document.getElementById('modalEliminarCliente').classList.remove('active');
+}
+</script>
 {% endblock %}

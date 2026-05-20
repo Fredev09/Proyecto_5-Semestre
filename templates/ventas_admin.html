@@ -202,7 +202,10 @@
                         <th>Documento</th>
                         <th>Inmueble</th>
                         <th>Ubicación</th>
-                        <th>Valor</th>
+                        <th>Valor inmueble</th>
+                        <th>Abonado</th>
+                        <th>Saldo</th>
+                        <th>Estado pago</th>
                         <th>Observación</th>
                     </tr>
                 </thead>
@@ -216,6 +219,32 @@
                         <td>{{ v.inmueble }}</td>
                         <td>{{ v.ubicacion }}</td>
                         <td class="valor">COP ${{ "{:,.0f}".format(v.valor_venta) }}</td>
+                        <td class="valor">
+                            COP ${{ "{:,.0f}".format(v.anticipo) }}
+                        </td>
+                        <td class="valor">
+                            COP ${{ "{:,.0f}".format(v.saldo) }}
+                        </td>
+                        <td>
+                            <span class="badge {{ v.estado_pago|replace(' ', '-') }}">
+                                 {{ v.estado_pago }}
+                                </span>
+
+                                {% if v.estado_pago != 'Pagado' %}
+    <br><br>
+
+    <a href="{{ url_for('completar_pago', id=v.id) }}"
+       class="edit">
+        Completar pago
+    </a>
+    {% endif %}
+    <br><br>
+
+    <a href="{{ url_for('factura_venta', id=v.id) }}"
+       class="edit">
+        Factura
+    </a>
+                            </td>
                         <td>{{ v.observacion }}</td>
                     </tr>
                     {% endfor %}

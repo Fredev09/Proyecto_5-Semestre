@@ -1,0 +1,19 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Factura de venta{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Factura de Venta #{{ venta.id }}</h1>
+    <p>Cliente: {{ venta.cliente }}</p>
+</section>
+
+<section class="section-box">
+    <p><strong>Inmueble:</strong> {{ venta.inmueble }}</p>
+    <p><strong>Ubicación:</strong> {{ venta.ubicacion }}</p>
+    <p><strong>Valor total:</strong> ${{ "{:,.0f}".format(venta.valor_venta) }}</p>
+    <p><strong>Abonado:</strong> ${{ "{:,.0f}".format(venta.anticipo) }}</p>
+    <p><strong>Saldo:</strong> ${{ "{:,.0f}".format(venta.saldo) }}</p>
+    <p><strong>Estado:</strong> {{ venta.estado_pago }}</p>
+</section>
+{% endblock %}
