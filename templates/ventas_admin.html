@@ -218,6 +218,10 @@
                         <td>{{ v.documento }}</td>
                         <td>{{ v.inmueble }}</td>
                         <td>{{ v.ubicacion }}</td>
+<<<<<<< HEAD
+=======
+                        <td class="valor">COP ${{ "{:,.0f}".format(v.valor_venta) }}</td>
+>>>>>>> 1b06f3f1890b72f044a61b71d75b5a5d8c391d1a
                         <td class="valor">
                             COP ${{ "{:,.0f}".format(v.valor_venta or 0) }}
                         </td>
@@ -247,6 +251,12 @@
         Factura
     </a>
                             </td>
+<<<<<<< HEAD
+=======
+                        <td class="valor">
+                            COP ${{ "{:,.0f}".format(v.valor_venta) }}
+                        </td>
+>>>>>>> 1b06f3f1890b72f044a61b71d75b5a5d8c391d1a
                         <td>{{ v.observacion }}</td>
                     </tr>
                     {% endfor %}

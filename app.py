@@ -400,6 +400,10 @@ def usuarios():
     por_pagina = 10
     offset = (pagina - 1) * por_pagina
 
+    pagina = request.args.get('pagina', 1, type=int)
+    por_pagina = 10
+    offset = (pagina - 1) * por_pagina
+
     query = """
         SELECT id, username, email, rol, email_confirmado
         FROM usuarios
@@ -418,13 +422,45 @@ def usuarios():
 
         busqueda = f"%{buscar}%"
         valores.extend([
+            
+            busqueda,
+           
+            busqueda
+        
+        ])
+
+    if rol:
+        query += " AND rol = %s  "
+        valores.append(rol)
+
+    query += " ORDER BY id DESC "
+
+    count_query = """
+        SELECT COUNT(*) AS total
+        FROM usuarios
+        WHERE 1=1
+    """
+
+    count_valores = []
+
+    if buscar:
+
+        count_query += """
+            AND (
+                username LIKE %s
+                OR email LIKE %s
+            )
+        """
+
+        busqueda = f"%{buscar}%"
+        count_valores.extend([
             busqueda,
             busqueda
         ])
 
     if rol:
-        query += " AND rol = %s "
-        valores.append(rol)
+        count_query += " AND rol = %s "
+        count_valores.append(rol)
 
     query += " ORDER BY id DESC "
 
@@ -468,18 +504,32 @@ def usuarios():
         offset
     ])
 
+    cur.execute(count_query, count_valores)
+    total_registros = cur.fetchone()['total']
+    total_paginas = (
+        total_registros + por_pagina - 1
+    ) // por_pagina
+
+    query += " LIMIT %s OFFSET %s "
+    valores.extend([
+        por_pagina,
+        offset
+    ])
+
     cur.execute(query, valores)
     usuarios = cur.fetchall()
     cur.close()
 
     return render_template(
-        'usuarios.html',
-        usuarios=usuarios,
-        buscar=buscar,
-        rol=rol,
+            'usuarios.html',
+            usuarios=usuarios,
+            buscar=buscar,
+            rol=rol,
+        pagina=pagina,
+        total_paginas=total_paginas,
         pagina=pagina,
         total_paginas=total_paginas
-    )
+        )
 
 
 @app.route('/eliminar_usuario/<int:id>')
@@ -970,6 +1020,56 @@ def ventas_admin():
         offset
     ])
 
+    count_query = """
+        SELECT COUNT(*) AS total
+
+        FROM ventas v
+
+        INNER JOIN inmuebles i
+            ON v.inmueble_id = i.id
+
+        INNER JOIN clientes_inmobiliaria c
+            ON v.cliente_id = c.id
+
+        WHERE 1=1
+    """
+
+    count_valores = []
+
+    if buscar:
+
+        count_query += """
+            AND (
+                c.nombre LIKE %s
+                OR i.titulo LIKE %s
+            )
+        """
+
+        busqueda = f"%{buscar}%"
+
+        count_valores.extend([
+            busqueda,
+            busqueda
+        ])
+
+    if metodo_pago:
+
+        count_query += " AND v.metodo_pago LIKE %s "
+        count_valores.append(f"%{metodo_pago}%")
+
+    cur.execute(count_query, count_valores)
+    total_registros = cur.fetchone()['total']
+
+    total_paginas = (
+        total_registros + por_pagina - 1
+    ) // por_pagina
+
+    query += " LIMIT %s OFFSET %s "
+    valores.extend([
+        por_pagina,
+        offset
+    ])
+
     cur.execute(query, valores)
     ventas = cur.fetchall()
 
@@ -1004,19 +1104,19 @@ def ventas_admin():
     cur.close()
 
     return render_template(
-        'ventas_admin.html',
-        inmuebles_disponibles=inmuebles_disponibles,
-        clientes=clientes,
-        ventas=ventas,
-        total_vendido=total_vendido,
-        total_ventas=total_ventas,
-        ventas_mes=ventas_mes,
-        inmuebles_vendidos=inmuebles_vendidos,
-        buscar=buscar,
-        metodo_pago=metodo_pago,
-        pagina=pagina,
-        total_paginas=total_paginas
-    )
+    'ventas_admin.html',
+    inmuebles_disponibles=inmuebles_disponibles,
+    clientes=clientes,
+    ventas=ventas,
+    total_vendido=total_vendido,
+    total_ventas=total_ventas,
+    ventas_mes=ventas_mes,
+    inmuebles_vendidos=inmuebles_vendidos,
+    ultimas_ventas=ultimas_ventas,
+    ventas_grafico=ventas_grafico,
+    buscar=buscar,
+    metodo_pago=metodo_pago
+)
 
 @app.route('/completar_pago/<int:id>')
 def completar_pago(id):
@@ -1359,97 +1459,14 @@ def proyectos_admin():
     """)
 
     clientes = cur.fetchall()
-    buscar = request.args.get('buscar', '')
-    estado = request.args.get('estado', '')
-    pagina = request.args.get('pagina', 1, type=int)
-    por_pagina = 10
-    offset = (pagina - 1) * por_pagina
-
-    query = """
-        SELECT *
-        FROM proyectos_constructora
-        WHERE 1=1
-    """
-
-    valores = []
-
-    if buscar:
-
-        query += """
-            AND (
-                nombre LIKE %s
-                OR descripcion LIKE %s
-                OR tipo_trabajo LIKE %s
-            )
-        """
-
-        busqueda = f"%{buscar}%"
-
-        valores.extend([
-            busqueda,
-            busqueda,
-            busqueda
-        ])
-
-    if estado:
-        query += " AND estado = %s "
-        valores.append(estado)
-
-    query += " ORDER BY id DESC "
-    count_query = """
-        SELECT COUNT(*) AS total
-        FROM proyectos_constructora
-        WHERE 1=1
-    """
-
-    count_valores = []
-
-    if buscar:
-        count_query += """
-    AND (
-                nombre LIKE %s
-                OR descripcion LIKE %s
-                OR tipo_trabajo LIKE %s
-            )
-        """
-
-        busqueda = f"%{buscar}%"
-        count_valores.extend([
-            busqueda,
-            busqueda,
-            busqueda
-        ])
-
-    if estado:
-
-        count_query += " AND estado = %s "
-        count_valores.append(estado)
-
-    cur.execute(count_query, count_valores)
-    total_registros = cur.fetchone()['total']
-
-    total_paginas = (
-        total_registros + por_pagina - 1
-    ) // por_pagina
-    query += " LIMIT %s OFFSET %s "
-
-    valores.extend([
-        por_pagina,
-        offset
-    ])
-
-    cur.execute(query, valores)
-    proyectos = cur.fetchall()
+    cur.close()
 
     return render_template(
         'Proyectos_confi.html',
         proyectos=proyectos,
-        clientes=clientes,
-        buscar=buscar,
-        estado=estado,
-        pagina=pagina,
-        total_paginas=total_paginas
-        )
+        clientes=clientes
+    )
+
 
 @app.route('/crear_proyecto', methods=['POST'])
 def crear_proyecto():
@@ -1633,9 +1650,8 @@ def reservas_admin():
 
         return redirect(url_for('reservas_admin'))
 
-    cur.execute("""
-        SELECT *
-        FROM inmuebles
+    cursor.execute("""
+        SELECT * FROM inmuebles
         WHERE estado = 'Disponible'
         ORDER BY id DESC
     """)
@@ -1650,16 +1666,7 @@ def reservas_admin():
 
     clientes = cur.fetchall()
 
-    buscar = request.args.get('buscar', '')
-    estado = request.args.get('estado', '')
-
-    pagina = request.args.get('pagina', 1, type=int)
-
-    por_pagina = 5
-
-    offset = (pagina - 1) * por_pagina
-
-    query = """
+    cursor.execute("""
         SELECT
             r.*,
             i.titulo AS inmueble,
@@ -1674,95 +1681,12 @@ def reservas_admin():
 
         INNER JOIN clientes_inmobiliaria c
             ON r.cliente_id = c.id
+        ORDER BY r.fecha_reserva DESC
+    """)
 
-        WHERE 1=1
-    """
+    reservas = cursor.fetchall()
 
-    valores = []
-
-    if buscar:
-
-        query += """
-            AND (
-                c.nombre LIKE %s
-                OR i.titulo LIKE %s
-            )
-        """
-
-        busqueda = f"%{buscar}%"
-
-        valores.extend([
-            busqueda,
-            busqueda
-        ])
-
-    if estado:
-
-        query += " AND r.estado = %s "
-
-        valores.append(estado)
-
-    query += " ORDER BY r.fecha_reserva DESC "
-
-
-    count_query = """
-        SELECT COUNT(*) AS total
-
-        FROM reservas r
-
-        INNER JOIN inmuebles i
-            ON r.inmueble_id = i.id
-
-        INNER JOIN clientes_inmobiliaria c
-            ON r.cliente_id = c.id
-
-        WHERE 1=1
-    """
-
-    count_valores = []
-
-    if buscar:
-
-        count_query += """
-            AND (
-                c.nombre LIKE %s
-                OR i.titulo LIKE %s
-            )
-        """
-
-        busqueda = f"%{buscar}%"
-
-        count_valores.extend([
-            busqueda,
-            busqueda
-        ])
-
-    if estado:
-
-        count_query += " AND r.estado = %s "
-
-        count_valores.append(estado)
-
-    cur.execute(count_query, count_valores)
-
-    total_registros = cur.fetchone()['total']
-
-    total_paginas = (
-        total_registros + por_pagina - 1
-    ) // por_pagina
-
-    query += " LIMIT %s OFFSET %s "
-
-    valores.extend([
-        por_pagina,
-        offset
-    ])
-
-    cur.execute(query, valores)
-
-    reservas = cur.fetchall()
-
-    cur.close()
+    cursor.close()
 
     return render_template(
         'reservas_admin.html',
