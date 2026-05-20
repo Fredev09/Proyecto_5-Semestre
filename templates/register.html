@@ -7,10 +7,28 @@
     <div class="register-container">
 
         <div class="left-side">
-            <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO">
-        </div>
+
+    <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO">
+
+    <h3>Sistema Administrativo</h3>
+
+    <p>
+        Gestiona usuarios y permisos
+        de forma segura y eficiente.
+    </p>
+
+    <div class="left-footer">
+        Seguro • Confiable • Profesional
+    </div>
+
+</div>
 
         <div class="right-side">
+            <div class="register-icon">
+             <i class="fa fa-user-plus"></i>
+        </div>
+
+
             <h2>Crear cuenta</h2>
             <p class="subtitle">Registro de usuarios del sistema administrativo</p>
 
@@ -75,7 +93,7 @@
 
                 <div class="input-group">
     <label>Rol</label>
-    <div class="input-icon select-box">
+    <div class="input-icon">
         <i class="fa fa-user-shield left-icon"></i>
 
         <select id="rol" name="rol">
