@@ -80,6 +80,47 @@
     </form>
 </section>
 
+<section class="filters">
+    <form method="GET" class="filters-form">
+
+        <div class="filter-group">
+            <input type="text"
+                   name="buscar"
+                   placeholder="Buscar cliente o inmueble..."
+                   value="{{ buscar }}">
+        </div>
+
+        <div class="filter-group">
+            <select name="estado">
+
+                <option value="">Todos los estados</option>
+
+                <option value="Activa"
+                    {% if estado == 'Activa' %}selected{% endif %}>
+                    Activa
+                </option>
+
+                <option value="Finalizada"
+                    {% if estado == 'Finalizada' %}selected{% endif %}>
+                    Finalizada
+                </option>
+
+                <option value="Cancelada"
+                    {% if estado == 'Cancelada' %}selected{% endif %}>
+                    Cancelada
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn-filter">
+            <i class="fa fa-filter"></i> Filtrar
+        </button>
+
+    </form>
+
+</section>
+
 <section class="section-box">
     <h2><i class="fa fa-list"></i> Reservas registradas</h2>
 
@@ -151,6 +192,50 @@
             </tbody>
         </table>
     </div>
+
+    <div class="pagination">
+
+        {% if pagina > 1 %}
+            <a href="{{ url_for(
+                'reservas_admin',
+                pagina=pagina-1,
+                buscar=buscar,
+                estado=estado
+            ) }}">
+                ←
+            </a>
+        {% endif %}
+
+        {% for p in range(1, total_paginas + 1) %}
+
+            <a
+                href="{{ url_for(
+                    'reservas_admin',
+                    pagina=p,
+                    buscar=buscar,
+                    estado=estado
+                ) }}"
+
+                class="{% if p == pagina %}active{% endif %}"
+            >
+                {{ p }}
+            </a>
+
+        {% endfor %}
+
+        {% if pagina < total_paginas %}
+            <a href="{{ url_for(
+                'reservas_admin',
+                pagina=pagina+1,
+                buscar=buscar,
+                estado=estado
+            ) }}">
+                →
+            </a>
+        {% endif %}
+
+    </div>
+
     {% else %}
     <div class="empty">
         <i class="fa fa-calendar-xmark"></i>

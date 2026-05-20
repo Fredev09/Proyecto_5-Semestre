@@ -101,6 +101,47 @@
                 {% endfor %}
             </tbody>
         </table>
-    </section>
 
+    <div class="pagination">
+
+        {% if pagina > 1 %}
+            <a href="{{ url_for(
+                'usuarios',
+                pagina=pagina-1,
+                buscar=buscar,
+                rol=rol
+            ) }}">
+                ←
+            </a>
+        {% endif %}
+
+        {% for p in range(1, total_paginas + 1) %}
+
+            <a
+                href="{{ url_for(
+                    'usuarios',
+                    pagina=p,
+                    buscar=buscar,
+                    rol=rol
+                ) }}"
+
+                class="{% if p == pagina %}active{% endif %}"
+            >
+                {{ p }}
+            </a>
+
+        {% endfor %}
+
+        {% if pagina < total_paginas %}
+            <a href="{{ url_for(
+                'usuarios',
+                pagina=pagina+1,
+                buscar=buscar,
+                rol=rol
+            ) }}">
+                →
+            </a>
+        {% endif %}
+
+    </div>
     {% endblock %}

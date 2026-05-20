@@ -1,14 +1,65 @@
 {% extends "base_admin.html" %}
+
+{% block title %}Editar Proyecto - CiviWeb Manager{% endblock %}
+
+{% block admin_actions %}
+
+<a href="{{ url_for('proyectos_admin') }}">
+    <i class="fa fa-arrow-left"></i> Proyectos
+</a>
+
+<a href="{{ url_for('dashboard') }}">
+    <i class="fa fa-home"></i> Dashboard
+</a>
+
+{% endblock %}
+
+{% block breadcrumb %}
+
+<div class="breadcrumb">
+
+    <a href="{{ url_for('dashboard') }}">
+        Inicio
+    </a>
+
+    <span>/</span>
+
+    <a href="{{ url_for('constructora_admin') }}">
+        Constructora
+    </a>
+
+    <span>/</span>
+
+    <a href="{{ url_for('proyectos_admin') }}">
+        Proyectos
+    </a>
+
+    <span>/</span>
+
+    <strong>Editar proyecto</strong>
+
+</div>
+
+{% endblock %}
+
 {% block content %}
 
 <section class="form-card">
-    <h2>Editar proyecto</h2>
+
+    <h2>
+        <i class="fa fa-pen"></i>
+        Editar proyecto
+    </h2>
 
     <form method="POST">
+
         <div class="input-group">
             <label>Nombre</label>
-            <input type="text" name="nombre"
-                   value="{{ proyecto.nombre }}" required>
+
+            <input type="text"
+                   name="nombre"
+                   value="{{ proyecto.nombre }}"
+                   required>
         </div>
 
         <div class="input-group">
@@ -20,14 +71,17 @@
                     {% if proyecto.estado == 'Activo' %}selected{% endif %}>
                     Activo
                 </option>
+
                 <option value="Pendiente"
                     {% if proyecto.estado == 'Pendiente' %}selected{% endif %}>
                     Pendiente
                 </option>
+
                 <option value="Pausado"
                     {% if proyecto.estado == 'Pausado' %}selected{% endif %}>
                     Pausado
                 </option>
+
                 <option value="Finalizado"
                     {% if proyecto.estado == 'Finalizado' %}selected{% endif %}>
                     Finalizado
@@ -52,6 +106,7 @@
         </div>
 
         <button type="submit" class="btn-submit">
+            <i class="fa fa-save"></i>
             Guardar cambios
         </button>
 

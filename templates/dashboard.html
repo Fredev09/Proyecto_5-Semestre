@@ -144,11 +144,13 @@
         <p>Administración de casas, apartamentos, reservas, ventas y disponibilidad.</p>
     </a>
 
+    {% if rol == 'admin' %}
     <a href="{{ url_for('usuarios') }}" class="dashboard-card card-link">
         <i class="fa fa-users"></i>
         <h3>Usuarios</h3>
         <p>Gestión de cuentas, roles, permisos y acceso al sistema administrativo.</p>
     </a>
+    {% endif %}
 
     <a href="{{ url_for('ventas_admin') }}" class="dashboard-card card-link">
         <i class="fa fa-handshake"></i>

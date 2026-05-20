@@ -31,8 +31,6 @@
 
     <section class="form-card">
         <h2><i class="fa fa-plus"></i> Registrar nuevo proyecto</h2>
-
-                <!-- REEMPLAZA EL FORMULARIO ACTUAL EN Proyectos_confi.html POR ESTE -->
         <form action="{{ url_for('crear_proyecto') }}" method="POST">
 
             <div class="input-group">
@@ -96,6 +94,51 @@
         </form>
     </section>
 
+    <section class="filters">
+    <form method="GET" class="filters-form">
+
+        <div class="filter-group">
+            <input type="text"
+                   name="buscar"
+                   placeholder="Buscar proyecto..."
+                   value="{{ buscar }}">
+        </div>
+
+        <div class="filter-group">
+            <select name="estado">
+                <option value="">Todos los estados</option>
+
+                <option value="Activo"
+                    {% if estado == 'Activo' %}selected{% endif %}>
+                    Activo
+                </option>
+
+                <option value="Pendiente"
+                    {% if estado == 'Pendiente' %}selected{% endif %}>
+                    Pendiente
+                </option>
+
+                <option value="Pausado"
+                    {% if estado == 'Pausado' %}selected{% endif %}>
+                    Pausado
+                </option>
+
+                <option value="Finalizado"
+                    {% if estado == 'Finalizado' %}selected{% endif %}>
+                    Finalizado
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn-filter">
+            <i class="fa fa-filter"></i> Filtrar
+        </button>
+
+    </form>
+
+</section>
+
     <section class="table-card">
         <h2><i class="fa fa-list"></i> Lista de proyectos</h2>
 
@@ -125,6 +168,49 @@
             </div>
             {% endfor %}
         </div>
+
+        <div class="pagination">
+
+            {% if pagina > 1 %}
+                <a href="{{ url_for(
+                    'proyectos_admin',
+                    pagina=pagina-1,
+                    buscar=buscar,
+                    estado=estado
+                ) }}">
+                    ←
+                </a>
+            {% endif %}
+
+            {% for p in range(1, total_paginas + 1) %}
+
+                <a
+                    href="{{ url_for(
+                        'proyectos_admin',
+                        pagina=p,
+                        buscar=buscar,
+                        estado=estado
+                    ) }}"
+
+                    class="{% if p == pagina %}active{% endif %}"
+                >
+                    {{ p }}
+                </a>
+
+            {% endfor %}
+
+            {% if pagina < total_paginas %}
+                <a href="{{ url_for(
+                    'proyectos_admin',
+                    pagina=pagina+1,
+                    buscar=buscar,
+                    estado=estado
+                ) }}">
+                    →
+                </a>
+            {% endif %}
+        </div>
+
         {% else %}
         <div class="empty">
             <i class="fa fa-folder-open"></i>
@@ -134,7 +220,6 @@
         {% endif %}
     </section>
 
-            <!-- POPUP ELIMINAR -->
         <div class="custom-popup" id="popupEliminar">
             <div class="popup-box">
                 <i class="fa fa-trash"></i>
