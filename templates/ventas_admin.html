@@ -32,10 +32,52 @@
     </p>
 </section>
 
+<section class="filters">
+
+    <form method="GET" class="filters-form">
+
+        <div class="filter-group">
+            <input type="text"
+                   name="buscar"
+                   placeholder="Buscar cliente o inmueble..."
+                   value="{{ buscar }}">
+        </div>
+
+        <div class="filter-group">
+            <select name="metodo_pago">
+
+                <option value="">Todos los métodos</option>
+
+                <option value="Efectivo"
+                    {% if metodo_pago == 'Efectivo' %}selected{% endif %}>
+                    Efectivo
+                </option>
+
+                <option value="Transferencia"
+                    {% if metodo_pago == 'Transferencia' %}selected{% endif %}>
+                    Transferencia
+                </option>
+
+                <option value="Crédito"
+                    {% if metodo_pago == 'Crédito' %}selected{% endif %}>
+                    Crédito
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn-filter">
+            <i class="fa fa-filter"></i> Filtrar
+        </button>
+
+    </form>
+
+</section>
+
 <section class="stats">
     <div class="stat-card">
         <h3>Total vendido</h3>
-        <p>${{ "{:,.0f}".format(total_vendido) }}</p>
+        <p>${{ "{:,.0f}".format(total_vendido or 0) }}</p>
     </div>
 
     <div class="stat-card">
@@ -118,6 +160,7 @@
     </div>
 </div>
 
+
 <div class="input-group full">
     <label>Porcentaje de anticipo</label>
 
@@ -137,6 +180,8 @@
 <input type="hidden" name="anticipo" id="anticipoInput" value="0">
 <input type="hidden" name="saldo" id="saldoInput" value="0">
 
+
+
             <button type="submit" class="btn-submit">
                 <i class="fa fa-save"></i> Registrar venta
             </button>
@@ -144,54 +189,11 @@
         </form>
     </section>
 
-<section class="filters">
-
-    <form method="GET" class="filters-form">
-
-        <div class="filter-group">
-            <input type="text"
-                   name="buscar"
-                   placeholder="Buscar cliente o inmueble..."
-                   value="{{ buscar }}">
-        </div>
-
-        <div class="filter-group">
-            <select name="metodo_pago">
-
-                <option value="">Todos los métodos</option>
-
-                <option value="Efectivo"
-                    {% if metodo_pago == 'Efectivo' %}selected{% endif %}>
-                    Efectivo
-                </option>
-
-                <option value="Transferencia"
-                    {% if metodo_pago == 'Transferencia' %}selected{% endif %}>
-                    Transferencia
-                </option>
-
-                <option value="Crédito"
-                    {% if metodo_pago == 'Crédito' %}selected{% endif %}>
-                    Crédito
-                </option>
-
-            </select>
-        </div>
-
-        <button type="submit" class="btn-filter">
-            <i class="fa fa-filter"></i> Filtrar
-        </button>
-
-    </form>
-
-</section>
-
     <section class="section-box">
         <h2><i class="fa fa-list"></i> Ventas registradas</h2>
 
-                {% if ventas %}
+        {% if ventas %}
         <div class="table-responsive">
-
             <table>
                 <thead>
                     <tr>
@@ -211,18 +213,19 @@
                 <tbody>
                     {% for v in ventas %}
                     <tr>
-                        <td>{{ v.fecha }}</td>
+                        <td>{{ v.fecha or 'Sin fecha' }}</td>
                         <td>{{ v.cliente }}</td>
                         <td>{{ v.documento }}</td>
                         <td>{{ v.inmueble }}</td>
                         <td>{{ v.ubicacion }}</td>
-<<<<<<< HEAD
-                        <td class="valor">COP ${{ "{:,.0f}".format(v.valor_venta) }}</td>
                         <td class="valor">
-                            COP ${{ "{:,.0f}".format(v.anticipo) }}
+                            COP ${{ "{:,.0f}".format(v.valor_venta or 0) }}
                         </td>
                         <td class="valor">
-                            COP ${{ "{:,.0f}".format(v.saldo) }}
+                            COP ${{ "{:,.0f}".format(v.anticipo or 0) }}
+                        </td>
+                        <td class="valor">
+                            COP ${{ "{:,.0f}".format(v.saldo or 0) }}
                         </td>
                         <td>
                             <span class="badge {{ v.estado_pago|replace(' ', '-') }}">
@@ -244,67 +247,66 @@
         Factura
     </a>
                             </td>
-=======
-                        <td class="valor">
-                            COP ${{ "{:,.0f}".format(v.valor_venta) }}
-                        </td>
->>>>>>> 06465784a0ff6a114b0890fc3e441ef387860907
                         <td>{{ v.observacion }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-        </div>
-
-        <div class="pagination">
-
-            {% if pagina > 1 %}
-                <a href="{{ url_for(
-                    'ventas_admin',
-                    pagina=pagina-1,
-                    buscar=buscar,
-                    metodo_pago=metodo_pago
-                ) }}">
-                    ←
-                </a>
-            {% endif %}
-
-            {% for p in range(1, total_paginas + 1) %}
-
-                <a
-                    href="{{ url_for(
-                        'ventas_admin',
-                        pagina=p,
-                        buscar=buscar,
-                        metodo_pago=metodo_pago
-                    ) }}"
-
-                    class="{% if p == pagina %}active{% endif %}"
-                >
-                    {{ p }}
-                </a>
-            {% endfor %}
-            {% if pagina < total_paginas %}
-                <a href="{{ url_for(
-                    'ventas_admin',
-                    pagina=pagina+1,
-                    buscar=buscar,
-                    metodo_pago=metodo_pago
-                ) }}">
-                    →
-                </a>
-            {% endif %}
         </div>
         {% else %}
         <div class="empty">
             <i class="fa fa-circle-info"></i>
             <h3>No hay ventas registradas</h3>
-            <p>
-                Cuando registres una venta aparecerá en esta sección.
-            </p>
+            <p>Cuando registres una venta aparecerá en esta sección.</p>
         </div>
         {% endif %}
     </section>
+
+    <script>
+const inmuebleSelect = document.getElementById("inmuebleSelect");
+const valorVenta = document.getElementById("valorVenta");
+const slider = document.getElementById("anticipoSlider");
+
+const porcentajeTexto = document.getElementById("porcentajeTexto");
+const valorAnticipo = document.getElementById("valorAnticipo");
+const saldoPendiente = document.getElementById("saldoPendiente");
+
+const anticipoInput = document.getElementById("anticipoInput");
+const saldoInput = document.getElementById("saldoInput");
+
+function formatoMoneda(valor) {
+    return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0
+    }).format(valor);
+}
+
+function calcularAnticipo() {
+    const precio = Number(valorVenta.value || 0);
+    const porcentaje = Number(slider.value || 0);
+
+    const anticipo = precio * porcentaje / 100;
+    const saldo = precio - anticipo;
+
+    porcentajeTexto.textContent = porcentaje + "%";
+    valorAnticipo.textContent = formatoMoneda(anticipo);
+    saldoPendiente.textContent = formatoMoneda(saldo);
+
+    anticipoInput.value = anticipo;
+    saldoInput.value = saldo;
+}
+
+inmuebleSelect.addEventListener("change", function () {
+    const opcion = this.options[this.selectedIndex];
+    const precio = opcion.dataset.precio || 0;
+    valorVenta.value = precio;
+    slider.value = 0;
+
+    calcularAnticipo();
+});
+
+slider.addEventListener("input", calcularAnticipo);
+</script>
 
 {% endblock %}
