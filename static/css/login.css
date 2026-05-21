@@ -18,13 +18,14 @@
         justify-content: center;
     }
 
-          .login-container {
+        .login-container {
         display: flex;
 
          width: 88%;
         max-width: 1280px;
 
-        height: 640px;
+        min-height: 640px;
+        height: auto;
 
         border-radius: 30px;
 
@@ -34,28 +35,28 @@
 
         box-shadow:
         0 20px 50px rgba(0,0,0,.5);
-}
+        }
 
         /* LADO IZQUIERDO (LOGO) */
          .left-side {
-          width: 55%;
-         position: relative;
+            width: 55%;
+            position: relative;
 
-        background:
-        linear-gradient(rgba(0,0,0,.75),
-        rgba(0,0,0,.75)),
-        url("../imagenes/construccion.jpg");
+            background:
+            linear-gradient(rgba(0,0,0,.75),
+            rgba(0,0,0,.75)),
+            url("../imagenes/construccion.jpg");
 
-        background-size: cover;
-        background-position: center;
+            background-size: cover;
+            background-position: center;
 
-        color: white;
+            color: white;
 
-        padding: 40px;
+            padding: 40px;
 
-        display: flex;
-        align-items: center;
-    }
+            display: flex;
+            align-items: center;
+        }
 
     .content-left{
     position: relative;
@@ -859,7 +860,8 @@
 
         .recover-container {
             display: flex;
-            width: 800px;
+            width: 95%;
+            max-width: 800px;
             background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
@@ -880,7 +882,7 @@
 
         .right-side {
             width: 60%;
-            padding: 45px 50px;
+            padding: 30px;
             text-align: center;
         }
 
@@ -1139,7 +1141,8 @@
 
         .modificar-container {
             display: flex;
-            width: 800px;
+            width: 95%;
+            max-width: 800px;
             background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
@@ -1160,7 +1163,7 @@
 
         .right-side {
             width: 60%;
-            padding: 45px 50px;
+            padding: 30px;
             box-sizing: border-box;
         }
 
@@ -1489,7 +1492,8 @@
 
         .recover-container {
             display: flex;
-            width: 800px;
+            width: 95%;
+            max-width: 800px;
             background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
@@ -1510,7 +1514,7 @@
 
         .right-side {
             width: 60%;
-            padding: 45px 50px;
+            padding: 30px;
             box-sizing: border-box;
         }
 
@@ -1832,7 +1836,8 @@
 
         .reset-container {
             display: flex;
-            width: 800px;
+            width: 95%;
+            max-width: 800px;
             background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
@@ -1853,7 +1858,7 @@
 
         .right-side {
             width: 60%;
-            padding: 45px 50px;
+            padding: 30px;
             box-sizing: border-box;
         }
 
@@ -2179,7 +2184,8 @@
 
         .reset-container {
             display: flex;
-            width: 800px;
+            width: 95%;
+            max-width: 800px;
             background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
@@ -2200,7 +2206,7 @@
 
         .right-side {
             width: 60%;
-            padding: 45px 50px;
+            padding: 30px;
             box-sizing: border-box;
         }
 
@@ -2675,7 +2681,7 @@ CONTENEDOR
 .register-container{
     display: flex;
 
-    width: 78%;
+    width: 95%;
     max-width: 980px;
     min-height: 560px;
 
@@ -2970,7 +2976,7 @@ INPUTS
 
     border-radius: 12px;
 
-    padding-left: 72px;
+    padding-left: 52px;
 
     padding-right: 16px;
 
@@ -3100,5 +3106,219 @@ RESPONSIVE
     .register-container form{
         width: 100%;
     }
+}
+
+/* =========================================
+FIX RESPONSIVE GLOBAL
+========================================= */
+
+img,
+video{
+    max-width:100%;
+    height:auto;
+}
+
+input,
+select,
+button,
+textarea{
+    width:100%;
+    max-width:100%;
+}
+
+body{
+    overflow-x:hidden;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    body{
+        padding:12px;
+    }
+
+    .login-container,
+    .register-container,
+    .recover-container,
+    .reset-container,
+    .confirm-container,
+    .modificar-container{
+        width:100% !important;
+        max-width:100% !important;
+
+        flex-direction:column;
+
+        border-radius:18px;
+    }
+
+    .left-side,
+    .right-side,
+    .confirm-left-side,
+    .confirm-right-side{
+        width:100% !important;
+    }
+
+    .left-side{
+        min-height:220px;
+        padding:25px 18px !important;
+    }
+
+    .right-side{
+        padding:25px 18px !important;
+    }
+
+    h1{
+        font-size:28px !important;
+    }
+
+    h2{
+        font-size:24px !important;
+    }
+
+    p{
+        font-size:14px !important;
+    }
+
+    .feature-container{
+        flex-direction:column;
+    }
+
+    .feature-box{
+        width:100%;
+    }
+
+    .input-icon{
+        height:50px !important;
+    }
+
+    .input-icon input{
+        font-size:14px !important;
+        padding-left:15px !important;
+    }
+
+    button{
+        height:50px;
+        font-size:14px !important;
+    }
+}
+
+/* CELULARES PEQUEÑOS */
+@media(max-width:480px){
+
+    h1{
+        font-size:24px !important;
+    }
+
+    h2{
+        font-size:20px !important;
+    }
+
+    .left-side img{
+        width:100px !important;
+    }
+
+    .logo{
+        width:100px !important;
+    }
+
+    .feature-box{
+        padding:12px;
+    }
+
+    .input-icon{
+        border-radius:10px;
+    }
+
+    button{
+        border-radius:10px;
+    }
+}
+
+/* =========================================
+ULTIMO FIX GLOBAL AUTH
+PEGAR AL FINAL
+========================================= */
+
+html,
+body{
+    overflow-x:hidden;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+img{
+    max-width:100%;
+    height:auto;
+}
+
+.login-container,
+.register-container,
+.recover-container,
+.reset-container,
+.confirm-container,
+.modificar-container{
+    overflow:hidden;
+}
+
+.input-icon{
+    width:100%;
+}
+
+.input-icon input,
+.input-icon select{
+    width:100%;
+    min-width:0;
+}
+
+@media(max-width:768px){
+
+    .feature-container{
+        flex-direction:column;
+        width:100%;
+    }
+
+    .feature-box{
+        width:100%;
+    }
+
+    .content-left h1{
+        font-size:28px !important;
+    }
+
+    .content-left p{
+        font-size:14px !important;
+    }
+
+    .right-side{
+        border-radius:0 !important;
+    }
+
+    .login-container,
+    .register-container,
+    .recover-container,
+    .reset-container,
+    .confirm-container,
+    .modificar-container{
+        min-height:auto;
+    }
+
+}
+
+@media(max-width:480px){
+
+    .content-left h1{
+        font-size:24px !important;
+    }
+
+    .right-side{
+        padding:20px 16px !important;
+    }
+
+    button{
+        height:48px !important;
+    }
+
 }
 

@@ -35,10 +35,16 @@
             margin-left: 10px;
         }
 
-        .container {
-            max-width: 1450px;
-            margin: 45px auto;
-            padding: 0 35px;
+        .container{
+            width:100%;
+
+            max-width:1450px;
+
+            margin:45px auto;
+
+            padding:0 20px;
+
+            box-sizing:border-box;
         }
 
         .ventas-layout {
@@ -1545,12 +1551,20 @@
             grid-template-columns: 1.2fr 1fr; 
             gap: 26px; } 
             
-        .panel { 
-            background: white; 
-            border-radius: 24px; 
-            padding: 32px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); } 
-            
+       .panel{
+            width:100%;
+
+            background:white;
+
+            border-radius:22px;
+
+            padding:28px;
+
+            overflow:hidden;
+
+            box-shadow:0 10px 30px rgba(0,0,0,0.08);
+        }
+
         .panel h2 { 
             color: #981313; 
             margin-bottom: 22px; 
@@ -1684,19 +1698,28 @@
         .dropdown { 
             position: relative; } 
             
-        .dropdown-content { 
-            display: none; 
-            position: absolute; 
-            top: 65px; 
-            left: 0; 
-            min-width: 330px; 
-            background: white; 
-            border-radius: 24px; 
-            padding: 16px; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.18); 
-            flex-direction: column; 
-            gap: 10px; 
-            z-index: 3000; } 
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 0;
+
+            width: 100%;
+            min-width: unset;
+            max-width: 260px;
+
+            background: white;
+            border-radius: 18px;
+
+            padding: 12px;
+
+            box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+
+            flex-direction: column;
+            gap: 10px;
+
+            z-index: 3000;
+        }
             
             
         .dropdown-content.show { 
@@ -1704,10 +1727,10 @@
 
             .main-content,
             .container {
-    max-width: 1450px;
-    margin: 45px auto;
-    padding: 0 35px;
-}
+                max-width: 1450px;
+                margin: 45px auto;
+                padding: 0 35px;
+            }
             
         @media 
         
@@ -3090,12 +3113,20 @@ SERVICIOS CONSTRUCTIVOS
 PROYECTOS DE OBRA
 ========================================= */
 
-.form-card {
-    background: white;
-    border-radius: 24px;
-    padding: 34px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    margin-bottom: 32px;
+.form-card{
+    width:100%;
+
+    max-width:100%;
+
+    background:white;
+
+    padding:24px;
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    box-sizing:border-box;
 }
 
 .form-card h2 {
@@ -5220,3 +5251,525 @@ RESERVAS ADMIN
         align-items: flex-start;
     }
 }
+
+/* =========================================
+RESPONSIVE GLOBAL ADMIN
+========================================= */
+
+@media(max-width:768px){
+
+    .admin-header{
+        padding:15px;
+        flex-direction:row;
+        align-items:center;
+    }
+
+    .admin-logo img{
+        width:130px;
+    }
+
+    .container{
+        padding:0 12px;
+    }
+
+    .page-title{
+        padding:20px;
+        border-radius:18px;
+    }
+
+    .page-title h1{
+        font-size:24px;
+    }
+
+    .page-title p{
+        font-size:14px;
+        line-height:1.6;
+    }
+
+    .module-grid,
+    .projects-grid,
+    .services-grid,
+    .stats-grid,
+    .dashboard-cards,
+    .chart-grid{
+        grid-template-columns:1fr !important;
+    }
+
+    .module-card,
+    .project-card,
+    .service-card,
+    .dashboard-card,
+    .stat-card{
+        padding:22px;
+        border-radius:18px;
+    }
+
+    .table-card{
+        overflow-x:auto;
+    }
+
+    table{
+        min-width:800px;
+    }
+
+    .admin-actions{
+        width:100%;
+    }
+
+}
+
+/* =========================================
+FIX DROPDOWN MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+    .dropdown{
+        width:100%;
+    }
+
+    .dropdown-content{
+        position: relative;
+        top: 10px;
+        left: 0;
+
+        width: 100%;
+        max-width: 100%;
+
+        border-radius: 16px;
+
+        box-shadow: none;
+    }
+
+    .dropdown-content a{
+        font-size:14px;
+        padding:14px;
+    }
+
+}
+
+/* =========================================
+RESPONSIVE MASTER ADMIN
+PEGAR AL FINAL DE TODO EL CSS
+========================================= */
+
+html{
+    overflow-x:hidden;
+}
+
+body{
+    overflow-x:hidden;
+}
+
+/* =========================
+CONTAINER GENERAL
+========================= */
+
+@media(max-width:1200px){
+
+    .container,
+    .main-content{
+        padding:0 20px !important;
+    }
+
+}
+
+/* =========================
+TABLETS
+========================= */
+
+@media(max-width:992px){
+
+    /* HEADER */
+
+    .admin-header{
+        padding:18px 20px !important;
+        flex-wrap:wrap;
+        gap:15px;
+    }
+
+    .admin-logo img{
+        width:150px !important;
+    }
+
+    .admin-actions{
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+    }
+
+    .admin-actions a{
+        padding:12px 18px !important;
+        font-size:14px;
+    }
+
+    /* TITULOS */
+
+    .page-title,
+    .topbar,
+    .section-box,
+    .table-card,
+    .panel,
+    .form-card{
+        padding:24px !important;
+    }
+
+    .page-title h1,
+    .topbar h1{
+        font-size:30px !important;
+    }
+
+    /* GRIDS */
+
+    .stats-grid,
+    .dashboard-cards,
+    .module-grid,
+    .projects-grid,
+    .services-grid,
+    .inmuebles-grid,
+    .reportes-grid,
+    .chart-grid{
+        grid-template-columns:1fr 1fr !important;
+    }
+
+    /* FORMULARIOS */
+
+    form,
+    .form-admin,
+    .ventas-layout,
+    .filters,
+    .panel-grid{
+        grid-template-columns:1fr !important;
+    }
+
+    .btn-submit,
+    .input-group.full,
+    .form-actions{
+        grid-column:span 1 !important;
+    }
+
+    /* TABLAS */
+
+    table,
+    .clientes-table,
+    .ventas-table{
+        min-width:850px !important;
+    }
+
+}
+
+/* =========================
+CELULARES
+========================= */
+
+@media(max-width:768px){
+
+    /* HEADER */
+
+    .admin-header{
+        flex-direction:column !important;
+        align-items:center !important;
+        text-align:center;
+        padding:15px !important;
+    }
+
+    .admin-logo img{
+        width:130px !important;
+    }
+
+    .admin-actions{
+        width:100%;
+        flex-direction:column;
+    }
+
+    .admin-actions a{
+        width:100%;
+        margin:0 !important;
+    }
+
+    /* CONTENIDO */
+
+    .container,
+    .main-content{
+        padding:0 12px !important;
+        margin:25px auto !important;
+    }
+
+    /* CAJAS */
+
+    .page-title,
+    .topbar,
+    .section-box,
+    .table-card,
+    .panel,
+    .form-card,
+    .stat-card,
+    .dashboard-card,
+    .module-card,
+    .project-card,
+    .service-card,
+    .inmueble-card{
+        padding:20px !important;
+        border-radius:18px !important;
+    }
+
+    /* TITULOS */
+
+    .page-title h1,
+    .topbar h1{
+        font-size:24px !important;
+    }
+
+    .page-title p,
+    .topbar p{
+        font-size:14px !important;
+        line-height:1.6;
+    }
+
+    /* GRIDS */
+
+    .stats-grid,
+    .dashboard-cards,
+    .module-grid,
+    .projects-grid,
+    .services-grid,
+    .inmuebles-grid,
+    .reportes-grid,
+    .chart-grid{
+        grid-template-columns:1fr !important;
+        gap:18px !important;
+    }
+
+    /* BOTONES */
+
+    .btn-submit,
+    .btn-save,
+    .btn-back,
+    .save-btn{
+        width:100%;
+    }
+
+    /* FORMULARIOS */
+
+    form,
+    .form-admin,
+    .ventas-layout,
+    .filters,
+    .panel-grid,
+    .modal-grid{
+        grid-template-columns:1fr !important;
+    }
+
+    input,
+    select,
+    textarea{
+        font-size:14px !important;
+        padding:13px !important;
+    }
+
+    /* TABLAS */
+
+    .table-responsive{
+        overflow-x:auto;
+    }
+
+    table,
+    .clientes-table,
+    .ventas-table{
+        min-width:780px !important;
+    }
+
+    th,
+    td{
+        padding:12px !important;
+        font-size:14px !important;
+    }
+
+    /* CARDS */
+
+    .dashboard-card{
+        min-height:auto !important;
+    }
+
+    .image-box{
+        height:220px !important;
+    }
+
+    .precio{
+        font-size:22px !important;
+    }
+
+    /* MODALES */
+
+    .modal-box,
+    .modal-card{
+        width:95% !important;
+        padding:22px !important;
+    }
+
+    .modal-header h2{
+        font-size:28px !important;
+    }
+
+}
+
+/* =========================
+CELULARES PEQUEÑOS
+========================= */
+
+@media(max-width:480px){
+
+    .page-title h1,
+    .topbar h1{
+        font-size:21px !important;
+    }
+
+    .module-card h3,
+    .project-card h3,
+    .service-card h3,
+    .dashboard-card h3{
+        font-size:20px !important;
+    }
+
+    .stat-card p,
+    .precio{
+        font-size:20px !important;
+    }
+
+    .image-box{
+        height:200px !important;
+    }
+
+    .modal-header h2{
+        font-size:22px !important;
+    }
+
+}
+
+/* =========================================
+FIX FORMULARIOS MOVIL ADMIN
+========================================= */
+
+@media(max-width:400px){
+
+    .panel{
+        padding:18px !important;
+        border-radius:18px;
+    }
+
+    .panel h2{
+        font-size:20px !important;
+        line-height:1.4;
+    }
+
+    .panel form{
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+        width:100%;
+    }
+
+    .panel input,
+    .panel select,
+    .panel textarea{
+        width:100%;
+
+        font-size:14px !important;
+
+        padding:12px !important;
+    }
+
+    .panel button{
+        width:100%;
+    }
+
+}
+
+/* =========================================
+FIX CONTAINER MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+    .container{
+        padding:0 12px !important;
+    }
+
+    .main-content.container{
+        width:100%;
+
+        margin:20px auto !important;
+
+        padding:0 10px !important;
+    }
+
+}
+
+@media(max-width:480px){
+
+    .container{
+        padding:0 8px !important;
+    }
+
+}
+
+/* =========================================
+FIX REAL IPHONE SE
+========================================= */
+
+@media(max-width:768px){
+
+    .main-content,
+    .main-content.container{
+        width:100% !important;
+
+        max-width:100% !important;
+
+        margin:0 auto !important;
+
+        padding:12px !important;
+
+        overflow:visible !important;
+
+        box-sizing:border-box;
+    }
+
+    .page-title,
+    .form-card{
+        width:100% !important;
+
+        max-width:100% !important;
+
+        margin:0 0 20px 0 !important;
+
+        box-sizing:border-box;
+    }
+
+    .form-card{
+        padding:20px !important;
+
+        overflow:visible !important;
+    }
+
+}
+
+@media(max-width:480px){
+
+    body{
+        overflow-x:hidden;
+    }
+
+    .container{
+        padding:8px !important;
+    }
+
+    .form-card h2{
+        font-size:20px !important;
+        line-height:1.3;
+    }
+
+}
+
+
+
+
