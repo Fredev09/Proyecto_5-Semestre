@@ -410,3 +410,45 @@ inmuebleSelect.addEventListener("change", function () {
 });
 
 slider.addEventListener("input", calcularAnticipo);
+
+const ingresosData = {{ ingresos_grafico | tojson }};
+    const estados = {{ estado_inmuebles | tojson }};
+
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    const ingresosPorMes = Array(12).fill(0);
+
+    ingresosData.forEach(item => {
+        ingresosPorMes[item.mes - 1] = item.ingresos;
+    });
+
+    new Chart(document.getElementById('finanzasChart'), {
+        type: 'bar',
+        data: {
+            labels: meses,
+            datasets: [
+                {
+                    label: 'Ingresos',
+                    data: ingresosPorMes,
+                    backgroundColor: '#981313',
+                    borderRadius: 8
+                }
+            ]
+        }
+    });
+
+    new Chart(document.getElementById('inmueblesChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Disponibles', 'Reservados', 'Vendidos'],
+            datasets: [{
+                data: [
+                    estados.disponibles || 0,
+                    estados.reservados || 0,
+                    estados.vendidos || 0
+                ],
+                backgroundColor: ['#1f9d55', '#c58a00', '#981313']
+            }]
+        }
+    });

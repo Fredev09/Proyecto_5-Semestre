@@ -131,7 +131,8 @@
                         <td>
                             <a href="#"
                             class="btn-delete btn-delete-cliente"
-                            onclick="abrirModalEliminarCliente('{{ url_for('eliminar_cliente', id=c.id) }}')">
+                            onclick="abrirModalEliminarCliente
+                            (''{{ url_for('eliminar_cliente', id=c.id) }}''')">
                             <i class="fa fa-trash"></i>
                             <span>Eliminar</span>
                         </a>

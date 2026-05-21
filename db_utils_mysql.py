@@ -104,7 +104,6 @@ def add_contacto_mysql(mysql, nombre, telefono, correo, servicio, mensaje):
             mensaje.strip()
         )
 
-        # DEBUG EN CONSOLA
         print("===================================")
         print("GUARDANDO CLIENTE EN MYSQL")
         print("SQL:", sql)
