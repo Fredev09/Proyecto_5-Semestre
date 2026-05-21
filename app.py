@@ -12,6 +12,12 @@ import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 import pymysql
+from flask import make_response
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from io import BytesIO
 
 from db_utils_mysql import (
     add_usuario_mysql,
@@ -206,7 +212,15 @@ def register():
         
         password_hash = generate_password_hash(password)
         add_usuario_mysql(mysql, username, password_hash, email, rol)
-
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""
+                    UPDATE usuarios
+                    SET estado = 'Activo'
+                    WHERE username = %s
+                    """, (username,))
+        mysql.connection.commit()
+        cur.close()
         #  envío de correo de confirmación por codigo
 
         import random
@@ -401,7 +415,7 @@ def usuarios():
     offset = (pagina - 1) * por_pagina
 
     query = """
-        SELECT id, username, email, rol, email_confirmado
+        SELECT id, username, email, rol, email_confirmado, estado
         FROM usuarios
         WHERE 1=1
     """
@@ -1368,6 +1382,170 @@ def reportes_admin():
         total_ventas=total_ventas
     )
 
+@app.route('/reporte_pdf')
+def reporte_pdf():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    if session.get('rol') != 'admin':
+        flash('No tienes permisos para generar reportes.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS ingresos FROM ventas")
+    ingresos = cur.fetchone()['ingresos']
+
+    cur.execute("SELECT COUNT(*) AS total FROM ventas")
+    total_ventas = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
+    inmuebles_disponibles = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Reservado'")
+    inmuebles_reservados = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Vendido'")
+    inmuebles_vendidos = cur.fetchone()['total']
+
+    cur.execute("SELECT COUNT(*) AS total FROM clientes_inmobiliaria")
+    total_clientes = cur.fetchone()['total']
+
+    cur.execute("""
+        SELECT 
+            v.fecha,
+            c.nombre AS cliente,
+            c.documento,
+            i.titulo AS inmueble,
+            i.ubicacion,
+            v.valor_venta,
+            v.anticipo,
+            v.saldo,
+            v.estado_pago,
+            v.metodo_pago
+        FROM ventas v
+        INNER JOIN clientes_inmobiliaria c ON v.cliente_id = c.id
+        INNER JOIN inmuebles i ON v.inmueble_id = i.id
+        ORDER BY v.fecha DESC
+        LIMIT 10
+    """)
+    ventas = cur.fetchall()
+
+    cur.close()
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    ancho, alto = letter
+
+    # Encabezado
+    pdf.setFillColor(colors.HexColor("#111111"))
+    pdf.rect(0, alto - 90, ancho, 90, fill=True, stroke=False)
+
+    pdf.setFillColor(colors.white)
+    pdf.setFont("Helvetica-Bold", 20)
+    pdf.drawString(2 * cm, alto - 45, "CiviWeb Manager")
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(2 * cm, alto - 65, "Reporte general del sistema inmobiliario")
+
+    pdf.setFillColor(colors.HexColor("#981313"))
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawString(2 * cm, alto - 125, "Reportes Generales")
+
+    pdf.setFillColor(colors.black)
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(2 * cm, alto - 145, f"Fecha de generacion: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+
+    # Indicadores
+    y = alto - 190
+
+    indicadores = [
+        ("Ingresos por ventas", f"COP ${ingresos or 0:,.0f}"),
+        ("Ventas registradas", str(total_ventas or 0)),
+        ("Inmuebles disponibles", str(inmuebles_disponibles or 0)),
+        ("Inmuebles reservados", str(inmuebles_reservados or 0)),
+        ("Inmuebles vendidos", str(inmuebles_vendidos or 0)),
+        ("Clientes registrados", str(total_clientes or 0)),
+    ]
+
+    pdf.setFont("Helvetica-Bold", 13)
+    pdf.setFillColor(colors.HexColor("#981313"))
+    pdf.drawString(2 * cm, y, "Indicadores principales")
+
+    y -= 25
+
+    for titulo, valor in indicadores:
+        pdf.setFillColor(colors.HexColor("#f4f4f4"))
+        pdf.roundRect(2 * cm, y - 8, 17 * cm, 28, 8, fill=True, stroke=False)
+
+        pdf.setFillColor(colors.black)
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.drawString(2.4 * cm, y + 2, titulo)
+
+        pdf.setFillColor(colors.HexColor("#981313"))
+        pdf.setFont("Helvetica-Bold", 11)
+        pdf.drawRightString(18.5 * cm, y + 2, valor)
+
+        y -= 38
+
+    # Ultimas ventas
+    y -= 10
+    pdf.setFillColor(colors.HexColor("#981313"))
+    pdf.setFont("Helvetica-Bold", 13)
+    pdf.drawString(2 * cm, y, "Ultimas ventas registradas")
+
+    y -= 25
+
+    pdf.setFillColor(colors.HexColor("#981313"))
+    pdf.rect(2 * cm, y - 5, 17 * cm, 22, fill=True, stroke=False)
+
+    pdf.setFillColor(colors.white)
+    pdf.setFont("Helvetica-Bold", 8)
+    pdf.drawString(2.2 * cm, y + 2, "Fecha")
+    pdf.drawString(4.0 * cm, y + 2, "Cliente")
+    pdf.drawString(7.2 * cm, y + 2, "Inmueble")
+    pdf.drawString(11.0 * cm, y + 2, "Valor")
+    pdf.drawString(14.0 * cm, y + 2, "Estado")
+
+    y -= 24
+
+    pdf.setFont("Helvetica", 8)
+    pdf.setFillColor(colors.black)
+
+    for venta in ventas:
+        if y < 80:
+            pdf.showPage()
+            y = alto - 80
+
+        fecha = venta['fecha'].strftime('%d/%m/%Y') if venta['fecha'] else 'Sin fecha'
+        cliente = str(venta['cliente'])[:22]
+        inmueble = str(venta['inmueble'])[:24]
+        valor = f"${(venta['valor_venta'] or 0):,.0f}"
+        estado = str(venta['estado_pago'] or 'Sin estado')
+
+        pdf.drawString(2.2 * cm, y, fecha)
+        pdf.drawString(4.0 * cm, y, cliente)
+        pdf.drawString(7.2 * cm, y, inmueble)
+        pdf.drawString(11.0 * cm, y, valor)
+        pdf.drawString(14.0 * cm, y, estado)
+
+        y -= 18
+
+    # Pie
+    pdf.setFillColor(colors.gray)
+    pdf.setFont("Helvetica", 8)
+    pdf.drawString(2 * cm, 35, "Reporte generado automaticamente por CiviWeb Manager.")
+
+    pdf.save()
+
+    buffer.seek(0)
+
+    response = make_response(buffer.getvalue())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=reporte_general.pdf'
+
+    return response
+
 @app.route('/proyectos')
 def proyectos_admin():
 
@@ -1601,9 +1779,8 @@ def inmobiliaria_publica():
             WHERE inmueble_id = %s
             ORDER BY id ASC
         """, (inmueble['id'],))
-
-        inmueble['galeria'] = cur.fetchall()
-        
+            inmueble['galeria'] = cur.fetchall()
+            
         cur.close()
         
         return render_template(
