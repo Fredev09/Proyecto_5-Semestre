@@ -5988,6 +5988,8 @@ table{
 th,
 td{
     white-space: nowrap;
+
+}
 /* Hamburguesa */
 #menu-toggle{
     display:none;
