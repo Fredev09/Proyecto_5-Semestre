@@ -1,5 +1,4 @@
 import email
-from tkinter import INSERT
 from flask import Flask, render_template, request, redirect, url_for, session, flash, current_app
 from flask_mysqldb import MySQL
 import random
@@ -51,7 +50,10 @@ app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
 app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
 app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT', 3306))
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_SSL'] = {'ssl': {}}
+
 mysql = MySQL(app)
 
 #Configuracion e-mail
