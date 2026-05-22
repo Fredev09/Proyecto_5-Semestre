@@ -83,9 +83,9 @@
 
             <div class="image-box">
                 {% if i.imagen %}
-                    <img src="{{ url_for('static', filename='Imagenes/' ~ i.imagen) }}" alt="{{ i.titulo }}">
+                    <img src="{{ url_for('static', filename='imagenes/' ~ i.imagen) }}" alt="{{ i.titulo }}">
                 {% else %}
-                    <img src="{{ url_for('static', filename='Imagenes/LOGO.png') }}" alt="Sin imagen">
+                    <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="Sin imagen">
                 {% endif %}
 
                 <span class="estado {{ i.estado }}">{{ i.estado }}</span>

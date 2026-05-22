@@ -5,7 +5,7 @@
 {% block header %}
 <header class="admin-header">
     <div class="admin-logo">
-        <img src="{{ url_for('static', filename='Imagenes/Civi.png') }}" alt="Logo">
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Logo">
     </div>
 
     <nav class="admin-nav">
@@ -25,7 +25,7 @@
                 <a href="{{ url_for('proyectos_admin') }}"><i class="fa fa-building"></i> Proyectos de obra</a>
                 {% endif %}
                 {% if permisos.ver_servicios %}
-                <a href="{{ url_for('servicios_Constructivos') }}"><i class="fa fa-screwdriver-wrench"></i> Servicios</a>
+                <a href="{{ url_for('servicios_constructivos') }}"><i class="fa fa-screwdriver-wrench"></i> Servicios</a>
                 {% endif %}
                 {% if permisos.ver_contactos %}
                 <a href="{{ url_for('admin_contactos') }}"><i class="fa fa-list-check"></i> Clientes interesados</a>
@@ -153,7 +153,7 @@
         {% endif %}
 
         {% if permisos.ver_servicios %}
-        <a href="{{ url_for('servicios_Constructivos') }}" class="dashboard-card card-link">
+        <a href="{{ url_for('servicios_constructivos') }}" class="dashboard-card card-link">
             <i class="fa fa-screwdriver-wrench"></i>
             <h3>Servicios Constructivos</h3>
             <p>Revisa los servicios disponibles de la constructora.</p>

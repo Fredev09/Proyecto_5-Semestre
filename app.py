@@ -4,12 +4,12 @@ from flask_mysqldb import MySQL
 import random
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 import os
 from werkzeug.utils import secure_filename
 import re
 import uuid
 from datetime import datetime
-from dotenv import load_dotenv
 import pymysql
 import cloudinary
 import cloudinary.uploader
@@ -58,7 +58,6 @@ def no_cache(response):
 def index():
     return render_template ('index.html')
 
-# Configuración de MySQL (ajusta según tu XAMPP)
 app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
 app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
 app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
@@ -66,10 +65,9 @@ app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT', 3306))
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_SSL'] = {'ssl': {}}
-
 mysql = MySQL(app)
 
-#Configuracion e-mail
+
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
@@ -82,6 +80,7 @@ mail = Mail(app)
 
 UPLOAD_FOLDER = os.path.join('static', 'imagenes')
 
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'mp4'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -89,6 +88,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def imagen_permitida(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def subir_a_cloudinary(archivo, carpeta="civiweb/inmuebles"):
     resultado = cloudinary.uploader.upload(
@@ -98,6 +98,7 @@ def subir_a_cloudinary(archivo, carpeta="civiweb/inmuebles"):
     )
 
     return resultado["secure_url"]
+
 
 with app.app_context():
     init_mysql_db(mysql)
@@ -229,7 +230,6 @@ def desactivar_usuario(id):
 
     cur = mysql.connection.cursor()
 
-    # Evitar que el administrador se desactive a sí mismo
     cur.execute(
         "SELECT username FROM usuarios WHERE id = %s",
         (id,)
@@ -277,7 +277,6 @@ def activar_usuario(id):
 
     return redirect(url_for('usuarios'))
 
-# REGISTRO
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
@@ -348,7 +347,6 @@ def confirmar_codigo():
     return render_template('confirmar_codigo.html')
 
 
-# RECUPERAR CONTRASEÑA (simulado)
 @app.route('/recover', methods=['GET', 'POST'])
 def recover():
     if request.method == 'POST':
@@ -384,7 +382,6 @@ def verificar_codigo_recuperacion():
 
     return render_template('verificar_codigo_recuperacion.html')
 
-# RESTABLECER CONTRASEÑA NO ES SIMULADO
 @app.route('/reset_password_codigo', methods=['GET', 'POST'])
 def reset_password_codigo():
     if 'usuario_recuperacion' not in session:
@@ -723,7 +720,6 @@ def registrar_inmueble():
             ))
 
             inmueble_id = cur.lastrowid
-
             archivos_galeria = request.files.getlist('galeria')
 
             # Subir galería a Cloudinary
@@ -928,14 +924,20 @@ def ventas_admin():
     cur = conexion.cursor()
 
     # =========================
-    # PAGINACIÓN Y FILTROS
+    # FILTROS Y PAGINACIÓN
     # =========================
-    pagina = request.args.get('page', 1, type=int)
     buscar = request.args.get('buscar', '')
     metodo_pago = request.args.get('metodo_pago', '')
-
+    pagina = request.args.get('pagina', request.args.get('page', 1, type=int), type=int)
     por_pagina = 10
     offset = (pagina - 1) * por_pagina
+
+    # Compatibilidad: si la BD no tiene porcentaje_anticipo, no rompemos el INSERT.
+    cur.execute("SHOW COLUMNS FROM ventas LIKE 'porcentaje_anticipo'")
+    tiene_porcentaje_anticipo = cur.fetchone() is not None
+
+    cur.execute("SHOW COLUMNS FROM ventas LIKE 'fecha'")
+    tiene_fecha = cur.fetchone() is not None
 
     # =========================
     # REGISTRAR VENTA
@@ -945,13 +947,18 @@ def ventas_admin():
         inmueble_id = request.form['inmueble_id']
         cliente_id = request.form['cliente_id']
         valor_venta = float(request.form['valor_venta'])
-        anticipo = float(request.form['anticipo'])
-
+        observacion = request.form.get('observacion', '')
         metodo_pago = request.form['metodo_pago']
+        porcentaje_anticipo = int(request.form.get('porcentaje_anticipo') or 0)
+        anticipo = float(request.form.get('anticipo') or 0)
 
-        observacion = request.form['observacion']
+        saldo_form = request.form.get('saldo')
+        if saldo_form not in (None, ''):
+            saldo = float(saldo_form)
+        else:
+            saldo = valor_venta - anticipo
 
-        saldo = valor_venta - anticipo
+        fecha = request.form.get('fecha') or datetime.now().strftime('%Y-%m-%d')
 
         if saldo <= 0:
             estado_pago = 'Pagado'
@@ -960,28 +967,27 @@ def ventas_admin():
         else:
             estado_pago = 'Sin anticipo'
 
-        cur.execute("""
-            INSERT INTO ventas (
-                inmueble_id,
-                cliente_id,
-                valor_venta,
-                metodo_pago,
-                anticipo,
-                saldo,
-                estado_pago,
-                observacion
-            )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-        """, (
-            inmueble_id,
-            cliente_id,
-            valor_venta,
-            metodo_pago,
-            anticipo,
-            saldo,
-            estado_pago,
-            observacion
-        ))
+        columnas = ['inmueble_id', 'cliente_id', 'valor_venta', 'metodo_pago']
+        valores_insert = [inmueble_id, cliente_id, valor_venta, metodo_pago]
+
+        if tiene_porcentaje_anticipo:
+            columnas.append('porcentaje_anticipo')
+            valores_insert.append(porcentaje_anticipo)
+
+        columnas.extend(['anticipo', 'saldo', 'estado_pago', 'observacion'])
+        valores_insert.extend([anticipo, saldo, estado_pago, observacion])
+
+        if tiene_fecha:
+            columnas.append('fecha')
+            valores_insert.append(fecha)
+
+        columnas_sql = ', '.join(columnas)
+        placeholders = ', '.join(['%s'] * len(columnas))
+
+        cur.execute(
+            f"INSERT INTO ventas ({columnas_sql}) VALUES ({placeholders})",
+            tuple(valores_insert)
+        )
 
         cur.execute("""
             UPDATE inmuebles
@@ -990,9 +996,7 @@ def ventas_admin():
         """, (inmueble_id,))
 
         conexion.commit()
-
         flash('Venta registrada correctamente.', 'success')
-
         return redirect(url_for('ventas_admin'))
 
     # =========================
@@ -1002,6 +1006,7 @@ def ventas_admin():
         SELECT *
         FROM inmuebles
         WHERE estado = 'Disponible'
+        AND tipo_negocio = 'Venta'
         ORDER BY id DESC
     """)
     inmuebles_disponibles = cur.fetchall()
@@ -1012,15 +1017,16 @@ def ventas_admin():
     cur.execute("""
         SELECT *
         FROM clientes_inmobiliaria
+        WHERE id NOT IN (
+            SELECT cliente_id
+            FROM ventas
+        )
         ORDER BY nombre ASC
     """)
     clientes = cur.fetchall()
 
-    # =========================
-    # CONSULTA VENTAS PAGINADAS
-    # =========================
-    sql_ventas = """
-        SELECT SQL_CALC_FOUND_ROWS
+    query = """
+        SELECT
             v.id,
             v.valor_venta,
             v.fecha,
@@ -1040,13 +1046,10 @@ def ventas_admin():
             ON v.cliente_id = c.id
         WHERE 1=1
     """
-
     valores = []
 
-    # BUSCADOR
     if buscar:
-
-        sql_ventas += """
+        query += """
             AND (
                 c.nombre LIKE %s
                 OR i.titulo LIKE %s
@@ -1054,48 +1057,48 @@ def ventas_admin():
                 OR c.documento LIKE %s
             )
         """
-
         busqueda = f"%{buscar}%"
+        valores.extend([busqueda, busqueda, busqueda, busqueda])
 
-        valores.extend([
-            busqueda,
-            busqueda,
-            busqueda,
-            busqueda
-        ])
-
-    # FILTRO MÉTODO DE PAGO
     if metodo_pago:
+        query += " AND v.metodo_pago LIKE %s "
+        valores.append(f"%{metodo_pago}%")
 
-        sql_ventas += """
-            AND v.metodo_pago = %s
-        """
-
-        valores.append(metodo_pago)
-
-    sql_ventas += """
-        ORDER BY v.fecha DESC
-        LIMIT %s OFFSET %s
+    count_query = """
+        SELECT COUNT(*) AS total
+        FROM ventas v
+        INNER JOIN inmuebles i
+            ON v.inmueble_id = i.id
+        INNER JOIN clientes_inmobiliaria c
+            ON v.cliente_id = c.id
+        WHERE 1=1
     """
+    count_valores = []
 
+    if buscar:
+        count_query += """
+            AND (
+                c.nombre LIKE %s
+                OR i.titulo LIKE %s
+                OR i.ubicacion LIKE %s
+                OR c.documento LIKE %s
+            )
+        """
+        count_valores.extend([busqueda, busqueda, busqueda, busqueda])
+
+    if metodo_pago:
+        count_query += " AND v.metodo_pago LIKE %s "
+        count_valores.append(f"%{metodo_pago}%")
+
+    cur.execute(count_query, count_valores)
+    total_registros = cur.fetchone()['total']
+    total_paginas = (total_registros + por_pagina - 1) // por_pagina
+
+    query += " ORDER BY v.fecha DESC LIMIT %s OFFSET %s "
     valores.extend([por_pagina, offset])
-
-    cur.execute(sql_ventas, valores)
-
+    cur.execute(query, valores)
     ventas = cur.fetchall()
 
-    # =========================
-    # TOTAL PARA PAGINACIÓN
-    # =========================
-    cur.execute("SELECT FOUND_ROWS() AS total")
-
-    total = cur.fetchone()['total']
-
-    total_paginas = (total + por_pagina - 1) // por_pagina
-
-    # =========================
-    # ESTADÍSTICAS
-    # =========================
     cur.execute("""
         SELECT COALESCE(SUM(valor_venta), 0) AS total
         FROM ventas
@@ -1123,9 +1126,6 @@ def ventas_admin():
     """)
     inmuebles_vendidos = cur.fetchone()['total']
 
-    # =========================
-    # ÚLTIMAS VENTAS
-    # =========================
     cur.execute("""
         SELECT
             v.id,
@@ -1141,12 +1141,8 @@ def ventas_admin():
         ORDER BY v.fecha DESC
         LIMIT 5
     """)
-
     ultimas_ventas = cur.fetchall()
 
-    # =========================
-    # GRÁFICO
-    # =========================
     cur.execute("""
         SELECT MONTH(fecha) AS mes,
                COUNT(*) AS total
@@ -1155,7 +1151,6 @@ def ventas_admin():
         GROUP BY MONTH(fecha)
         ORDER BY MONTH(fecha)
     """)
-
     ventas_grafico = cur.fetchall()
 
     cur.close()
@@ -1171,13 +1166,11 @@ def ventas_admin():
         inmuebles_vendidos=inmuebles_vendidos,
         ultimas_ventas=ultimas_ventas,
         ventas_grafico=ventas_grafico,
-        pagina=pagina,
-        total_paginas=total_paginas,
         buscar=buscar,
-        metodo_pago=metodo_pago
+        metodo_pago=metodo_pago,
+        pagina=pagina,
+        total_paginas=total_paginas
     )
-
-
 
 @app.route('/completar_pago/<int:id>')
 def completar_pago(id):
@@ -1448,63 +1441,139 @@ def compras_admin():
         compras_grafico=compras_grafico
     )
 
-@app.route('/reportes_admin')
-def reportes_admin():
+@app.route('/proyectos')
+def proyectos_admin():
 
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT *
+        FROM clientes_constructora
+        ORDER BY nombre ASC
+    """)
+
+    clientes = cur.fetchall()
+    buscar = request.args.get('buscar', '')
+    estado = request.args.get('estado', '')
+    pagina = request.args.get('pagina', 1, type=int)
+    por_pagina = 10
+    offset = (pagina - 1) * por_pagina
+
+    query = """
+        SELECT *
+        FROM proyectos_constructora
+        WHERE 1=1
+    """
+
+    valores = []
+
+    if buscar:
+
+        query += """
+            AND (
+                nombre LIKE %s
+                OR descripcion LIKE %s
+                OR tipo_trabajo LIKE %s
+            )
+        """
+
+        busqueda = f"%{buscar}%"
+
+        valores.extend([
+            busqueda,
+            busqueda,
+            busqueda
+        ])
+
+    if estado:
+        query += " AND estado = %s "
+        valores.append(estado)
+
+    query += " ORDER BY id DESC "
+    count_query = """
+        SELECT COUNT(*) AS total
+        FROM proyectos_constructora
+        WHERE 1=1
+    """
+
+    count_valores = []
+
+    if buscar:
+        count_query += """
+            AND (
+                nombre LIKE %s
+                OR descripcion LIKE %s
+                OR tipo_trabajo LIKE %s
+            )
+        """
+
+        busqueda = f"%{buscar}%"
+        count_valores.extend([
+            busqueda,
+            busqueda,
+            busqueda
+        ])
+
+    if estado:
+
+        count_query += " AND estado = %s "
+        count_valores.append(estado)
+
+    cur.execute(count_query, count_valores)
+    total_registros = cur.fetchone()['total']
+
+    total_paginas = (
+        total_registros + por_pagina - 1
+    ) // por_pagina
+    query += " LIMIT %s OFFSET %s "
+
+    valores.extend([
+        por_pagina,
+        offset
+    ])
+
+    cur.execute(query, valores)
+    proyectos = cur.fetchall()
+
+    return render_template(
+        'Proyectos_confi.html',
+        proyectos=proyectos,
+        clientes=clientes,
+        buscar=buscar,
+        estado=estado,
+        pagina=pagina,
+        total_paginas=total_paginas
+        )
+
+
+@app.route('/crear_proyecto', methods=['POST'])
+def crear_proyecto():
+    nombre = request.form['nombre']
+    tipo_trabajo = request.form['tipo_trabajo']
+    descripcion = request.form['descripcion']
+    estado = request.form['estado']
+    cliente_id = request.form['cliente_id']
 
     cur = mysql.connection.cursor()
 
-    # TOTAL INGRESOS
-    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
-    ingresos = cur.fetchone()['total']
-
-    # TOTAL VENTAS REGISTRADAS
-    cur.execute("SELECT COUNT(*) AS total FROM ventas")
-    total_ventas = cur.fetchone()['total']
-
-    # INMUEBLES DISPONIBLES
-    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
-    inmuebles_disponibles = cur.fetchone()['total']
-
-    # ESTADO DE INMUEBLES
+    # Crear proyecto con tipo de trabajo
     cur.execute("""
-        SELECT 
-            COALESCE(SUM(CASE WHEN estado = 'Disponible' THEN 1 ELSE 0 END), 0) AS disponibles,
-            COALESCE(SUM(CASE WHEN estado = 'Reservado' THEN 1 ELSE 0 END), 0) AS reservados,
-            COALESCE(SUM(CASE WHEN estado = 'Vendido' THEN 1 ELSE 0 END), 0) AS vendidos
-        FROM inmuebles
-    """)
-    estado_inmuebles = cur.fetchone()
+        INSERT INTO proyectos_constructora (nombre, tipo_trabajo, descripcion, estado)
+        VALUES (%s, %s, %s, %s)
+    """, (nombre, tipo_trabajo, descripcion, estado))
 
-    # INGRESOS MENSUALES
+    proyecto_id = cur.lastrowid
+
     cur.execute("""
-        SELECT MONTH(fecha) AS mes,
-               COALESCE(SUM(valor_venta), 0) AS ingresos
-        FROM ventas
-        GROUP BY MONTH(fecha)
-        ORDER BY mes
-    """)
-    ingresos_mensuales = cur.fetchall()
+        INSERT INTO cliente_proyecto (cliente_id, proyecto_id)
+        VALUES (%s, %s)
+    """, (cliente_id, proyecto_id))
 
+    mysql.connection.commit()
     cur.close()
 
-    # Como no vas a usar compras, egresos queda vacío
-    egresos_grafico = []
+    flash('Proyecto creado y vinculado al cliente correctamente.', 'success')
+    return redirect(url_for('proyectos_admin'))
 
-    return render_template(
-        'reportes_admin.html',
-        ingresos=ingresos,
-        total_ventas=total_ventas,
-        inmuebles_disponibles=inmuebles_disponibles,
-        ingresos_mensuales=ingresos_mensuales,
-
-        # Estos nombres los dejo para que el HTML no dé error con tojson
-        estado_inmuebles=estado_inmuebles,
-        ingresos_grafico=ingresos_mensuales,
-        egresos_grafico=egresos_grafico
-    )
 
 @app.route('/editar_proyecto/<int:id>', methods=['GET', 'POST'])
 def editar_proyecto(id):
@@ -1589,27 +1658,32 @@ def eliminar_proyecto(id):
 
 @app.route('/inmobiliaria')
 def inmobiliaria_publica():
-        cur = mysql.connection.cursor()
-        
-        cur.execute("""
-        SELECT * FROM inmuebles
+
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM inmuebles
         WHERE estado IN ('Disponible', 'Reservado')
         ORDER BY id DESC
     """)
-        inmuebles_publicos = cur.fetchall()
-        
-        for inmueble in inmuebles_publicos:
-            cur.execute("""
-            SELECT * FROM inmueble_multimedia
+
+    inmuebles_publicos = cur.fetchall()
+
+    for inmueble in inmuebles_publicos:
+
+        cur.execute("""
+            SELECT *
+            FROM inmueble_multimedia
             WHERE inmueble_id = %s
             ORDER BY id ASC
         """, (inmueble['id'],))
 
         inmueble['galeria'] = cur.fetchall()
-        
-        cur.close()
-        
-        return render_template(
+
+    cur.close()
+
+    return render_template(
         'inmobiliaria_publica.html',
         inmuebles_publicos=inmuebles_publicos
     )
@@ -2202,7 +2276,7 @@ def servicios_constructivos():
         })
 
     return render_template(
-        'servicios_constructivos.html',
+        'servicios_Constructivos.html',
         total_proyectos=total_proyectos,
         obras_civiles=obras_civiles,
         diseño_estructural=diseño_estructural,
@@ -2210,138 +2284,6 @@ def servicios_constructivos():
         consultoria=consultoria,
         servicios=servicios
     )
-
-@app.route('/proyectos')
-def proyectos_admin():
-
-    cur = mysql.connection.cursor()
-    cur.execute("""
-        SELECT *
-        FROM clientes_constructora
-        ORDER BY nombre ASC
-    """)
-
-    clientes = cur.fetchall()
-    buscar = request.args.get('buscar', '')
-    estado = request.args.get('estado', '')
-    pagina = request.args.get('pagina', 1, type=int)
-    por_pagina = 10
-    offset = (pagina - 1) * por_pagina
-
-    query = """
-        SELECT *
-        FROM proyectos_constructora
-        WHERE 1=1
-    """
-
-    valores = []
-
-    if buscar:
-
-        query += """
-            AND (
-                nombre LIKE %s
-                OR descripcion LIKE %s
-                OR tipo_trabajo LIKE %s
-            )
-        """
-
-        busqueda = f"%{buscar}%"
-
-        valores.extend([
-            busqueda,
-            busqueda,
-            busqueda
-        ])
-
-    if estado:
-        query += " AND estado = %s "
-        valores.append(estado)
-
-    query += " ORDER BY id DESC "
-    count_query = """
-        SELECT COUNT(*) AS total
-        FROM proyectos_constructora
-        WHERE 1=1
-    """
-
-    count_valores = []
-
-    if buscar:
-        count_query += """
-            AND (
-                nombre LIKE %s
-                OR descripcion LIKE %s
-                OR tipo_trabajo LIKE %s
-            )
-        """
-
-        busqueda = f"%{buscar}%"
-        count_valores.extend([
-            busqueda,
-            busqueda,
-            busqueda
-        ])
-
-    if estado:
-
-        count_query += " AND estado = %s "
-        count_valores.append(estado)
-
-    cur.execute(count_query, count_valores)
-    total_registros = cur.fetchone()['total']
-
-    total_paginas = (
-        total_registros + por_pagina - 1
-    ) // por_pagina
-    query += " LIMIT %s OFFSET %s "
-
-    valores.extend([
-        por_pagina,
-        offset
-    ])
-
-    cur.execute(query, valores)
-    proyectos = cur.fetchall()
-
-    return render_template(
-        'Proyectos_confi.html',
-        proyectos=proyectos,
-        clientes=clientes,
-        buscar=buscar,
-        estado=estado,
-        pagina=pagina,
-        total_paginas=total_paginas
-        )
-
-@app.route('/crear_proyecto', methods=['POST'])
-def crear_proyecto():
-    nombre = request.form['nombre']
-    tipo_trabajo = request.form['tipo_trabajo']
-    descripcion = request.form['descripcion']
-    estado = request.form['estado']
-    cliente_id = request.form['cliente_id']
-
-    cur = mysql.connection.cursor()
-
-    # Crear proyecto con tipo de trabajo
-    cur.execute("""
-        INSERT INTO proyectos_constructora (nombre, tipo_trabajo, descripcion, estado)
-        VALUES (%s, %s, %s, %s)
-    """, (nombre, tipo_trabajo, descripcion, estado))
-
-    proyecto_id = cur.lastrowid
-
-    cur.execute("""
-        INSERT INTO cliente_proyecto (cliente_id, proyecto_id)
-        VALUES (%s, %s)
-    """, (cliente_id, proyecto_id))
-
-    mysql.connection.commit()
-    cur.close()
-
-    flash('Proyecto creado y vinculado al cliente correctamente.', 'success')
-    return redirect(url_for('proyectos_admin'))
 
 @app.route('/reporte_pdf')
 def reporte_pdf():
@@ -2507,6 +2449,63 @@ def reporte_pdf():
 
     return response
 
+@app.route('/reportes_admin')
+def reportes_admin():
+
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+
+    # TOTAL INGRESOS
+    cur.execute("SELECT COALESCE(SUM(valor_venta), 0) AS total FROM ventas")
+    ingresos = cur.fetchone()['total']
+
+    # TOTAL VENTAS REGISTRADAS
+    cur.execute("SELECT COUNT(*) AS total FROM ventas")
+    total_ventas = cur.fetchone()['total']
+
+    # INMUEBLES DISPONIBLES
+    cur.execute("SELECT COUNT(*) AS total FROM inmuebles WHERE estado = 'Disponible'")
+    inmuebles_disponibles = cur.fetchone()['total']
+
+    # ESTADO DE INMUEBLES
+    cur.execute("""
+        SELECT 
+            COALESCE(SUM(CASE WHEN estado = 'Disponible' THEN 1 ELSE 0 END), 0) AS disponibles,
+            COALESCE(SUM(CASE WHEN estado = 'Reservado' THEN 1 ELSE 0 END), 0) AS reservados,
+            COALESCE(SUM(CASE WHEN estado = 'Vendido' THEN 1 ELSE 0 END), 0) AS vendidos
+        FROM inmuebles
+    """)
+    estado_inmuebles = cur.fetchone()
+
+    # INGRESOS MENSUALES
+    cur.execute("""
+        SELECT MONTH(fecha) AS mes,
+               COALESCE(SUM(valor_venta), 0) AS ingresos
+        FROM ventas
+        GROUP BY MONTH(fecha)
+        ORDER BY mes
+    """)
+    ingresos_mensuales = cur.fetchall()
+
+    cur.close()
+
+    # Como no vas a usar compras, egresos queda vacío
+    egresos_grafico = []
+
+    return render_template(
+        'reportes_admin.html',
+        ingresos=ingresos,
+        total_ventas=total_ventas,
+        inmuebles_disponibles=inmuebles_disponibles,
+        ingresos_mensuales=ingresos_mensuales,
+
+        # Estos nombres los dejo para que el HTML no dé error con tojson
+        estado_inmuebles=estado_inmuebles,
+        ingresos_grafico=ingresos_mensuales,
+        egresos_grafico=egresos_grafico
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

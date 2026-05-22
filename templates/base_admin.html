@@ -7,7 +7,7 @@
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="shortcut icon" href="../static/imagenes/LogoCivi.png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='imagenes/LogoCivi.png') }}">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/admin.css') }}">
 
@@ -20,7 +20,7 @@
 <header class="admin-header">
 
     <div class="admin-logo">
-        <img src="{{ url_for('static', filename='Imagenes/Civi.png') }}"
+        <img src="{{ url_for('static', filename='imagenes/Civi.png') }}"
              alt="CiviWeb Manager">
     </div>
 

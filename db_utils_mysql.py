@@ -17,19 +17,15 @@ def init_mysql_db(mysql):
         activo TINYINT DEFAULT 1
     )''')
 
-    cur.execute("SHOW COLUMNS FROM usuarios LIKE 'activo'")
-    columna_activo = cur.fetchone()
-
-    if not columna_activo:
-        cur.execute("ALTER TABLE usuarios ADD COLUMN activo TINYINT DEFAULT 1")
-
     mysql.connection.commit()
     cur.close()
 
 def add_usuario_mysql(mysql, username, password_hash, email, rol='usuario'):
     cur = mysql.connection.cursor()
-    cur.execute('INSERT INTO usuarios (username, password_hash, email, rol) VALUES (%s, %s, %s, %s)',
-                (username, password_hash, email, rol))
+    cur.execute(
+        'INSERT INTO usuarios (username, password_hash, email, rol, activo) VALUES (%s, %s, %s, %s, %s)',
+        (username, password_hash, email, rol, 1)
+    )
     mysql.connection.commit()
     cur.close()
 

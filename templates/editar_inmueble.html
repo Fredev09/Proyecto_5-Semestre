@@ -35,9 +35,9 @@
 
     <div class="preview-box">
         {% if inmueble.imagen %}
-            <img class="imagen-preview" src="{{ url_for('static', filename='Imagenes/' ~ inmueble.imagen) }}" alt="{{ inmueble.titulo }}">
+            <img class="imagen-preview" src="{{ url_for('static', filename='imagenes/' ~ inmueble.imagen) }}" alt="{{ inmueble.titulo }}">
         {% else %}
-            <img class="imagen-preview" src="{{ url_for('static', filename='Imagenes/Civi.png') }}" alt="Sin imagen">
+            <img class="imagen-preview" src="{{ url_for('static', filename='imagenes/Civi.png') }}" alt="Sin imagen">
         {% endif %}
 
         <div class="preview-info">
@@ -114,10 +114,10 @@
                     <div class="galeria-item">
                         {% if item.tipo == 'video' %}
                             <video controls>
-                                <source src="{{ url_for('static', filename='Imagenes/' ~ item.archivo) }}" type="video/mp4">
+                                <source src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}" type="video/mp4">
                             </video>
                         {% else %}
-                            <img src="{{ url_for('static', filename='Imagenes/' ~ item.archivo) }}" alt="Galería">
+                            <img src="{{ url_for('static', filename='imagenes/' ~ item.archivo) }}" alt="Galería">
                         {% endif %}
 
                         <a href="#"
