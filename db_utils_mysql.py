@@ -6,14 +6,23 @@ def get_mysql():
 
 def init_mysql_db(mysql):
     cur = mysql.connection.cursor()
+
     cur.execute('''CREATE TABLE IF NOT EXISTS usuarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
         rol VARCHAR(20) NOT NULL DEFAULT 'usuario',
-        email_confirmado TINYINT DEFAULT 0
+        email_confirmado TINYINT DEFAULT 0,
+        activo TINYINT DEFAULT 1
     )''')
+
+    cur.execute("SHOW COLUMNS FROM usuarios LIKE 'activo'")
+    columna_activo = cur.fetchone()
+
+    if not columna_activo:
+        cur.execute("ALTER TABLE usuarios ADD COLUMN activo TINYINT DEFAULT 1")
+
     mysql.connection.commit()
     cur.close()
 
@@ -38,14 +47,20 @@ def set_email_confirmado_mysql(mysql, email):
 
 def get_usuario_by_username_mysql(mysql, username):
     cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM usuarios WHERE username = %s', (username,))
+    cur.execute(
+        'SELECT id, username, password_hash, email, rol, email_confirmado, activo FROM usuarios WHERE username = %s',
+        (username,)
+    )
     user = cur.fetchone()
     cur.close()
     return user
 
 def get_usuario_by_email_mysql(mysql, email):
     cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM usuarios WHERE email = %s', (email,))
+    cur.execute(
+        'SELECT id, username, password_hash, email, rol, email_confirmado, activo FROM usuarios WHERE email = %s',
+        (email,)
+    )
     user = cur.fetchone()
     cur.close()
     return user

@@ -186,7 +186,7 @@ def login():
 
         if user and check_password_hash(user['password_hash'], password):
 
-            if not user['activo']:
+            if not user.get('activo', True):
                 flash(
                     'Su cuenta ha sido deshabilitada por un administrador.',
                     'danger'
