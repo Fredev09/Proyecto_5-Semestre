@@ -11,6 +11,8 @@ import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 import pymysql
+import cloudinary
+import cloudinary.uploader
 from flask import make_response
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -35,6 +37,11 @@ from db_utils_mysql import (
 )
 
 load_dotenv()
+
+cloudinary.config(
+    secure=True
+)
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -83,6 +90,14 @@ def imagen_permitida(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def subir_a_cloudinary(archivo, carpeta="civiweb/inmuebles"):
+    resultado = cloudinary.uploader.upload(
+        archivo,
+        folder=carpeta,
+        resource_type="auto"
+    )
+
+    return resultado["secure_url"]
 
 with app.app_context():
     init_mysql_db(mysql)
@@ -666,54 +681,102 @@ def registrar_inmueble():
 
         nombre_imagen = ''
 
+        # Subir imagen principal a Cloudinary
         if archivo_imagen and archivo_imagen.filename != '':
             if not imagen_permitida(archivo_imagen.filename):
                 flash('Formato de imagen no permitido. Usa PNG, JPG, JPEG, WEBP o MP4.', 'danger')
                 return render_template('registrar_inmueble.html', form=request.form)
 
-            nombre_original = secure_filename(archivo_imagen.filename)
-            extension = nombre_original.rsplit('.', 1)[1].lower()
-            nombre_imagen = f"inmueble_{uuid.uuid4().hex}.{extension}"
-
-            ruta_imagen = os.path.join(app.config['UPLOAD_FOLDER'], nombre_imagen)
-            archivo_imagen.save(ruta_imagen)
+            try:
+                nombre_imagen = subir_a_cloudinary(
+                    archivo_imagen,
+                    carpeta="civiweb/inmuebles/principal"
+                )
+            except Exception as e:
+                flash(f'Error al subir la imagen principal: {str(e)}', 'danger')
+                return render_template('registrar_inmueble.html', form=request.form)
 
         cur = mysql.connection.cursor()
-        
-        cur.execute("""
-                    INSERT INTO inmuebles (titulo, tipo, tipo_negocio, ubicacion, precio, estado, descripcion, imagen)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (titulo, tipo, tipo_negocio, ubicacion, precio, estado, descripcion, nombre_imagen))
 
-        inmueble_id = cur.lastrowid
+        try:
+            cur.execute("""
+                INSERT INTO inmuebles (
+                    titulo,
+                    tipo,
+                    tipo_negocio,
+                    ubicacion,
+                    precio,
+                    estado,
+                    descripcion,
+                    imagen
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                titulo,
+                tipo,
+                tipo_negocio,
+                ubicacion,
+                precio,
+                estado,
+                descripcion,
+                nombre_imagen
+            ))
 
-        archivos_galeria = request.files.getlist('galeria')
+            inmueble_id = cur.lastrowid
 
-        for archivo in archivos_galeria:
-            if archivo and archivo.filename != '':
-                if imagen_permitida(archivo.filename):
-                    nombre_original = secure_filename(archivo.filename)
-                    extension = nombre_original.rsplit('.', 1)[1].lower()
-                    nombre_archivo = f"inmueble_{uuid.uuid4().hex}.{extension}"
+            archivos_galeria = request.files.getlist('galeria')
 
-                    ruta_archivo = os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo)
-                    archivo.save(ruta_archivo)
+            # Subir galería a Cloudinary
+            for archivo in archivos_galeria:
+                if archivo and archivo.filename != '':
+                    if not imagen_permitida(archivo.filename):
+                        flash(f'Archivo no permitido en galería: {archivo.filename}', 'danger')
+                        mysql.connection.rollback()
+                        cur.close()
+                        return render_template('registrar_inmueble.html', form=request.form)
+
+                    extension = archivo.filename.rsplit('.', 1)[1].lower()
+
+                    try:
+                        nombre_archivo = subir_a_cloudinary(
+                            archivo,
+                            carpeta="civiweb/inmuebles/galeria"
+                        )
+                    except Exception as e:
+                        flash(f'Error al subir archivo de galería: {str(e)}', 'danger')
+                        mysql.connection.rollback()
+                        cur.close()
+                        return render_template('registrar_inmueble.html', form=request.form)
 
                     tipo_archivo = 'video' if extension == 'mp4' else 'imagen'
 
                     cur.execute("""
-                        INSERT INTO inmueble_multimedia (inmueble_id, archivo, tipo)
+                        INSERT INTO inmueble_multimedia (
+                            inmueble_id,
+                            archivo,
+                            tipo
+                        )
                         VALUES (%s, %s, %s)
-                    """, (inmueble_id, nombre_archivo, tipo_archivo))
+                    """, (
+                        inmueble_id,
+                        nombre_archivo,
+                        tipo_archivo
+                    ))
 
-        mysql.connection.commit()
-        cur.close()
+            mysql.connection.commit()
+
+        except Exception as e:
+            mysql.connection.rollback()
+            flash(f'Error al registrar el inmueble: {str(e)}', 'danger')
+            return render_template('registrar_inmueble.html', form=request.form)
+
+        finally:
+            cur.close()
 
         flash('Inmueble publicado exitosamente con su galería multimedia.', 'success')
         return redirect(url_for('inmuebles'))
 
     return render_template('registrar_inmueble.html')
-
 
 @app.route('/eliminar_multimedia/<int:id>/<int:inmueble_id>')
 def eliminar_multimedia(id, inmueble_id):
