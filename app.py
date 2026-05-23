@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, current_app
 from flask_mysqldb import MySQL
 import random
-from flask_mail import Mail, Message
+import json
+import urllib.request
+import urllib.error
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
@@ -64,16 +66,12 @@ app.config['MYSQL_SSL'] = {'ssl': {}}
 mysql = MySQL(app)
 
 
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'True'
-app.config['MAIL_TIMEOUT'] = 10
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
-
-mail = Mail(app)
+# Brevo API (recomendado en Render Free porque usa HTTPS/443, no SMTP)
+# Variables necesarias en Render:
+# BREVO_API_KEY, BREVO_SENDER_EMAIL, BREVO_SENDER_NAME
+app.config['BREVO_API_KEY'] = os.getenv('BREVO_API_KEY')
+app.config['BREVO_SENDER_EMAIL'] = os.getenv('BREVO_SENDER_EMAIL')
+app.config['BREVO_SENDER_NAME'] = os.getenv('BREVO_SENDER_NAME') or 'CiviWeb Manager'
 
 UPLOAD_FOLDER = os.path.join('static', 'imagenes')
 
@@ -165,22 +163,81 @@ def es_contrasena_segura(password):
 # def enviar_correo_simulado(destino, asunto, cuerpo):
 #     print(f"\n--- Simulación de envío de correo ---\nPara: {destino}\nAsunto: {asunto}\nCuerpo: {cuerpo}\n------------------------------\n")
 
-def enviar_codigo_correo(destinatario, codigo):
-    msg = Message(
-        subject='Verificación de cuenta - Constructora CiviWeb Manager',
-        recipients=[destinatario]
+def enviar_correo_brevo(destinatario, asunto, cuerpo):
+    """Envía correo usando Brevo API por HTTPS.
+
+    Render Free bloquea SMTP 25/465/587, por eso esta función evita Flask-Mail/Gmail SMTP.
+    Retorna True si envía, False si falla, para que la app no muestre pantalla blanca.
+    """
+    api_key = current_app.config.get('BREVO_API_KEY')
+    sender_email = current_app.config.get('BREVO_SENDER_EMAIL')
+    sender_name = current_app.config.get('BREVO_SENDER_NAME') or 'CiviWeb Manager'
+
+    if not api_key:
+        current_app.logger.error('BREVO_API_KEY no está configurada en Render.')
+        return False
+
+    if not sender_email:
+        current_app.logger.error('BREVO_SENDER_EMAIL no está configurado en Render.')
+        return False
+
+    payload = {
+        'sender': {
+            'name': sender_name,
+            'email': sender_email
+        },
+        'to': [
+            {
+                'email': destinatario
+            }
+        ],
+        'subject': asunto,
+        'textContent': cuerpo
+    }
+
+    data = json.dumps(payload).encode('utf-8')
+
+    req = urllib.request.Request(
+        'https://api.brevo.com/v3/smtp/email',
+        data=data,
+        headers={
+            'accept': 'application/json',
+            'api-key': api_key,
+            'content-type': 'application/json'
+        },
+        method='POST'
     )
-    msg.body = f"""
-    Querido usuario,
-    Te damos la bienvenida a Constructora CiviWeb Manager.
-    
-    Para completar tu registro y activar tu cuenta, utiliza el siguiente código de verificación:
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            return 200 <= response.status < 300
+
+    except urllib.error.HTTPError as e:
+        detalle = e.read().decode('utf-8', errors='replace')
+        current_app.logger.exception('Brevo rechazó el correo. Status=%s Body=%s', e.code, detalle)
+        print('ERROR BREVO HTTP:', e.code, detalle)
+        return False
+
+    except Exception as e:
+        current_app.logger.exception('Error enviando correo con Brevo')
+        print('ERROR BREVO:', e)
+        return False
+
+
+def enviar_codigo_correo(destinatario, codigo):
+    asunto = 'Verificación de cuenta - Constructora CiviWeb Manager'
+    cuerpo = f"""
+Querido usuario,
+
+Te damos la bienvenida a Constructora CiviWeb Manager.
+
+Para completar tu registro y activar tu cuenta, utiliza el siguiente código de verificación:
 
 --------------------------------------------------
-        {codigo}
+    {codigo}
 --------------------------------------------------
 
-Este código es personal y tiene una validez limitada. 
+Este código es personal y tiene una validez limitada.
 Por favor, no lo compartas con nadie.
 
 Si no realizaste este registro, puedes ignorar este mensaje.
@@ -189,49 +246,31 @@ Atentamente,
 Equipo Constructora CiviWeb Manager
 """
 
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        current_app.logger.exception("Error enviando correo de confirmación")
-        print("ERROR ENVIANDO CORREO DE CONFIRMACIÓN:", e)
-        return False
+    return enviar_correo_brevo(destinatario, asunto, cuerpo)
 
 
 def enviar_codigo_recuperacion(destinatario, codigo):
-    msg = Message(
-        subject='Recuperación de contraseña - CiviWeb Manager',
-        recipients=[destinatario]
-    )
+    asunto = 'Recuperación de contraseña - CiviWeb Manager'
+    cuerpo = f"""
+Hola,
 
-    msg.body = f"""
-    Hola,
-    
-    Recibimos una solicitud para restablecer tu contraseña en CiviWeb Manager.
-    
-    Tu código de recuperación es:
-    ------------------------------
-    
-    {codigo}
-    ------------------------------
-    Ingresa este código en la plataforma para crear una nueva contraseña.
-    
-    Si no solicitaste este cambio, ignora este correo.
-    
-    Atentamente,
-    
-    Equipo CiviWeb Manager
-    """
+Recibimos una solicitud para restablecer tu contraseña en CiviWeb Manager.
 
-    try:
-        mail.send(msg)
-        return True
-    except Exception as e:
-        current_app.logger.exception("Error enviando correo de recuperación")
-        print("ERROR ENVIANDO CORREO DE RECUPERACIÓN:", e)
-        return False
+Tu código de recuperación es:
+------------------------------
+{codigo}
+------------------------------
 
-    
+Ingresa este código en la plataforma para crear una nueva contraseña.
+
+Si no solicitaste este cambio, ignora este correo.
+
+Atentamente,
+Equipo CiviWeb Manager
+"""
+
+    return enviar_correo_brevo(destinatario, asunto, cuerpo)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -400,7 +439,7 @@ def register():
 
         if not correo_enviado:
             flash(
-                'Usuario creado, pero no se pudo enviar el correo de confirmación. Revisa la configuración SMTP en Render.',
+                'Usuario creado, pero no se pudo enviar el correo de confirmación. Revisa BREVO_API_KEY/BREVO_SENDER_EMAIL en Render.',
                 'danger'
             )
             return redirect(url_for('login'))
@@ -467,7 +506,7 @@ def recover():
             session.pop('usuario_recuperacion', None)
 
             flash(
-                'No se pudo enviar el correo de recuperación. Revisa la configuración SMTP en Render.',
+                'No se pudo enviar el correo de recuperación. Revisa BREVO_API_KEY/BREVO_SENDER_EMAIL en Render.',
                 'danger'
             )
             return render_template('recover.html')
