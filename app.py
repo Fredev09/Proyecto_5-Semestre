@@ -67,7 +67,7 @@ mysql = MySQL(app)
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'False'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'True'
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
@@ -550,6 +550,17 @@ def dashboard():
         inmuebles_disponibles=inmuebles_disponibles,
         ventas_registradas=ventas_registradas,
         usuarios_sistema=usuarios_sistema
+    )
+
+
+@app.route('/dashboard_usuario')
+def dashboard_usuario():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return render_template(
+        'dashboard_usuario.html',
+        usuario=session['usuario'],
+        rol=session.get('rol', 'usuario')
     )
 
 @app.route('/logout')

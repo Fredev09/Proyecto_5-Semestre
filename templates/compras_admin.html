@@ -1,0 +1,62 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Compras{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="page-header">
+        <div>
+            <h1>Compras</h1>
+            <p>Resumen de egresos y proveedores registrados.</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span>Total compras</span>
+            <strong>${{ "{:,.0f}".format(total_compras or 0) }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Proveedores</span>
+            <strong>{{ total_proveedores or 0 }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Compras del mes</span>
+            <strong>{{ compras_mes or 0 }}</strong>
+        </div>
+    </div>
+
+    <section class="table-card">
+        <div class="table-header">
+            <h2>Últimas compras</h2>
+        </div>
+
+        {% if ultimas_compras %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Proveedor</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for compra in ultimas_compras %}
+                    <tr>
+                        <td>{{ compra.fecha }}</td>
+                        <td>{{ compra.concepto }}</td>
+                        <td>{{ compra.proveedor or 'Sin proveedor' }}</td>
+                        <td>${{ "{:,.0f}".format(compra.valor or 0) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-state">No hay compras registradas todavía.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación enviada</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <main class="login-container">
+        <section class="login-card">
+            <img src="{{ url_for('static', filename='imagenes/LOGO.png') }}" alt="LOGO" class="logo">
+            <h1>Revisa tu correo</h1>
+            <p>Te enviamos un código de confirmación. Ingresa el código para activar tu cuenta.</p>
+            <a href="{{ url_for('confirmar_codigo') }}" class="btn-login">Ingresar código</a>
+            <a href="{{ url_for('login') }}" class="link-volver">Volver al login</a>
+        </section>
+    </main>
+</body>
+</html>
